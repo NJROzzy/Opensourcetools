@@ -1,0 +1,114 @@
+// Catalogue of free, open-source tools. Licences reflect each project's
+// repository at time of writing; always verify before building on one.
+window.ATLAS = {
+  disciplines: [
+    { id: "cs", name: "Computer Science" },
+    { id: "ai", name: "Artificial Intelligence" },
+    { id: "ml", name: "Machine Learning" },
+    { id: "robotics", name: "Robotics" },
+  ],
+
+  tools: [
+    // Computer Science — foundations, languages, infrastructure
+    { d: "cs", name: "Linux", kind: "Operating system", license: "GPL-2.0", url: "https://kernel.org", desc: "The kernel beneath nearly every server, robot, and research cluster." },
+    { d: "cs", name: "Git", kind: "Version control", license: "GPL-2.0", url: "https://git-scm.com", desc: "Distributed version control — the ledger of every serious project." },
+    { d: "cs", name: "Python", kind: "Language", license: "PSF", url: "https://www.python.org", desc: "The lingua franca of research code, data work, and AI." },
+    { d: "cs", name: "Rust", kind: "Language", license: "MIT / Apache-2.0", url: "https://www.rust-lang.org", desc: "Memory-safe systems programming without a garbage collector." },
+    { d: "cs", name: "LLVM", kind: "Compiler infrastructure", license: "Apache-2.0", url: "https://llvm.org", desc: "Modular compiler toolchain behind Clang, Rust, Swift and ML compilers." },
+    { d: "cs", name: "VS Code (Code OSS)", kind: "Editor", license: "MIT", url: "https://github.com/microsoft/vscode", desc: "The open-source core of the most widely used code editor." },
+    { d: "cs", name: "Neovim", kind: "Editor", license: "Apache-2.0", url: "https://neovim.io", desc: "Hyper-extensible, keyboard-driven editing with built-in LSP." },
+    { d: "cs", name: "Docker Engine (Moby)", kind: "Containers", license: "Apache-2.0", url: "https://mobyproject.org", desc: "Package software and its environment into reproducible containers." },
+    { d: "cs", name: "Kubernetes", kind: "Orchestration", license: "Apache-2.0", url: "https://kubernetes.io", desc: "Schedule and scale containerised workloads across machines." },
+    { d: "cs", name: "PostgreSQL", kind: "Database", license: "PostgreSQL", url: "https://www.postgresql.org", desc: "The rigorous relational database; with pgvector, a vector store too." },
+    { d: "cs", name: "SQLite", kind: "Database", license: "Public domain", url: "https://sqlite.org", desc: "A full SQL engine in a single file — embedded everywhere." },
+    { d: "cs", name: "Valkey", kind: "In-memory store", license: "BSD-3-Clause", url: "https://valkey.io", desc: "Community-governed key-value store for caching, queues and pub/sub." },
+    { d: "cs", name: "Grafana", kind: "Observability", license: "AGPL-3.0", url: "https://grafana.com/oss/grafana/", desc: "Dashboards and alerting over metrics, logs and traces." },
+
+    // Artificial Intelligence — models, inference, agents
+    { d: "ai", name: "Hugging Face Transformers", kind: "Model library", license: "Apache-2.0", url: "https://github.com/huggingface/transformers", desc: "Thousands of pretrained models for text, vision, audio and more." },
+    { d: "ai", name: "llama.cpp", kind: "Local inference", license: "MIT", url: "https://github.com/ggml-org/llama.cpp", desc: "Run large language models on CPUs, laptops and edge devices." },
+    { d: "ai", name: "Ollama", kind: "Local inference", license: "MIT", url: "https://github.com/ollama/ollama", desc: "One command to pull and serve open-weight models locally." },
+    { d: "ai", name: "vLLM", kind: "Serving", license: "Apache-2.0", url: "https://github.com/vllm-project/vllm", desc: "High-throughput LLM serving with PagedAttention." },
+    { d: "ai", name: "LangChain", kind: "Agent framework", license: "MIT", url: "https://github.com/langchain-ai/langchain", desc: "Compose models, tools and memory into LLM applications." },
+    { d: "ai", name: "LlamaIndex", kind: "Retrieval (RAG)", license: "MIT", url: "https://github.com/run-llama/llama_index", desc: "Connect your documents and data to language models." },
+    { d: "ai", name: "Model Context Protocol", kind: "Agent standard", license: "MIT", url: "https://modelcontextprotocol.io", desc: "An open protocol for wiring AI agents to tools and data sources." },
+    { d: "ai", name: "Whisper", kind: "Speech recognition", license: "MIT", url: "https://github.com/openai/whisper", desc: "Robust multilingual speech-to-text, runnable offline." },
+    { d: "ai", name: "ComfyUI", kind: "Image generation", license: "GPL-3.0", url: "https://github.com/comfyanonymous/ComfyUI", desc: "Node-graph workbench for diffusion and generative pipelines." },
+    { d: "ai", name: "OLMo (AI2)", kind: "Fully open model", license: "Apache-2.0", url: "https://allenai.org/olmo", desc: "Open weights, open data, open training code — a model you can study end to end." },
+    { d: "ai", name: "Qwen", kind: "Open-weight models", license: "Apache-2.0 (most)", url: "https://github.com/QwenLM", desc: "Capable open-weight language and vision models in many sizes." },
+    { d: "ai", name: "Mistral (open models)", kind: "Open-weight models", license: "Apache-2.0 (select)", url: "https://github.com/mistralai", desc: "Efficient European open-weight models; check each model's licence." },
+
+    // Machine Learning — frameworks, data, experiment tooling
+    { d: "ml", name: "PyTorch", kind: "Deep learning", license: "BSD-3-Clause", url: "https://pytorch.org", desc: "The dominant research framework for neural networks." },
+    { d: "ml", name: "JAX", kind: "Deep learning", license: "Apache-2.0", url: "https://github.com/jax-ml/jax", desc: "Composable transforms — grad, jit, vmap — for numerical research." },
+    { d: "ml", name: "TensorFlow", kind: "Deep learning", license: "Apache-2.0", url: "https://www.tensorflow.org", desc: "Production-grade ML with mobile and edge deployment via LiteRT." },
+    { d: "ml", name: "Keras", kind: "High-level API", license: "Apache-2.0", url: "https://keras.io", desc: "Readable model building that runs atop JAX, PyTorch or TensorFlow." },
+    { d: "ml", name: "scikit-learn", kind: "Classical ML", license: "BSD-3-Clause", url: "https://scikit-learn.org", desc: "The reference toolkit for regression, classification and clustering." },
+    { d: "ml", name: "XGBoost", kind: "Gradient boosting", license: "Apache-2.0", url: "https://xgboost.ai", desc: "Winning baseline for tabular data, at scale." },
+    { d: "ml", name: "LightGBM", kind: "Gradient boosting", license: "MIT", url: "https://github.com/microsoft/LightGBM", desc: "Fast, memory-lean boosting on large tabular datasets." },
+    { d: "ml", name: "NumPy", kind: "Numerics", license: "BSD-3-Clause", url: "https://numpy.org", desc: "N-dimensional arrays — the bedrock of scientific Python." },
+    { d: "ml", name: "Polars", kind: "DataFrames", license: "MIT", url: "https://pola.rs", desc: "Lightning-fast columnar DataFrames written in Rust." },
+    { d: "ml", name: "pandas", kind: "DataFrames", license: "BSD-3-Clause", url: "https://pandas.pydata.org", desc: "The classic toolkit for wrangling tabular data." },
+    { d: "ml", name: "Jupyter", kind: "Notebooks", license: "BSD-3-Clause", url: "https://jupyter.org", desc: "Executable research notebooks mixing code, prose and plots." },
+    { d: "ml", name: "MLflow", kind: "Experiment tracking", license: "Apache-2.0", url: "https://mlflow.org", desc: "Track runs, register models and reproduce results." },
+    { d: "ml", name: "DVC", kind: "Data versioning", license: "Apache-2.0", url: "https://dvc.org", desc: "Git-style versioning for datasets and pipelines." },
+    { d: "ml", name: "Ray", kind: "Distributed compute", license: "Apache-2.0", url: "https://www.ray.io", desc: "Scale training, tuning and serving from a laptop to a cluster." },
+    { d: "ml", name: "ONNX Runtime", kind: "Inference", license: "MIT", url: "https://onnxruntime.ai", desc: "Portable, accelerated inference across hardware." },
+
+    // Robotics — middleware, simulation, perception, control
+    { d: "robotics", name: "ROS 2", kind: "Middleware", license: "Apache-2.0", url: "https://www.ros.org", desc: "The standard nervous system for robot software." },
+    { d: "robotics", name: "Gazebo", kind: "Simulation", license: "Apache-2.0", url: "https://gazebosim.org", desc: "Physics simulation of robots and worlds, tightly paired with ROS 2." },
+    { d: "robotics", name: "MuJoCo", kind: "Physics engine", license: "Apache-2.0", url: "https://mujoco.org", desc: "Fast, accurate contact dynamics for control and RL research." },
+    { d: "robotics", name: "PyBullet", kind: "Physics engine", license: "zlib", url: "https://pybullet.org", desc: "Lightweight Python physics for prototyping and learning." },
+    { d: "robotics", name: "Genesis", kind: "Simulation", license: "Apache-2.0", url: "https://github.com/Genesis-Embodied-AI/Genesis", desc: "GPU-parallel generative physics platform for embodied AI." },
+    { d: "robotics", name: "Webots", kind: "Simulation", license: "Apache-2.0", url: "https://cyberbotics.com", desc: "Friendly desktop robot simulator with a large model library." },
+    { d: "robotics", name: "MoveIt 2", kind: "Motion planning", license: "BSD-3-Clause", url: "https://moveit.ai", desc: "Manipulation, kinematics and collision-aware motion planning." },
+    { d: "robotics", name: "Nav2", kind: "Navigation", license: "Apache-2.0", url: "https://nav2.org", desc: "Autonomous navigation stack for mobile robots on ROS 2." },
+    { d: "robotics", name: "Drake", kind: "Modelling & control", license: "BSD-3-Clause", url: "https://drake.mit.edu", desc: "Model-based design, optimisation and verification of robots." },
+    { d: "robotics", name: "LeRobot", kind: "Robot learning", license: "Apache-2.0", url: "https://github.com/huggingface/lerobot", desc: "Datasets, policies and tools for end-to-end learned robotics." },
+    { d: "robotics", name: "OpenCV", kind: "Computer vision", license: "Apache-2.0", url: "https://opencv.org", desc: "Two decades of vision algorithms — cameras, calibration, tracking." },
+    { d: "robotics", name: "PX4", kind: "Flight control", license: "BSD-3-Clause", url: "https://px4.io", desc: "Autopilot firmware for drones and autonomous vehicles." },
+    { d: "robotics", name: "ArduPilot", kind: "Flight control", license: "GPL-3.0", url: "https://ardupilot.org", desc: "Battle-tested autopilot for copters, planes, rovers and boats." },
+  ],
+
+  trends: [
+    {
+      title: "Agentic AI and open tool protocols",
+      body: "Language models are moving from chat to action: agents that plan, call tools and operate software. Open standards such as the Model Context Protocol let any agent reach any tool, without vendor lock-in.",
+      tools: ["Model Context Protocol", "LangChain", "LlamaIndex"],
+    },
+    {
+      title: "Open-weight models closing the gap",
+      body: "Openly released models now rival closed systems on many benchmarks, and fully open efforts publish their data and training code too — making genuine reproducibility possible in AI research.",
+      tools: ["OLMo (AI2)", "Qwen", "Mistral (open models)", "Hugging Face Transformers"],
+    },
+    {
+      title: "Local and edge inference",
+      body: "Quantisation and efficient runtimes put capable models on laptops, phones and robots — private by default, and free of per-token cost.",
+      tools: ["llama.cpp", "Ollama", "ONNX Runtime"],
+    },
+    {
+      title: "Vision-language-action models for robots",
+      body: "The methods behind language models are being applied to embodiment: policies that map camera pixels and instructions directly to motor commands, trained on shared open datasets.",
+      tools: ["LeRobot", "PyTorch", "OpenCV"],
+    },
+    {
+      title: "Simulation-first robotics",
+      body: "GPU-parallel simulators train thousands of robot instances at once, then transfer the policy to hardware — sim-to-real has become the default workflow for humanoids and manipulators.",
+      tools: ["MuJoCo", "Genesis", "Gazebo", "ROS 2"],
+    },
+    {
+      title: "Retrieval inside the database",
+      body: "Rather than separate vector stores, teams increasingly keep embeddings beside their relational data, simplifying retrieval-augmented systems.",
+      tools: ["PostgreSQL", "SQLite", "LlamaIndex"],
+    },
+  ],
+
+  // Live headline topics, queried against the Hacker News Algolia API.
+  wire: [
+    { id: "ai", name: "AI", query: "AI" },
+    { id: "ml", name: "Machine Learning", query: "machine learning" },
+    { id: "robotics", name: "Robotics", query: "robot" },
+    { id: "oss", name: "Open Source", query: "open source" },
+  ],
+};
