@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AmalgambyNJR — Open Source Atlas</title>
+  <meta name="description" content="A research-style atlas of free, open-source tools for building real projects in Computer Science, Artificial Intelligence, Machine Learning and Robotics — with live trends." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23000'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' dominant-baseline='middle' font-family='serif' font-style='italic' font-size='44' fill='%23fff'%3EA%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+  <canvas id="field" aria-hidden="true"></canvas>
+
+  <header class="masthead">
+    <div class="wrap bar">
+      <a class="mark" href="#top">Amalgam<span>by NJR</span></a>
+      <nav>
+        <a href="#atlas">Atlas</a>
+        <a href="#trends">Trends</a>
+        <a href="#wire">Live Wire</a>
+        <a href="#method">Method</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero wrap">
+      <p class="eyebrow">Vol. I &nbsp;·&nbsp; An Open Source Atlas &nbsp;·&nbsp; <span id="today"></span></p>
+      <h1>Amalgam</h1>
+      <p class="lede">
+        A field guide to the <em>free and open-source</em> instruments with which one may build
+        a proper project in <strong>Computer Science</strong>, <strong>Artificial Intelligence</strong>,
+        <strong>Machine Learning</strong> and <strong>Robotics</strong> — catalogued, annotated,
+        and read against the currents of the day.
+      </p>
+      <div class="stats" id="stats"></div>
+    </section>
+
+    <section id="atlas" class="wrap section">
+      <div class="section-head">
+        <span class="num">§ 1</span>
+        <h2>The Atlas</h2>
+        <p class="sub">Every entry is free to use and published under an open licence. Filter by discipline or search by name, purpose, or licence.</p>
+      </div>
+
+      <div class="controls">
+        <div class="tabs" id="tabs" role="tablist"></div>
+        <label class="search">
+          <span class="sr">Search tools</span>
+          <input id="q" type="search" placeholder="search — e.g. simulation, LLM, MIT…" autocomplete="off" />
+        </label>
+      </div>
+
+      <div id="atlas-grid" class="grid"></div>
+      <p id="empty" class="empty" hidden>No instrument matches that inquiry.</p>
+    </section>
+
+    <section id="trends" class="wrap section">
+      <div class="section-head">
+        <span class="num">§ 2</span>
+        <h2>Currents &amp; Trends</h2>
+        <p class="sub">The movements shaping open tooling right now, and which instruments in the Atlas they touch.</p>
+      </div>
+      <ol class="trends" id="trend-list"></ol>
+    </section>
+
+    <section id="wire" class="wrap section">
+      <div class="section-head">
+        <span class="num">§ 3</span>
+        <h2>The Live Wire</h2>
+        <p class="sub">Freshly published headlines, pulled live from the Hacker News index each time this page loads.</p>
+      </div>
+      <div class="tabs" id="wire-tabs" role="tablist"></div>
+      <ul class="wire" id="wire-list" aria-live="polite"></ul>
+    </section>
+
+    <section id="method" class="wrap section">
+      <div class="section-head">
+        <span class="num">§ 4</span>
+        <h2>Method</h2>
+      </div>
+      <div class="method">
+        <p><span class="drop">O</span>n inclusion. A tool enters the Atlas only if it can be used at no cost and its source is published under a recognised open licence (MIT, Apache-2.0, BSD, GPL and kin). Open-<em>weight</em> models are noted separately, as their licences vary.</p>
+        <p>On assembly. A proper project is rarely one tool — it is an <em>amalgam</em>. A typical robotics study might braid ROS 2, MuJoCo, PyTorch and OpenCV; a language-model product might braid llama.cpp, LlamaIndex and PostgreSQL with pgvector. Read the Atlas as a set of parts, not a ranking.</p>
+        <p>On currency. Licences change. Always verify the licence file in a project's repository before you build upon it.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <span class="script">Amalgam</span>
+    <span>Compiled by NJR · Black on white on black · <span id="year"></span></span>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
