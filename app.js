@@ -57,6 +57,111 @@
       <div class="chips">${t.tools.map((n) => `<span class="chip">${esc(n)}</span>`).join("")}</div>
     </div></li>`).join("");
 
+  // Amalgam Map — three-set Venn on a Computer Science ground
+  const NS = "http://www.w3.org/2000/svg";
+  const circles = {
+    ai: { cx: 300, cy: 205, r: 168, label: "Artificial Intelligence", lx: 300, ly: 24 },
+    ml: { cx: 213, cy: 352, r: 168, label: "Machine Learning", lx: 20, ly: 552, anchor: "start" },
+    robotics: { cx: 387, cy: 352, r: 168, label: "Robotics", lx: 580, ly: 552, anchor: "end" },
+  };
+  // Label anchors for each region, keyed by its sorted set list
+  const anchors = { ai: [300, 115], ml: [140, 410], robotics: [460, 410], "ai+ml": [222, 258], "ai+robotics": [378, 258], "ml+robotics": [300, 418], "ai+ml+robotics": [300, 308], "": [44, 72] };
+  const regionKey = (sets) => [...sets].sort().join("+");
+  const regions = window.ATLAS.map.map((r) => ({ ...r, key: regionKey(r.sets) }));
+  const svg = $("#venn");
+  const el = (tag, attrs, parent = svg) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    parent.appendChild(n);
+    return n;
+  };
+
+  // Each region is the full plane clipped to its own circles and masked
+  // away from the others.
+  const defs = el("defs", {});
+  for (const [id, c] of Object.entries(circles)) {
+    el("circle", { cx: c.cx, cy: c.cy, r: c.r }, el("clipPath", { id: `clip-${id}` }, defs));
+  }
+  const ground = el("rect", { x: 1, y: 1, width: 598, height: 568, class: "v-ground" });
+  const shapes = {};
+  for (const r of regions) {
+    const mask = el("mask", { id: `mask-${r.key || "cs"}` }, defs);
+    el("rect", { width: 600, height: 570, fill: "#fff" }, mask);
+    for (const id in circles) if (!r.sets.includes(id)) el("circle", { cx: circles[id].cx, cy: circles[id].cy, r: circles[id].r, fill: "#000" }, mask);
+    let g = el("g", { mask: `url(#mask-${r.key || "cs"})`, class: "v-region" });
+    shapes[r.key] = g;
+    for (const id of r.sets) g = el("g", { "clip-path": `url(#clip-${id})` }, g);
+    el("rect", { width: 600, height: 570 }, g);
+  }
+  for (const [id, c] of Object.entries(circles)) {
+    el("circle", { cx: c.cx, cy: c.cy, r: c.r, class: "v-ring", pathLength: 100 });
+    el("text", { x: c.lx, y: c.ly, class: "v-set", "text-anchor": c.anchor || "middle" }).textContent = c.label;
+  }
+  el("text", { x: 20, y: 40, class: "v-set v-cs" }).textContent = "Computer Science";
+  const counts = {};
+  for (const r of regions) {
+    const [x, y] = anchors[r.key];
+    const t = el("text", { x, y, class: "v-count", "text-anchor": r.key ? "middle" : "start" });
+    t.textContent = r.projects.length;
+    counts[r.key] = t;
+  }
+
+  const hit = (x, y) => regionKey(Object.keys(circles).filter((id) => {
+    const c = circles[id];
+    return Math.hypot(x - c.cx, y - c.cy) <= c.r;
+  }));
+  const toSvg = (e) => {
+    const p = svg.createSVGPoint();
+    p.x = e.clientX; p.y = e.clientY;
+    return p.matrixTransform(svg.getScreenCTM().inverse());
+  };
+  let selected = "ai+ml+robotics";
+  let hovered = null;
+  function paint() {
+    for (const k in shapes) {
+      shapes[k].classList.toggle("on", k === selected);
+      shapes[k].classList.toggle("hover", k === hovered && k !== selected);
+      counts[k].classList.toggle("on", k === selected);
+    }
+    keys.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.key === selected));
+  }
+  svg.addEventListener("pointermove", (e) => { const p = toSvg(e); const k = hit(p.x, p.y); if (k !== hovered) { hovered = k; paint(); } });
+  svg.addEventListener("pointerleave", () => { hovered = null; paint(); });
+  svg.addEventListener("click", (e) => { const p = toSvg(e); select(hit(p.x, p.y)); });
+
+  const keys = $("#venn-keys");
+  keys.innerHTML = regions.map((r) => `<button data-key="${r.key}">${esc(r.title)}</button>`).join("");
+  keys.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) select(b.dataset.key); });
+
+  const toolByName = Object.fromEntries(tools.map((t) => [t.name, t]));
+  function select(key) {
+    selected = key;
+    paint();
+    const r = regions.find((x) => x.key === key);
+    $("#venn-panel").innerHTML = `
+      <p class="eyebrow">${r.sets.length ? `${r.sets.length}-way intersection` : "The ground"}</p>
+      <h3 class="vp-title">${esc(r.title)}</h3>
+      <p class="vp-note">${esc(r.note)}</p>
+      <ol class="vp-list">${r.projects.map((p) => `
+        <li>
+          <h4>${esc(p.name)}</h4>
+          <p>${esc(p.desc)}</p>
+          <div class="vp-recipe">${p.tools.map((n) => `<button class="chip" data-tool="${esc(n)}" title="${esc(toolByName[n]?.kind || "")}">${esc(n)}</button>`).join('<span class="plus">+</span>')}</div>
+        </li>`).join("")}
+      </ol>`;
+  }
+  // A recipe chip jumps to that tool in the Atlas
+  $("#venn-panel").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-tool]");
+    if (!b) return;
+    active = "all";
+    tabBar.querySelectorAll("button").forEach((x) => x.setAttribute("aria-selected", x.dataset.id === "all"));
+    $("#q").value = b.dataset.tool;
+    renderAtlas();
+    $("#atlas").scrollIntoView();
+  });
+  select(selected);
+
   // Live wire — Hacker News via Algolia (CORS-enabled, no key needed)
   const wireTabs = $("#wire-tabs");
   const wireList = $("#wire-list");

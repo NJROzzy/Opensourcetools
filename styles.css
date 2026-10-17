@@ -132,6 +132,43 @@ h2 { font-family: var(--serif); font-weight: 400; font-style: italic; font-size:
 .empty { font-style: italic; color: var(--ink-soft); padding: 32px 0; }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
+/* amalgam map */
+.venn { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 40px; align-items: start; }
+@media (max-width: 900px) { .venn { grid-template-columns: 1fr; } }
+.venn-fig { margin: 0; }
+#venn { width: 100%; height: auto; display: block; cursor: crosshair; touch-action: manipulation; }
+.v-ground { fill: rgba(12,12,12,.6); stroke: var(--rule-strong); stroke-dasharray: 2 6; }
+.v-region rect { fill: #fff; fill-opacity: 0; transition: fill-opacity .25s; }
+.v-region.hover rect { fill-opacity: .12; }
+.v-region.on rect { fill-opacity: .92; }
+.v-ring { fill: none; stroke: var(--ink); stroke-width: 1.2; stroke-dasharray: 100; animation: draw 1.6s ease-out both; pointer-events: none; }
+.v-ring:nth-of-type(2) { animation-delay: .2s; }
+.v-ring:nth-of-type(3) { animation-delay: .4s; }
+@keyframes draw { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+.v-set { font-family: var(--mono); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; fill: var(--ink-soft); pointer-events: none; }
+.v-cs { fill: var(--ink-faint); }
+.v-count { font-family: var(--serif); font-style: italic; font-size: 44px; fill: var(--ink); pointer-events: none; dominant-baseline: middle; transition: fill .25s; }
+.v-count.on { fill: var(--paper); }
+.venn-keys { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+.venn-keys button, .vp-recipe .chip {
+  appearance: none; background: transparent; cursor: pointer;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  border: 1px solid var(--rule-strong); color: var(--ink-soft); padding: 5px 9px; transition: background .2s, color .2s;
+}
+.venn-keys button:hover, .vp-recipe .chip:hover { color: var(--ink); border-color: var(--ink); }
+.venn-keys button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.venn-panel { border-left: 1px solid var(--rule-strong); padding-left: 32px; min-height: 420px; }
+@media (max-width: 900px) { .venn-panel { border-left: 0; border-top: 1px solid var(--rule-strong); padding: 24px 0 0; min-height: 0; } }
+.vp-title { font-family: var(--serif); font-weight: 400; font-style: italic; font-size: 38px; line-height: 1.1; margin: 0 0 8px; }
+.vp-note { color: var(--ink-soft); margin: 0 0 20px; }
+.vp-list { list-style: none; margin: 0; padding: 0; counter-reset: p; }
+.vp-list li { counter-increment: p; padding: 18px 0 18px 44px; border-top: 1px solid var(--rule); position: relative; animation: rise .4s both; }
+.vp-list li::before { content: counter(p, lower-roman) "."; position: absolute; left: 0; top: 18px; font-style: italic; color: var(--ink-faint); font-size: 22px; }
+.vp-list h4 { font-family: var(--serif); font-weight: 500; font-size: 24px; margin: 0 0 4px; }
+.vp-list p { margin: 0 0 12px; color: var(--ink-soft); font-size: 17px; }
+.vp-recipe { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.vp-recipe .plus { font-family: var(--mono); color: var(--ink-faint); font-size: 12px; }
+
 /* trends */
 .trends { list-style: none; margin: 0; padding: 0; counter-reset: t; }
 .trends li {
@@ -171,3 +208,7 @@ h2 { font-family: var(--serif); font-weight: 400; font-style: italic; font-size:
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+nav a { white-space: nowrap; }
+@media (max-width: 480px) { nav a[href="#method"] { display: none; } }
+@media (max-width: 640px) { .v-set { font-size: 17px; letter-spacing: .1em; } .v-count { font-size: 52px; } .v-cs { display: none; } }

@@ -104,6 +104,80 @@ window.ATLAS = {
     },
   ],
 
+  // Venn map: each region is a combination of disciplines, with projects
+  // and the Atlas tools (by exact name) that combine to build them.
+  map: [
+    {
+      sets: ["ai"], title: "Artificial Intelligence",
+      note: "Language, speech and generative systems — no learning loop of your own required.",
+      projects: [
+        { name: "Private document assistant", desc: "Chat with your own PDFs and notes, fully offline, using retrieval-augmented generation.", tools: ["Ollama", "LlamaIndex", "PostgreSQL", "Qwen"] },
+        { name: "Meeting transcriber & summariser", desc: "Record, transcribe, then summarise discussions into action items.", tools: ["Whisper", "llama.cpp", "SQLite"] },
+        { name: "Tool-using agent", desc: "An assistant that searches, files tickets and queries databases through open protocol servers.", tools: ["Model Context Protocol", "LangChain", "Ollama"] },
+      ],
+    },
+    {
+      sets: ["ml"], title: "Machine Learning",
+      note: "Learning from data — prediction, analysis and rigorous experimentation.",
+      projects: [
+        { name: "Tabular prediction model", desc: "Forecast churn, prices or risk from structured data with a tracked, reproducible pipeline.", tools: ["pandas", "scikit-learn", "XGBoost", "MLflow"] },
+        { name: "Reproducible research pipeline", desc: "Version data, notebooks and models so every figure in a paper can be regenerated.", tools: ["Jupyter", "DVC", "PyTorch", "Git"] },
+        { name: "Large-scale data analysis", desc: "Explore millions of rows and train boosted models on a single machine.", tools: ["Polars", "LightGBM", "Jupyter"] },
+      ],
+    },
+    {
+      sets: ["robotics"], title: "Robotics",
+      note: "Classical autonomy — perception, planning and control without learned policies.",
+      projects: [
+        { name: "Autonomous mobile robot", desc: "Map a room, localise and navigate around obstacles — first in simulation, then on hardware.", tools: ["ROS 2", "Nav2", "Gazebo"] },
+        { name: "Survey drone mission", desc: "Plan and fly waypoint missions with failsafes, tested in software-in-the-loop.", tools: ["PX4", "ROS 2", "Gazebo"] },
+        { name: "Robot arm motion planner", desc: "Collision-free trajectories for a manipulator, with verified dynamics.", tools: ["MoveIt 2", "Drake", "ROS 2"] },
+      ],
+    },
+    {
+      sets: ["ai", "ml"], title: "AI ∩ Machine Learning",
+      note: "Training and adapting models yourself — where generative AI meets the learning loop.",
+      projects: [
+        { name: "Fine-tune an open model", desc: "Adapt an open-weight language model to your domain, then serve it at speed.", tools: ["Hugging Face Transformers", "PyTorch", "OLMo (AI2)", "vLLM"] },
+        { name: "Custom image generator", desc: "Train a style adapter and compose a reusable generation workflow.", tools: ["ComfyUI", "PyTorch", "Hugging Face Transformers"] },
+        { name: "Evaluated RAG system", desc: "Measure retrieval and answer quality across experiments, not by vibes.", tools: ["LlamaIndex", "MLflow", "Qwen", "PostgreSQL"] },
+      ],
+    },
+    {
+      sets: ["ml", "robotics"], title: "ML ∩ Robotics",
+      note: "Learning to move and see — reinforcement learning and perception for machines.",
+      projects: [
+        { name: "Legged locomotion via RL", desc: "Train a walking policy across thousands of parallel simulated robots.", tools: ["MuJoCo", "JAX", "Ray"] },
+        { name: "Vision-guided pick & place", desc: "Detect objects with a trained network and plan grasps for an arm.", tools: ["OpenCV", "PyTorch", "MoveIt 2", "ROS 2"] },
+        { name: "Edge perception on a rover", desc: "Run a compact detector on-board for obstacle and lane awareness.", tools: ["ONNX Runtime", "OpenCV", "Nav2"] },
+      ],
+    },
+    {
+      sets: ["ai", "robotics"], title: "AI ∩ Robotics",
+      note: "Robots you can talk to — language models as the interface and planner.",
+      projects: [
+        { name: "Voice-commanded robot", desc: "Speak a goal; the robot transcribes, reasons, and dispatches a navigation task.", tools: ["Whisper", "Ollama", "ROS 2", "Nav2"] },
+        { name: "Agent-operated lab robot", desc: "Expose robot actions as protocol tools so an AI agent can run experiments.", tools: ["Model Context Protocol", "ROS 2", "MoveIt 2"] },
+      ],
+    },
+    {
+      sets: ["ai", "ml", "robotics"], title: "AI ∩ ML ∩ Robotics",
+      note: "The frontier: embodied foundation models that see, read and act.",
+      projects: [
+        { name: "Vision-language-action robot", desc: "Collect demonstrations, train a policy that maps camera + instruction to motion, deploy on a low-cost arm.", tools: ["LeRobot", "PyTorch", "Hugging Face Transformers", "MuJoCo", "ROS 2"] },
+        { name: "Sim-to-real humanoid skills", desc: "Generate diverse simulated worlds, train at scale, and transfer behaviours to hardware.", tools: ["Genesis", "PyTorch", "Ray", "ROS 2"] },
+      ],
+    },
+    {
+      sets: [], title: "Computer Science — the ground",
+      note: "Every region above stands on this. These tools ship, scale and observe whatever you build.",
+      projects: [
+        { name: "Self-hosted deployment platform", desc: "Containerise any project above, orchestrate it, and watch it in production.", tools: ["Docker Engine (Moby)", "Kubernetes", "Grafana", "Linux"] },
+        { name: "High-performance core library", desc: "Rewrite a hot path in a memory-safe systems language and bind it to Python.", tools: ["Rust", "LLVM", "Python"] },
+      ],
+    },
+  ],
+
   // Live headline topics, queried against the Hacker News Algolia API.
   wire: [
     { id: "ai", name: "AI", query: "AI" },
