@@ -42,6 +42,10 @@ The design is futuristic and monochrome, with black and white throughout and onl
 | **§6 Method** | How tools were chosen: open-source licences only, no paid plans, and open community forks where a project left open source. |
 | **§7 The Atlas** | The full catalogue at the bottom: 141 open-source tools with logos, licences and domains. Filter by domain or search; every card opens the tool drawer. |
 
+**Architecture graphs.** Every project and every build path can be opened as a connected architecture graph, much like a node-graph editor. Layers are nodes ranked left to right by how they connect: "calls", "reads & writes", "verifies with", "deploys to" and so on, defined for all 11 paths. Tools sit inside their layers, and animated lines show how they connect. Search, *Connections*, *Collapse*, *Empty layers*, *Fit*, zoom (Ctrl/⌘ + scroll, pinch, or the buttons) and drag-to-pan are all there. Remove a tool with ×, add one from a layer's *+ add tool* (best fits first) or from *Add any tool*, compare against the original (*+2 added · −1 removed*, *Reset*), then *Open in Studio*. The Studio has the same graph as a *Graph* view of your board, alongside the grid, with *Undo*. On narrow screens the graph flows top to bottom, two layers per row.
+
+![Architecture graph](docs/graph.png)
+
 Clicking a tool anywhere on the site opens a drawer with its licence, domains, its layer in each build path, and every project that uses it.
 
 **Live Wire pop-up.** A rotating half-circle on the right edge of the screen, with *LIVE NEWS* circling it, a radar sweep and a glowing core, opens a compact pop-up that unfolds out of it with live headlines from the Hacker News index. You can also open it from *Live news* in the nav; Esc or a click outside closes it. It covers All, AI, Machine Learning, Robotics, Security, Networking, Databases, Distributed, Hardware, Quantum and Open Source, and refreshes every minute while the page is visible. Headlines that arrive between refreshes are marked **NEW**, and while the pop-up is closed the half-circle shows a count of unread headlines. On phones the half-circle sits in the bottom-right corner.
@@ -102,7 +106,8 @@ Plain **HTML, CSS and vanilla JavaScript**, with no framework and no build step.
 ├── index.html   # Page structure and sections
 ├── styles.css   # Monochrome, research-style design
 ├── data.js      # Domains, build tracks, architectures, tools, projects, chains, trends, map presets, news topics
-├── app.js       # Atlas filtering, Venn map, chains, live wire, background animation
+├── app.js       # Paths, Studio, map, chains, drawers, live news, background animation
+├── graph.js     # Pannable, zoomable architecture graph (layers, tools, connections)
 ├── logos/       # Self-hosted tool logos
 └── docs/        # README screenshots
 ```
@@ -123,7 +128,7 @@ All content lives in **`data.js`**.
 - **Domains:** `hardware`, `software`, `computation`, `networks`, `data`, `distributed`, `security`, `ai`, `ml`, `robotics`, `emerging`.
 - **Add a tool:** append to `tools` with `domains` (primary first, then any others it serves), `name`, `logo`, `kind`, `license`, `url` and `desc`. Set `foundation: true` for tools every project relies on; they sit on the map's ground when none of their domains is chosen.
 - **Add a project:** append to `projects` with its `track` (build path), `name`, a `short` label for the map, its `domains`, `desc` and `tools`. Tool names must exactly match a tool's `name`. The path, the drawer and the map pick it up automatically.
-- **Edit an architecture:** each build path's common path lives in `architectures[track].stages` as `{ name, role, tools }`, in order.
+- **Edit an architecture:** each build path's common path lives in `architectures[track].stages` as `{ name, role, tools }`, in order, and `architectures[track].links` lists how layers connect as `[from, to, "what it does"]`. Links must not form a cycle, because the graph ranks layers from them.
 - **Add a chain:** append to `chains` with `project` (matching a project name), `level`, `goal` and ordered `steps` of `{ stage, tool, role, why, alt? }`.
 - **Add a map preset:** append `{ name, domains: [three ids] }` to `venn.presets`.
 - **Logos:** put the file in `logos/` and set the tool's `logo` path. Logos are shown in full colour on light tiles; tools without one get a lettered tile.

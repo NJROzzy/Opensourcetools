@@ -89,14 +89,19 @@
       <div class="section-head">
         <span class="num">§ 2</span>
         <h2>Architecture Studio</h2>
-        <p class="sub">Drag tools, or a whole project, onto the grid to assemble an architecture layer by layer. The advisor inside the grid points out empty layers, tools that pair well with yours, and the real projects your stack resembles.</p>
+        <p class="sub">Drag tools, or a whole project, onto the grid to assemble an architecture layer by layer, then switch to <em>Graph</em> to see how every layer and tool connects, and add or remove tools right there. The advisor points out empty layers, tools that pair well with yours, and the real projects your stack resembles.</p>
       </div>
       <div class="studio">
         <div class="studio-bar">
           <label class="st-field">Path <select id="st-track"></select></label>
+          <div class="st-views" role="tablist" aria-label="Studio view">
+            <button role="tab" data-view="grid" aria-selected="true">Grid</button>
+            <button role="tab" data-view="graph" aria-selected="false">Graph</button>
+          </div>
           <input id="st-title" class="st-title" maxlength="60" aria-label="Architecture name" />
           <span class="st-spacer"></span>
           <span class="st-status" id="st-status" aria-live="polite"></span>
+          <button class="st-btn" id="st-undo" hidden>Undo</button>
           <button class="st-btn" id="st-copy">Copy as text</button>
           <button class="st-btn" id="st-clear">Clear</button>
         </div>
@@ -202,7 +207,19 @@
     <div class="drawer-body" id="drawer-body"></div>
   </dialog>
 
+  <dialog class="gmodal" id="gmodal" aria-labelledby="gm-title">
+    <div class="gm-head">
+      <div class="gm-titles"><p class="eyebrow" id="gm-kicker"></p><h3 class="vp-title" id="gm-title"></h3></div>
+      <span class="gm-diff" id="gm-diff" aria-live="polite"></span>
+      <button class="st-btn" id="gm-reset">Reset</button>
+      <button class="st-btn solid" id="gm-studio">Open in Studio →</button>
+      <button class="drawer-close gm-close" id="gm-close" aria-label="Close">×</button>
+    </div>
+    <div class="ag-host gm-graph" id="gm-graph"></div>
+  </dialog>
+
   <script src="data.js"></script>
+  <script src="graph.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

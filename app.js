@@ -481,6 +481,7 @@
       <p class="eyebrow">${esc(domainLine(projectByName[project].domains))} · ${esc(c.level)} · ${c.steps.length} links</p>
       <h3 class="vp-title">${esc(c.project)}</h3>
       <p class="vp-note">${esc(c.goal)}</p>
+      <button class="follow chain-graph" data-chain-graph="${esc(project)}">View its architecture graph →</button>
       <div class="chain-strip" aria-label="Chain summary">${c.steps.map((s) => `<span title="${esc(s.tool)}">${logo(toolByName[s.tool], "sm")}</span>`).join('<i>→</i>')}</div>
       <ol class="chain">${c.steps.map((s, i) => {
         const t = toolByName[s.tool];
@@ -497,7 +498,12 @@
       }).join("")}
       </ol>`;
   }
-  $("#chain-view").addEventListener("click", (e) => { const t = e.target.closest("[data-tool]"); if (t) openTool(t.dataset.tool); });
+  $("#chain-view").addEventListener("click", (e) => {
+    const g = e.target.closest("[data-chain-graph]");
+    if (g) return openProjectGraph(g.dataset.chainGraph);
+    const t = e.target.closest("[data-tool]");
+    if (t) openTool(t.dataset.tool);
+  });
 
   showChain(chains[0].project);
   // Names depend on the web font's metrics, so lay the map out once it loads
@@ -555,6 +561,7 @@
           </li>`).join("")}
         </ol>
         ${tr.note ? `<p class="arch-note">${esc(tr.note)}</p>` : ""}
+        <button class="follow" data-path-graph="${id}">See this path as a connected architecture graph →</button>
       </div>
       <p class="vp-label">Projects on this path <span class="hint">— hover a card to light up the layers it uses; open it for the full stack</span></p>
       <div class="pcards">${list.map(projectCard).join("")}</div>`;
@@ -565,6 +572,8 @@
     if (t) return openTool(t.dataset.openTool);
     const p = e.target.closest("[data-open-project]");
     if (p) return openProject(p.dataset.openProject);
+    const pg = e.target.closest("[data-path-graph]");
+    if (pg) return openPathGraph(pg.dataset.pathGraph);
     const s = e.target.closest("[data-stage]");
     if (s) {
       const card = trackView.querySelector(`[data-stage-card="${s.dataset.stage}"]`);
@@ -620,6 +629,7 @@
       ${extra.length ? `<li class="on"><span class="step">+</span><b>Also</b><span>${extra.map(esc).join(", ")}</span></li>` : ""}
       </ol>
       <div class="dr-actions">
+        <button class="follow" data-drawer-graph="${esc(name)}">View its architecture graph →</button>
         ${c ? `<button class="follow" data-drawer-chain="${esc(name)}">Follow the step-by-step chain →</button>` : ""}
         <button class="follow" data-drawer-map="${esc(name)}">Place it on the map →</button>
       </div>`);
@@ -668,6 +678,8 @@
     if (t) return openTool(t.dataset.openTool);
     const p = e.target.closest("[data-open-project]");
     if (p) return openProject(p.dataset.openProject);
+    const gr = e.target.closest("[data-drawer-graph]");
+    if (gr) { drawer.close(); return openProjectGraph(gr.dataset.drawerGraph); }
     const c = e.target.closest("[data-drawer-chain]");
     if (c) { drawer.close(); showChain(c.dataset.drawerChain); return $("#chains").scrollIntoView(); }
     const m = e.target.closest("[data-drawer-map]");
@@ -694,11 +706,14 @@
       if (!v || !architectures[v.track]) return null;
       const slots = {};
       for (const [k, names] of Object.entries(v.slots || {})) slots[k] = (names || []).filter((n) => toolByName[n]);
-      return { track: v.track, title: String(v.title || "").slice(0, 60), slots };
+      return { track: v.track, title: String(v.title || "").slice(0, 60), slots, view: v.view === "graph" ? "graph" : "grid" };
     } catch { return null; }
   };
-  let st = stLoad() || { track: "web", title: "", slots: {} };
+  let st = stLoad() || { track: "web", title: "", slots: {}, view: "grid" };
   let palTab = "tools";
+  // One step of undo for actions that replace or merge many tools at once
+  let undoSnap = null;
+  const snapshot = () => { undoSnap = JSON.parse(JSON.stringify(st)); };
 
   const stArch = () => architectures[st.track];
   const laneKeys = () => [...stArch().stages.map((_, i) => String(i)), "extra"];
@@ -715,6 +730,7 @@
     names.forEach((n) => addTool(n));
   }
   function loadProject(name) {
+    snapshot();
     const p = projectByName[name];
     if (p.track !== st.track) setTrack(p.track);
     p.tools.forEach((n) => { if (!placed().includes(n)) addTool(n); });
@@ -738,7 +754,9 @@
   trackSel.innerHTML = tracks.map((t) => `<option value="${t.id}">${esc(t.group === "Software Engineering" ? `Software · ${t.name}` : t.name)}</option>`).join("");
   trackSel.addEventListener("change", () => { setTrack(trackSel.value); stChanged(); });
   titleIn.addEventListener("input", () => { st.title = titleIn.value; stSave(); });
-  $("#st-clear").addEventListener("click", () => { st.slots = {}; st.title = ""; stChanged("Cleared"); });
+  $("#st-clear").addEventListener("click", () => { snapshot(); st.slots = {}; st.title = ""; stChanged("Cleared"); });
+  $("#st-undo").addEventListener("click", () => { if (!undoSnap) return; st = undoSnap; undoSnap = null; stChanged("Undone"); });
+  document.querySelectorAll(".st-views [data-view]").forEach((b) => b.addEventListener("click", () => { st.view = b.dataset.view; stChanged(); }));
   $("#st-copy").addEventListener("click", async () => {
     const arch = stArch(), tr = trackById[st.track];
     const lines = [`${st.title || "Untitled architecture"} — ${tr.name}`, ""];
@@ -786,12 +804,15 @@
       + `<p class="pal-label">Everything else</p><div class="pal-group">${tools.filter((t) => !inArch.has(t.name)).map((t) => chip(t.name)).join("")}</div>`;
   }
 
+  // How strongly a tool goes with what is already placed
+  const stAffinity = (n) => placed().reduce((s, m) => s + ((together[m] || {})[n] || 0), 0);
+
   // Advisor: coverage, empty layers, good pairings, closest projects, notes
   function advise() {
     const arch = stArch();
     const names = placed(), on = new Set(names);
     const filled = arch.stages.filter((_, i) => (st.slots[i] || []).length).length;
-    const affinity = (n) => names.reduce((s, m) => s + ((together[m] || {})[n] || 0), 0);
+    const affinity = stAffinity;
     const addBtn = (n, lane = bestLane(n), why = "") => `<button class="adv-add" data-add="${esc(n)}" data-to="${lane}" title="${esc(why || toolByName[n].kind)}">${logo(toolByName[n], "xs")}+ ${esc(n)}</button>`;
     const pct = Math.round(filled / arch.stages.length * 100);
     let html = `
@@ -835,6 +856,7 @@
       html += `<p class="adv-label">Closest real projects</p><ul class="adv-match">${matches.map(({ p, score }) => `
         <li><button class="adv-proj" data-open-project="${esc(p.name)}"><b>${esc(p.name)}</b><span>${esc(trackById[p.track].name)}</span></button>
         <span class="adv-pct">${Math.round(score * 100)}%</span>
+        <button class="adv-load sm" data-graph="${esc(p.name)}" title="See this project's architecture graph">graph</button>
         <button class="adv-load sm" data-load="${esc(p.name)}" title="Add this project's missing tools">merge</button></li>`).join("")}</ul>`;
     }
 
@@ -862,6 +884,11 @@
     if (document.activeElement !== titleIn) titleIn.value = st.title;
     titleIn.placeholder = `My ${trackById[st.track].name.toLowerCase()} architecture`;
     const arch = stArch();
+    document.querySelectorAll(".st-views [data-view]").forEach((b) => b.setAttribute("aria-selected", b.dataset.view === st.view));
+    $("#st-undo").hidden = !undoSnap;
+    if (st.view === "graph") return renderStudioGraph();
+    board.classList.remove("graph-mode");
+    stGraph = null;
     const lane = (key, num, name, role) => {
       const items = st.slots[key] || [];
       return `<div class="lane${items.length ? "" : " empty"}${key === "extra" ? " extra" : ""}" data-lane="${key}">
@@ -882,9 +909,34 @@
     $("#st-advisor").style.gridColumn = `span ${rest >= 2 ? rest : cols}`;
     renderPalette();
   }
+  // Graph view of the board: the same state, drawn as a connected architecture
+  let stGraph = null, stGraphTrack = null;
+  function renderStudioGraph() {
+    board.classList.add("graph-mode");
+    if (!stGraph || !board.contains(stGraph.host)) {
+      board.innerHTML = `<div class="ag-host st-graph"></div><div class="advisor" id="st-advisor" aria-live="polite"></div>`;
+      const host = board.querySelector(".st-graph");
+      stGraph = createArchGraph(host, {
+        arch: stArch,
+        getModel: () => ({ title: st.title || titleIn.placeholder, subtitle: `${trackById[st.track].name} · your architecture`, slots: st.slots }),
+        editable: true,
+        onAdd: (n, lane) => { addTool(n, lane); stChanged(`Added ${n}`); },
+        onRemove: (n) => { removeTool(n); stChanged(`Removed ${n}`); },
+        onOpenTool: openTool,
+        affinity: stAffinity, esc, logo, toolByName, tools,
+      });
+      stGraph.host = host;
+      stGraphTrack = st.track;
+    }
+    $("#st-advisor").innerHTML = advise();
+    $("#st-advisor").style.gridColumn = "";
+    if (stGraphTrack !== st.track) { stGraphTrack = st.track; stGraph.refit(); } else stGraph.render();
+    renderPalette();
+  }
+
   addEventListener("resize", () => {
     const adv = $("#st-advisor");
-    if (!adv) return;
+    if (!adv || st.view === "graph") return;
     const cols = boardCols(), rest = (cols - ((stArch().stages.length + 1) % cols)) % cols;
     adv.style.gridColumn = `span ${rest >= 2 ? rest : cols}`;
   });
@@ -899,6 +951,8 @@
     if (add) { addTool(add.dataset.add, add.dataset.to); return stChanged(`Added ${add.dataset.add}`); }
     const load = e.target.closest("[data-load]");
     if (load) return loadProject(load.dataset.load);
+    const gph = e.target.closest("[data-graph]");
+    if (gph) return openProjectGraph(gph.dataset.graph);
     const op = e.target.closest("[data-open-tool]");
     if (op) return openTool(op.dataset.openTool);
     const pp = e.target.closest("[data-open-project]");
@@ -920,7 +974,7 @@
     clearTimeout(drag.timer);
     drag.ghost?.remove();
     document.body.classList.remove("st-dragging");
-    board.querySelectorAll(".lane.over, .lane.fit").forEach((l) => l.classList.remove("over", "fit"));
+    board.querySelectorAll("[data-lane].over, [data-lane].fit").forEach((l) => l.classList.remove("over", "fit"));
     drag = null;
   }
   function beginDrag(x, y) {
@@ -940,13 +994,13 @@
   function moveGhost(x, y) {
     drag.ghost.style.transform = `translate(${x + 12}px, ${y + 12}px) rotate(-2deg)`;
     const over = laneAt(x, y);
-    board.querySelectorAll(".lane.over").forEach((l) => { if (l !== over) l.classList.remove("over"); });
+    board.querySelectorAll("[data-lane].over").forEach((l) => { if (l !== over) l.classList.remove("over"); });
     if (over && drag.kind !== "project") over.classList.add("over");
     board.classList.toggle("over", drag.kind === "project" && !!document.elementFromPoint(x, y)?.closest("#st-board"));
   }
   $(".studio").addEventListener("pointerdown", (e) => {
     const src = e.target.closest("[data-drag]");
-    if (!src || e.button > 0 || e.target.closest(".nchip-x")) return;
+    if (!src || e.button > 0 || e.target.closest(".nchip-x, .ag-x")) return;
     drag = { kind: src.dataset.drag, name: src.dataset.name, el: src, x0: e.clientX, y0: e.clientY, started: false, armed: e.pointerType !== "touch" };
     if (!drag.armed) drag.timer = setTimeout(() => { if (drag && !drag.started) { drag.armed = true; beginDrag(drag.x0, drag.y0); navigator.vibrate?.(12); } }, 280);
   });
@@ -978,6 +1032,79 @@
   });
   document.addEventListener("pointercancel", () => { board.classList.remove("over"); endDrag(); });
   addEventListener("keydown", (e) => { if (e.key === "Escape" && drag) { board.classList.remove("over"); endDrag(); } });
+
+
+  // ---------------------------------------------------------------------
+  // Architecture viewer: any project (or a whole path) as a connected graph
+  // you can edit, then send to the Studio.
+  const gm = $("#gmodal");
+  let gmState = null; // { kind, name, track, title, kicker, slots, original }
+  const slotsFor = (track, names) => {
+    const arch = architectures[track], slots = {};
+    for (const n of names) {
+      const i = arch.stages.findIndex((s) => s.tools.includes(n));
+      (slots[i < 0 ? "extra" : String(i)] ||= []).push(n);
+    }
+    return slots;
+  };
+  const gmNames = () => Object.values(gmState.slots).flat();
+  // Paths list every alternative per layer, so they connect layers, not tool pairs
+  const gmOpts = (toolEdges) => ({
+    arch: () => architectures[gmState.track],
+    getModel: () => ({ title: gmState.title, subtitle: gmState.kicker, slots: gmState.slots }),
+    editable: true,
+    onAdd: (n, lane) => {
+      for (const k in gmState.slots) gmState.slots[k] = gmState.slots[k].filter((x) => x !== n);
+      const arch = architectures[gmState.track];
+      const best = arch.stages.findIndex((s) => s.tools.includes(n));
+      lane ??= best < 0 ? "extra" : String(best);
+      (gmState.slots[lane] ||= []).push(n);
+      gmUpdate();
+    },
+    onRemove: (n) => { for (const k in gmState.slots) gmState.slots[k] = gmState.slots[k].filter((x) => x !== n); gmUpdate(); },
+    onOpenTool: openTool,
+    affinity: (n) => gmNames().reduce((s, m) => s + ((together[m] || {})[n] || 0), 0),
+    esc, logo, toolByName, tools, showEmpty: false, toolEdges,
+  });
+  let gmGraph = null, gmGraphKind = null;
+  function gmUpdate() {
+    const now = new Set(gmNames()), was = new Set(gmState.original);
+    const added = [...now].filter((n) => !was.has(n)).length, removed = [...was].filter((n) => !now.has(n)).length;
+    $("#gm-diff").textContent = added || removed ? `${added ? `+${added} added` : ""}${added && removed ? " · " : ""}${removed ? `−${removed} removed` : ""}` : "";
+    $("#gm-reset").hidden = !(added || removed);
+    gmGraph.render();
+  }
+  function openGraph(state) {
+    gmState = state;
+    // A fresh graph per kind keeps each one's own view settings
+    if (gmGraphKind !== state.kind) { gmGraph = createArchGraph($("#gm-graph"), gmOpts(state.kind === "project")); gmGraphKind = state.kind; }
+    $("#gm-kicker").textContent = state.kicker;
+    $("#gm-title").textContent = state.title;
+    if (!gm.open) gm.showModal();
+    gmUpdate();
+    requestAnimationFrame(() => gmGraph.refit());
+  }
+  function openProjectGraph(name) {
+    const p = projectByName[name];
+    openGraph({ kind: "project", name, track: p.track, title: p.name, kicker: `${trackById[p.track].name} · ${domainLine(p.domains)} · recommended architecture`, slots: slotsFor(p.track, p.tools), original: [...p.tools] });
+  }
+  function openPathGraph(id) {
+    const names = architectures[id].stages.flatMap((s) => s.tools);
+    openGraph({ kind: "path", name: id, track: id, title: architectures[id].title.replace(/^The common path of /, "").replace(/^./, (c) => c.toUpperCase()), kicker: `${trackById[id].name} · every open-source option, by layer`, slots: slotsFor(id, names), original: names });
+  }
+  $("#gm-close").addEventListener("click", () => gm.close());
+  gm.addEventListener("click", (e) => { if (e.target === gm) gm.close(); });
+  $("#gm-reset").addEventListener("click", () => {
+    gmState.slots = slotsFor(gmState.track, gmState.original);
+    gmUpdate();
+  });
+  $("#gm-studio").addEventListener("click", () => {
+    snapshot();
+    st = { track: gmState.track, title: gmState.kind === "project" ? gmState.title : "", slots: JSON.parse(JSON.stringify(gmState.slots)), view: "graph" };
+    gm.close();
+    stChanged("Loaded into the Studio · Undo restores your previous board");
+    $("#studio").scrollIntoView();
+  });
 
   renderStudio();
 

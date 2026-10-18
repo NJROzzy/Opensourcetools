@@ -32,6 +32,8 @@ window.ATLAS = {
     {id: "emerging", group: "Foundations & Frontiers", name: "Emerging computing", blurb: "Paradigms beyond classical transistors — quantum and neuromorphic computing."},
   ],
 
+  // Each architecture: ordered layers ({ name, role, tools }) and links
+  // between layers ([from, to, what it does]), which the graph lays out.
   architectures: {
     web: {
       title: "The common path of a web application",
@@ -49,11 +51,7 @@ window.ATLAS = {
         {
           name: "Build & style",
           role: "Types, bundling and styling that turn source into fast, consistent pages.",
-          tools: [
-            "TypeScript",
-            "Vite",
-            "Tailwind CSS"
-          ]
+          tools: ["TypeScript", "Vite", "Tailwind CSS"]
         },
         {
           name: "Server & API",
@@ -80,11 +78,7 @@ window.ATLAS = {
         {
           name: "Identity",
           role: "Sign-up, login and single sign-on, kept out of your own code.",
-          tools: [
-            "Keycloak",
-            "Supabase",
-            "PocketBase"
-          ]
+          tools: ["Keycloak", "Supabase", "PocketBase"]
         },
         {
           name: "Test",
@@ -97,21 +91,25 @@ window.ATLAS = {
         {
           name: "Deliver",
           role: "HTTPS, routing and packaging that put the app on the internet.",
-          tools: [
-            "Caddy",
-            "NGINX",
-            "Docker Engine (Moby)"
-          ]
+          tools: ["Caddy", "NGINX", "Docker Engine (Moby)"]
         },
         {
           name: "Observe",
           role: "Metrics, traces and dashboards that show it working in production.",
-          tools: [
-            "OpenTelemetry",
-            "Prometheus",
-            "Grafana"
-          ]
+          tools: ["OpenTelemetry", "Prometheus", "Grafana"]
         }
+      ],
+      links: [
+        ["Build & style", "Interface", "builds"],
+        ["Deliver", "Interface", "serves"],
+        ["Test", "Interface", "tests"],
+        ["Interface", "Server & API", "calls"],
+        ["Interface", "Identity", "signs in via"],
+        ["Test", "Server & API", "tests"],
+        ["Deliver", "Server & API", "routes to"],
+        ["Observe", "Server & API", "watches"],
+        ["Server & API", "Identity", "verifies with"],
+        ["Server & API", "Data", "reads & writes"]
       ]
     },
     mobile: {
@@ -130,11 +128,7 @@ window.ATLAS = {
         {
           name: "Language & tooling",
           role: "The language and project tooling around the framework.",
-          tools: [
-            "Kotlin",
-            "TypeScript",
-            "Expo"
-          ]
+          tools: ["Kotlin", "TypeScript", "Expo"]
         },
         {
           name: "On-device data",
@@ -146,11 +140,7 @@ window.ATLAS = {
         {
           name: "Backend & sync",
           role: "Accounts, data sync and files on a server you control.",
-          tools: [
-            "PocketBase",
-            "Supabase",
-            "Appwrite"
-          ]
+          tools: ["PocketBase", "Supabase", "Appwrite"]
         },
         {
           name: "Notifications",
@@ -175,6 +165,14 @@ window.ATLAS = {
             "F-Droid"
           ]
         }
+      ],
+      links: [
+        ["Language & tooling", "UI framework", "builds"],
+        ["Test", "UI framework", "tests"],
+        ["Build & release", "UI framework", "ships"],
+        ["UI framework", "On-device data", "stores in"],
+        ["On-device data", "Backend & sync", "syncs with"],
+        ["Backend & sync", "Notifications", "triggers"]
       ]
     },
     aiml: {
@@ -251,6 +249,16 @@ window.ATLAS = {
             "Grafana"
           ]
         }
+      ],
+      links: [
+        ["Data", "Explore", "feeds"],
+        ["Data", "Model", "trains"],
+        ["Explore", "Model", "shapes"],
+        ["Scale", "Model", "distributes"],
+        ["Model", "Track", "logs to"],
+        ["Model", "Serve", "deploys to"],
+        ["Serve", "Apply", "powers"],
+        ["Monitor", "Serve", "watches"]
       ]
     },
     robotics: {
@@ -292,11 +300,7 @@ window.ATLAS = {
         {
           name: "Plan & act",
           role: "Decide where to go and how to move safely.",
-          tools: [
-            "Nav2",
-            "MoveIt 2",
-            "Drake"
-          ]
+          tools: ["Nav2", "MoveIt 2", "Drake"]
         },
         {
           name: "Simulate",
@@ -311,11 +315,7 @@ window.ATLAS = {
         {
           name: "Learn",
           role: "Teach skills from demonstrations or trial and error.",
-          tools: [
-            "LeRobot",
-            "Ray",
-            "JAX"
-          ]
+          tools: ["LeRobot", "Ray", "JAX"]
         },
         {
           name: "Fleet",
@@ -325,6 +325,15 @@ window.ATLAS = {
             "Grafana"
           ]
         }
+      ],
+      links: [
+        ["Design", "Low-level control", "houses"],
+        ["Simulate", "Middleware", "stands in for hardware"],
+        ["Low-level control", "Middleware", "bridges to"],
+        ["Middleware", "Perceive", "streams sensors"],
+        ["Middleware", "Fleet", "reports to"],
+        ["Learn", "Plan & act", "trains policy"],
+        ["Perceive", "Plan & act", "informs"]
       ]
     },
     data: {
@@ -341,20 +350,12 @@ window.ATLAS = {
         {
           name: "Store",
           role: "Keep data in the engine that suits how it is queried.",
-          tools: [
-            "PostgreSQL",
-            "ClickHouse",
-            "DuckDB"
-          ]
+          tools: ["PostgreSQL", "ClickHouse", "DuckDB"]
         },
         {
           name: "Transform",
           role: "Clean and model raw data into trustworthy tables.",
-          tools: [
-            "dbt Core",
-            "Apache Spark",
-            "Polars"
-          ]
+          tools: ["dbt Core", "Apache Spark", "Polars"]
         },
         {
           name: "Orchestrate",
@@ -373,11 +374,7 @@ window.ATLAS = {
         {
           name: "Search",
           role: "Find records by text or by meaning.",
-          tools: [
-            "Meilisearch",
-            "Qdrant",
-            "pgvector"
-          ]
+          tools: ["Meilisearch", "Qdrant", "pgvector"]
         },
         {
           name: "Visualise",
@@ -387,6 +384,15 @@ window.ATLAS = {
             "Jupyter"
           ]
         }
+      ],
+      links: [
+        ["Orchestrate", "Ingest", "schedules"],
+        ["Ingest", "Store", "lands in"],
+        ["Orchestrate", "Transform", "schedules"],
+        ["Store", "Transform", "feeds"],
+        ["Exchange", "Transform", "moves tables"],
+        ["Transform", "Search", "indexes"],
+        ["Transform", "Visualise", "models for"]
       ]
     },
     distributed: {
@@ -435,11 +441,7 @@ window.ATLAS = {
         {
           name: "Observe",
           role: "Traces, metrics and dashboards across every service.",
-          tools: [
-            "OpenTelemetry",
-            "Prometheus",
-            "Grafana"
-          ]
+          tools: ["OpenTelemetry", "Prometheus", "Grafana"]
         },
         {
           name: "Secure",
@@ -449,6 +451,16 @@ window.ATLAS = {
             "Trivy"
           ]
         }
+      ],
+      links: [
+        ["Build", "Package", "compiled into"],
+        ["Secure", "Package", "scans"],
+        ["Package", "Orchestrate", "runs on"],
+        ["Provision", "Orchestrate", "creates"],
+        ["Secure", "Orchestrate", "supplies secrets"],
+        ["Observe", "Orchestrate", "watches"],
+        ["Orchestrate", "Connect", "wires"],
+        ["Observe", "Connect", "traces"]
       ]
     },
     networks: {
@@ -465,29 +477,17 @@ window.ATLAS = {
         {
           name: "Edge",
           role: "Serve and route traffic arriving from the internet.",
-          tools: [
-            "Caddy",
-            "NGINX",
-            "Envoy"
-          ]
+          tools: ["Caddy", "NGINX", "Envoy"]
         },
         {
           name: "Encrypt",
           role: "Private tunnels and TLS for everything in transit.",
-          tools: [
-            "WireGuard",
-            "OpenSSL",
-            "Certbot"
-          ]
+          tools: ["WireGuard", "OpenSSL", "Certbot"]
         },
         {
           name: "Message",
           role: "Protocols for devices and services to talk.",
-          tools: [
-            "Eclipse Mosquitto",
-            "NATS",
-            "gRPC"
-          ]
+          tools: ["Eclipse Mosquitto", "NATS", "gRPC"]
         },
         {
           name: "Inspect",
@@ -500,12 +500,18 @@ window.ATLAS = {
         {
           name: "Monitor",
           role: "Watch traffic and health continuously.",
-          tools: [
-            "Zeek",
-            "Prometheus",
-            "Grafana"
-          ]
+          tools: ["Zeek", "Prometheus", "Grafana"]
         }
+      ],
+      links: [
+        ["Model", "Edge", "designs"],
+        ["Encrypt", "Edge", "secures"],
+        ["Inspect", "Edge", "captures"],
+        ["Monitor", "Edge", "watches"],
+        ["Edge", "Message", "routes to"],
+        ["Encrypt", "Message", "secures"],
+        ["Inspect", "Message", "captures"],
+        ["Monitor", "Message", "watches"]
       ]
     },
     security: {
@@ -536,11 +542,7 @@ window.ATLAS = {
         {
           name: "Transport",
           role: "Encrypt every connection.",
-          tools: [
-            "OpenSSL",
-            "Certbot",
-            "WireGuard"
-          ]
+          tools: ["OpenSSL", "Certbot", "WireGuard"]
         },
         {
           name: "Detect",
@@ -567,6 +569,14 @@ window.ATLAS = {
             "Wireshark"
           ]
         }
+      ],
+      links: [
+        ["Code", "Supply chain", "then"],
+        ["Supply chain", "Secrets & identity", "then deploy with"],
+        ["Secrets & identity", "Transport", "issues certificates"],
+        ["Transport", "Detect", "traffic to"],
+        ["Test & analyse", "Detect", "validates"],
+        ["Detect", "Respond", "alerts"]
       ]
     },
     hardware: {
@@ -589,11 +599,7 @@ window.ATLAS = {
         {
           name: "Firmware",
           role: "Code that runs on the microcontroller.",
-          tools: [
-            "Zephyr RTOS",
-            "Arduino IDE",
-            "PlatformIO"
-          ]
+          tools: ["Zephyr RTOS", "Arduino IDE", "PlatformIO"]
         },
         {
           name: "Emulate",
@@ -623,6 +629,13 @@ window.ATLAS = {
             "OpenROAD"
           ]
         }
+      ],
+      links: [
+        ["Enclosure", "Board", "houses"],
+        ["Board", "Firmware", "runs"],
+        ["Emulate", "Firmware", "tests"],
+        ["Chip: simulate", "Chip: synthesise", "verified design"],
+        ["Chip: synthesise", "Chip: lay out", "netlist"]
       ]
     },
     computation: {
@@ -663,11 +676,7 @@ window.ATLAS = {
         {
           name: "Implement",
           role: "Compile a fast, safe implementation.",
-          tools: [
-            "Rust",
-            "GHC (Haskell)",
-            "LLVM"
-          ]
+          tools: ["Rust", "GHC (Haskell)", "LLVM"]
         },
         {
           name: "Communicate",
@@ -676,6 +685,14 @@ window.ATLAS = {
             "Jupyter"
           ]
         }
+      ],
+      links: [
+        ["Model", "Compute", "equations"],
+        ["Model", "Optimise", "constraints"],
+        ["Model", "Verify", "statement"],
+        ["Verify", "Implement", "proven spec"],
+        ["Compute", "Communicate", "results"],
+        ["Optimise", "Communicate", "results"]
       ]
     },
     emerging: {
@@ -719,6 +736,12 @@ window.ATLAS = {
             "Lava"
           ]
         }
+      ],
+      links: [
+        ["Notebook", "Circuits", "drives"],
+        ["Notebook", "Neuromorphic", "drives"],
+        ["Circuits", "Physics", "noise model"],
+        ["Circuits", "Hybrid learning", "becomes a layer in"]
       ]
     }
   },
