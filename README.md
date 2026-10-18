@@ -41,6 +41,8 @@ The design is futuristic and monochrome: black and white only, calligraphic scri
 
 ### Example chain: Voice-commanded robot
 
+![Recommendation chain](docs/chains.png)
+
 | # | Stage | Tool | Role | Why it's needed |
 |---|---|---|---|---|
 | 1 | Hear | Whisper | Speech to text | Turns spoken commands into text, offline |
