@@ -1142,28 +1142,56 @@
   })() || designToCanvas(designs[0]);
   const cvSave = () => { try { localStorage.setItem(CV_KEY, JSON.stringify({ ...cv, track: cvTrack })); } catch { /* storage unavailable */ } };
 
-  // Suggest tools for a component from its name and role, plus what the rest of the design uses
-  const toolText = Object.fromEntries(tools.map((t) => [t.name, {
-    kind: t.kind.toLowerCase(), desc: t.desc.toLowerCase(),
-    layers: Object.values(architectures).flatMap((a) => a.stages.filter((s) => s.tools.includes(t.name)).map((s) => s.name.toLowerCase())).join(" "),
-  }]));
-  function suggestFor(name, role, inDesign) {
-    const stop = ["and", "the", "for", "with", "service", "new", "component", "copy", "what", "does", "this"];
-    const split = (t) => t.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length > 2 && !stop.includes(w)).map((w) => w.slice(0, 4));
-    // The name's last word is usually the noun ("Response cache", "Load balancer"), so it counts most
-    const nameWords = split(name), weights = new Map();
-    nameWords.forEach((w, i) => weights.set(w, Math.max(weights.get(w) || 0, i === nameWords.length - 1 ? 3 : 1)));
-    split(role).forEach((w) => weights.set(w, Math.max(weights.get(w) || 0, 0.5)));
+  // Suggest tools for a component from its name and role. Each tool is described by its
+  // kind, description, the path layers it fills and the components it plays in the
+  // ready-made designs; words are matched at word starts and weighted by rarity.
+  // Light suffix stemming: caching/cache → cach, routes/routing → rout, retrieval ≠ retries
+  const SUFFIXES = ["ations", "ation", "ings", "ing", "ions", "ion", "ers", "er", "ies", "ied", "ed", "es", "s", "al", "e", "y"];
+  const stem = (w) => { for (const x of SUFFIXES) if (w.length - x.length >= 3 && w.endsWith(x)) return w.slice(0, -x.length); return w; };
+  const stems = (text) => new Set(text.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length > 2).map(stem));
+  const toolText = Object.fromEntries(tools.map((t) => {
+    const roles = designs.flatMap((d) => d.nodes.filter((n) => n.tools.includes(t.name)).map((n) => `${n.name} ${n.role}`)).join(" ");
+    const layers = Object.values(architectures).flatMap((a) => a.stages.filter((s) => s.tools.includes(t.name)).map((s) => s.name)).join(" ");
+    return [t.name, { kind: stems(t.kind), desc: stems(t.desc), layers: stems(layers), roles: stems(roles) }];
+  }));
+  // Which path layers each tool fills, to find alternatives to a component's own tools
+  const layerKeys = Object.fromEntries(tools.map((t) => [t.name, new Set(Object.entries(architectures).flatMap(([k, a]) => a.stages.map((st, i) => st.tools.includes(t.name) ? `${k}:${i}` : null).filter(Boolean)))]));
+  const df = {};
+  for (const x of Object.values(toolText)) for (const w of new Set([...x.kind, ...x.desc, ...x.layers, ...x.roles])) df[w] = (df[w] || 0) + 1;
+  const idf = (w) => Math.log((tools.length + 1) / ((df[w] || 0) + 1));
+  function suggestFor(name, role, inDesign, own = []) {
+    const stop = new Set(["and", "the", "for", "with", "service", "new", "component", "copy", "what", "does", "this", "build", "make", "run", "into", "from", "every", "each", "your", "that", "untitled"].map(stem));
+    const nameWords = [...stems(name)].filter((w) => !stop.has(w));
+    const roleWords = [...stems(role)].filter((w) => !stop.has(w) && !nameWords.includes(w));
+    const last = stem(name.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length > 2).pop() || "");
     return tools.map((t) => {
       const x = toolText[t.name];
-      let s = 0;
-      for (const [w, k] of weights) s += k * ((x.kind.includes(w) ? 3 : 0) + (x.layers.includes(w) ? 2 : 0) + (x.desc.includes(w) ? 1 : 0));
+      let s = 0, hits = 0;
+      for (const w of nameWords) {
+        const k = (w === last ? 1.2 : 1) * idf(w);
+        const m = (x.kind.has(w) ? 3 : 0) + (x.roles.has(w) ? 2 : 0) + (x.layers.has(w) ? 2 : 0) + (x.desc.has(w) ? 1 : 0);
+        if (m) hits++;
+        s += k * m;
+      }
+      // A tool matching only one word of a multi-word name ("load" in "Load balancer") counts less
+      if (nameWords.length > 1) s *= hits / nameWords.length;
+      // Role sentences are full of incidental words, so they only nudge the order
+      for (const w of roleWords) s += 0.1 * idf(w) * ((x.kind.has(w) ? 3 : 0) + (x.roles.has(w) ? 2 : 0));
+      // Alternatives to this component's own tools: same layer, same job, or a chain's listed alternative
+      let alt = 0;
+      for (const m of own) {
+        alt += [...layerKeys[m]].filter((k) => layerKeys[t.name].has(k)).length * 2;
+        if (overlaps(m, t.name)) alt += 3;
+      }
+      s += Math.min(6, alt);
+      // Tools that real projects pair with this component's own tools
+      s += Math.min(2, own.reduce((a, m) => a + ((together[m] || {})[t.name] || 0), 0) * 0.75);
       // Being used alongside the rest of the design only breaks ties
       if (s) s += Math.min(1, inDesign.reduce((a, m) => a + ((together[m] || {})[t.name] || 0), 0)) * 0.5;
       return [t.name, s];
     }).filter(([n, s]) => s > 0 && !inDesign.includes(n)).sort((a, b) => b[1] - a[1])
       // Drop weak, incidental matches
-      .filter(([, s], _, all) => s >= all[0][1] * 0.25).map(([n]) => n);
+      .filter(([, s], _, all) => s >= Math.max(0.7, all[0][1] * 0.45)).map(([n]) => n);
   }
   const cvTools = () => cv.nodes.flatMap((n) => n.tools);
 
@@ -1173,7 +1201,7 @@
     selected: () => sel,
     onSelect: (s) => { sel = s; renderCanvas(); if (s?.focus === "name") $("#ci-name")?.select(); },
     onEdit: canvasEdit,
-    suggest: (id) => { const n = cv.nodes.find((x) => x.id === id); return n ? suggestFor(n.name, n.role || "", cvTools()) : []; },
+    suggest: (id) => { const n = cv.nodes.find((x) => x.id === id); return n ? suggestFor(n.name, n.role || "", cvTools(), n.tools) : []; },
     canUndo: () => past.length > 0, canRedo: () => future.length > 0,
     onOpenTool: openTool, esc, logo, toolByName, tools,
   });
@@ -1298,7 +1326,7 @@
     const t = sel?.type === "note" && cv.notes.find((x) => x.id === sel.id);
     const nameOf = (id) => cv.nodes.find((x) => x.id === id)?.name || "?";
     if (n) {
-      const sugg = suggestFor(n.name, n.role || "", cvTools()).slice(0, 8);
+      const sugg = suggestFor(n.name, n.role || "", cvTools(), n.tools).slice(0, 8);
       const links = cv.edges.map((x, i) => ({ ...x, i })).filter((x) => x.from === n.id || x.to === n.id);
       inspector.innerHTML = `
         <p class="eyebrow">Component</p>
