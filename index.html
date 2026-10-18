@@ -64,10 +64,14 @@
       <div class="section-head">
         <span class="num">§ 2</span>
         <h2>The Amalgam Map</h2>
-        <p class="sub">Where the disciplines overlap, projects appear. Select a region of the diagram to see what can be built there — and the exact combination of open tools to build it with.</p>
+        <p class="sub">Where the disciplines overlap, projects appear. View the map <em>by project</em> to see what can be built in each region, or <em>by tool</em> to see where every tool lives — then select a region or a logo for the full picture.</p>
       </div>
       <div class="venn">
         <figure class="venn-fig">
+          <div class="tabs venn-mode" id="venn-mode" role="tablist" aria-label="Diagram view">
+            <button role="tab" data-mode="projects" aria-selected="true">By project</button>
+            <button role="tab" data-mode="tools" aria-selected="false">By tool</button>
+          </div>
           <svg id="venn" viewBox="0 0 600 570" role="img" aria-label="Venn diagram of AI, Machine Learning and Robotics on a Computer Science ground"></svg>
           <figcaption id="venn-keys" class="venn-keys"></figcaption>
         </figure>

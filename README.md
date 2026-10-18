@@ -24,20 +24,22 @@
 
 A real project is rarely one tool. It is an *amalgam*: ROS 2 braided with MuJoCo and PyTorch, or llama.cpp with LlamaIndex and PostgreSQL. This site catalogues those parts, shows which combinations produce which kinds of projects, and keeps you current with what is happening in the field.
 
-The design is futuristic and monochrome: black and white only, calligraphic script headings, a classical serif in the style of a research paper, and a drifting constellation that reacts to your cursor.
+The design is futuristic and monochrome, with black and white throughout and only the tool logos in colour, calligraphic script headings, a classical serif in the style of a research paper, and a drifting constellation that reacts to your cursor.
 
 ## Features
 
 | Section | What it does |
 |---|---|
-| **§1 The Atlas** | 53 open-source tools across four disciplines, each with its logo, purpose and licence. Filter by discipline or search by name, purpose or licence (e.g. `simulation`, `LLM`, `MIT`). |
-| **§2 The Amalgam Map** | An interactive **Venn diagram**: AI, ML and Robotics overlap on a Computer Science foundation. Select any region to see the projects you can build there and the exact **tool recipe** for each. Click a tool to jump to it in the Atlas. |
+| **§1 The Atlas** | 53 open-source tools across four disciplines, each with its full-colour logo, purpose and licence. Filter by discipline or search by name, purpose or licence (e.g. `simulation`, `LLM`, `MIT`). |
+| **§2 The Amalgam Map** | An interactive **Venn diagram**: AI, ML and Robotics overlap on a Computer Science foundation, with two views. **By project** writes every project name inside its region; **by tool** places all 53 tool logos where they belong. Select a region to see its tools and projects, or a logo to see every project that tool appears in, the role it plays and why it is needed. |
 | **§3 Recommendation Chains** | Step-by-step tool chains for 8 projects (one per Venn region). Every link names the tool, the **role** it plays, **why the project needs it**, and an alternative. Reach a chain from its project in the map via *Follow the chain →*. |
 | **§4 Currents & Trends** | Key movements in the field (agentic AI and MCP, open-weight models, edge inference, vision-language-action robots, sim-to-real) and the tools they relate to. |
 | **§5 The Live Wire** | Headlines on AI, ML, Robotics and Open Source, fetched live from the Hacker News index each time the page loads. |
 | **§6 Method** | How tools were chosen, and a reminder to verify licences before you build. |
 
-![The Amalgam Map](docs/map.png)
+| By project | By tool |
+|---|---|
+| ![Map by project](docs/map.png) | ![Map by tool](docs/map-tools.png) |
 
 ### Example chain: Voice-commanded robot
 
@@ -103,7 +105,7 @@ All content lives in **`data.js`**.
 - **Add a tool:** append to `tools` with `d` (`cs` | `ai` | `ml` | `robotics`), `name`, `kind`, `license`, `url` and `desc`.
 - **Add a project recipe:** add to the matching region in `map`. Tool names must exactly match a tool's `name` in the Atlas.
 - **Add a chain:** append to `chains` with `project` (matching a map project), `region`, `level`, `goal` and ordered `steps` of `{ stage, tool, role, why, alt? }`.
-- **Logos:** put the file in `logos/` and set the tool's `logo` path. Black single-colour SVGs are inverted to white automatically; PNGs are shown in greyscale.
+- **Logos:** put the file in `logos/` and set the tool's `logo` path. Logos are shown in full colour on light tiles. To place a tool on the Venn map, add its name to a region's `home` list in `map`.
 - Only include tools that are **free to use** and published under an **open licence**.
 
 ## Deploy

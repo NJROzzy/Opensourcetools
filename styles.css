@@ -295,3 +295,38 @@ nav a { white-space: nowrap; }
   nav::-webkit-scrollbar { display: none; }
   nav a[href="#method"] { display: inline; }
 }
+
+/* Venn: projects / tools views */
+.venn-mode { display: inline-flex; margin-bottom: 14px; }
+.v-name { font-family: var(--serif); font-weight: 500; font-size: 16px; fill: var(--ink); pointer-events: none; transition: fill .25s; }
+.v-name-group.on .v-name { fill: var(--paper); }
+.v-set { font-size: 13px; fill: var(--ink); }
+.v-counts { display: none; }
+#venn.mode-tools .v-names, #venn.mode-tools .v-counts { display: none; }
+#venn.mode-projects .v-tools { display: none; }
+.v-tool { cursor: pointer; outline: none; }
+.v-tile { fill: #f7f7f4; stroke: #fff; stroke-width: 1; transition: stroke .2s; }
+.v-tool image { pointer-events: none; }
+.v-tool:hover .v-tile, .v-tool:focus-visible .v-tile { stroke: var(--ink); stroke-width: 2.5; }
+.v-tool.on .v-tile { stroke: #fff; stroke-width: 3; }
+.v-tool.on { filter: drop-shadow(0 0 6px rgba(255,255,255,.8)); }
+.v-region.on ~ * .v-tile { stroke: #999; }
+@media (max-width: 640px) {
+  #venn.mode-projects .v-names { display: none; }
+  #venn.mode-projects .v-counts { display: inline; }
+}
+
+/* Venn panel additions */
+.vp-label { font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-faint); margin: 18px 0 8px; }
+.vp-home { margin-bottom: 4px; }
+.vp-home .chip, .vp-recipe .chip { cursor: pointer; }
+.tp-head { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+.tp-head .vp-title { margin: 0 0 6px; }
+.tp-head .lic { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+.plate.lg { width: 64px; height: 64px; border-radius: 14px; }
+.plate.lg img { width: 38px; height: 38px; }
+.plate.lg img.photo { width: 100%; height: 100%; }
+.region-link { appearance: none; background: none; border: 1px solid var(--rule-strong); color: var(--ink); cursor: pointer; font-family: var(--serif); font-style: italic; font-size: 18px; padding: 4px 12px; }
+.region-link:hover { background: var(--ink); color: var(--paper); }
+.vp-region { font-family: var(--mono); font-size: 11px !important; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint) !important; margin: 0 0 6px !important; }
+.vp-role { color: var(--ink); font-weight: 500; font-style: italic; }
