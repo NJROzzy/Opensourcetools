@@ -28,7 +28,7 @@
 
 A real project is rarely one tool, or one domain. It is an *amalgam*: ROS 2 braided with MuJoCo and PyTorch, or an IoT monitor built from KiCad, Zephyr, MQTT and Grafana across hardware, networks and data. This site catalogues those parts, shows which combinations produce which kinds of projects, and keeps you current with what is happening in the field.
 
-The design is futuristic and monochrome, with black and white throughout and only the tool logos in colour, calligraphic script headings, a classical serif in the style of a research paper, and a drifting constellation that reacts to your cursor.
+The design is futuristic and monochrome, with black and white throughout and only the tool logos in colour. A calligraphic chrome title, with a moving sheen and an outline echo that follows the pointer, sits over a live canvas scene: a depth starfield, a rotating point-cloud globe with orbiting satellites, and a perspective grid running to a glowing horizon that moves as you scroll. Scanlines and grain sit over the scene, and on-screen readouts (live clock, typed boot line, counting stats) frame the title. Section text is set in a classical serif in the style of a research paper. Everything respects `prefers-reduced-motion`.
 
 ## Features
 
@@ -88,7 +88,7 @@ Plain **HTML, CSS and vanilla JavaScript**, with no framework and no build step.
 - **Fonts:** Pinyon Script (calligraphy), Cormorant Garamond (research serif), IBM Plex Mono (instrument labels), from Google Fonts
 - **Logos:** [Simple Icons](https://simpleicons.org) glyphs (CC0) and project GitHub avatars, stored in the repo. Logos are trademarks of their respective projects.
 - **Venn diagram:** hand-built SVG using clip paths and masks to paint each exact intersection
-- **Background:** canvas constellation animation (respects `prefers-reduced-motion`)
+- **Background:** hand-written Canvas 2D scene (starfield, 3D point-cloud globe, perspective grid) at about 60 fps, with no libraries; it renders a single still frame when `prefers-reduced-motion` is set
 - **News:** [Hacker News Algolia API](https://hn.algolia.com/api), with no API key needed
 - **Hosting:** [Vercel](https://vercel.com)
 
