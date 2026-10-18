@@ -152,20 +152,68 @@
         <li>
           <h4>${esc(p.name)}</h4>
           <p>${esc(p.desc)}</p>
-          <div class="vp-recipe">${p.tools.map((n) => `<button class="chip" data-tool="${esc(n)}" title="${esc(toolByName[n]?.kind || "")}">${esc(n)}</button>`).join('<span class="plus">+</span>')}</div>
+          <div class="vp-recipe">${p.tools.map((n) => `<button class="chip" data-tool="${esc(n)}" title="${esc(toolByName[n]?.kind || "")}">${logo(toolByName[n], "xs")}${esc(n)}</button>`).join('<span class="plus">+</span>')}</div>
+          ${chainFor(p.name) ? `<button class="follow" data-chain="${esc(p.name)}">Follow the chain →</button>` : ""}
         </li>`).join("")}
       </ol>`;
   }
-  // A recipe chip jumps to that tool in the Atlas
-  $("#venn-panel").addEventListener("click", (e) => {
-    const b = e.target.closest("[data-tool]");
-    if (!b) return;
+  function jumpToTool(name) {
     active = "all";
     tabBar.querySelectorAll("button").forEach((x) => x.setAttribute("aria-selected", x.dataset.id === "all"));
-    $("#q").value = b.dataset.tool;
+    $("#q").value = name;
     renderAtlas();
     $("#atlas").scrollIntoView();
+  }
+  // A recipe chip jumps to that tool in the Atlas; a chain link opens its chain
+  $("#venn-panel").addEventListener("click", (e) => {
+    const t = e.target.closest("[data-tool]");
+    if (t) return jumpToTool(t.dataset.tool);
+    const c = e.target.closest("[data-chain]");
+    if (c) { showChain(c.dataset.chain); $("#chains").scrollIntoView(); }
   });
+
+  // Recommendation chains
+  const chains = window.ATLAS.chains;
+  const chainFor = (project) => chains.find((c) => c.project === project);
+  const picker = $("#chain-picker");
+  picker.innerHTML = chains.map((c) => `
+    <button role="tab" data-chain="${esc(c.project)}">
+      <span class="cp-name">${esc(c.project)}</span>
+      <span class="cp-meta">${esc(c.region)} · ${esc(c.level)}</span>
+    </button>`).join("");
+  picker.addEventListener("click", (e) => { const b = e.target.closest("[data-chain]"); if (b) showChain(b.dataset.chain); });
+
+  function showChain(project) {
+    const c = chainFor(project);
+    picker.querySelectorAll("button").forEach((b) => {
+      const on = b.dataset.chain === project;
+      b.setAttribute("aria-selected", on);
+      // On phones the picker scrolls sideways; keep the chosen project visible
+      if (on && picker.scrollWidth > picker.clientWidth) picker.scrollLeft = b.offsetLeft - picker.offsetLeft;
+    });
+    $("#chain-view").innerHTML = `
+      <p class="eyebrow">${esc(c.region)} · ${esc(c.level)} · ${c.steps.length} links</p>
+      <h3 class="vp-title">${esc(c.project)}</h3>
+      <p class="vp-note">${esc(c.goal)}</p>
+      <div class="chain-strip" aria-label="Chain summary">${c.steps.map((s) => `<span title="${esc(s.tool)}">${logo(toolByName[s.tool], "sm")}</span>`).join('<i>→</i>')}</div>
+      <ol class="chain">${c.steps.map((s, i) => {
+        const t = toolByName[s.tool];
+        return `
+        <li style="animation-delay:${i * 70}ms">
+          <div class="node"><span class="step">${String(i + 1).padStart(2, "0")}</span>${logo(t)}</div>
+          <div class="link-body">
+            <p class="stage">${esc(s.stage)}</p>
+            <h4><button class="tool-link" data-tool="${esc(s.tool)}">${esc(s.tool)}</button><span class="role">${esc(s.role)}</span></h4>
+            <p class="why"><b>Why it's needed —</b> ${esc(s.why)}</p>
+            ${s.alt ? `<p class="alt">Alternative: <button class="chip" data-tool="${esc(s.alt)}">${esc(s.alt)}</button></p>` : ""}
+          </div>
+        </li>`;
+      }).join("")}
+      </ol>`;
+  }
+  $("#chain-view").addEventListener("click", (e) => { const t = e.target.closest("[data-tool]"); if (t) jumpToTool(t.dataset.tool); });
+
+  showChain(chains[0].project);
   select(selected);
 
   // Live wire — Hacker News via Algolia (CORS-enabled, no key needed)

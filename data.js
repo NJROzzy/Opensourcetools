@@ -178,6 +178,102 @@ window.ATLAS = {
     },
   ],
 
+  // Recommendation chains: an ordered pipeline of tools for a project, with
+  // each tool's role and why it is needed. `project` matches a map project.
+  chains: [
+    {
+      project: "Private document assistant", region: "AI", level: "Beginner",
+      goal: "Ask questions of your own PDFs and notes, with answers grounded in the source — fully offline.",
+      steps: [
+        { stage: "Ingest", tool: "LlamaIndex", role: "Loader & indexer", why: "Parses PDFs, docs and notes, splits them into passages and creates embeddings, so the right passage can be found for any question.", alt: "LangChain" },
+        { stage: "Remember", tool: "PostgreSQL", role: "Vector memory", why: "With the pgvector extension it stores embeddings beside your metadata — one durable, queryable database instead of a separate vector store.", alt: "SQLite" },
+        { stage: "Reason", tool: "Qwen", role: "The language model", why: "An open-weight model, Apache-2.0 for most sizes; small variants run on a laptop yet answer fluently from the retrieved passages.", alt: "Mistral (open models)" },
+        { stage: "Serve", tool: "Ollama", role: "Local model server", why: "Downloads and runs the model with one command and exposes an API LlamaIndex can call — no data ever leaves your machine.", alt: "llama.cpp" },
+        { stage: "Ship", tool: "Docker Engine (Moby)", role: "Packaging", why: "Bundles the app and database into containers so anyone can run the whole assistant with a single command." },
+      ],
+    },
+    {
+      project: "Tabular prediction model", region: "ML", level: "Beginner",
+      goal: "Predict churn, prices or risk from spreadsheet-style data — with results you can reproduce and defend.",
+      steps: [
+        { stage: "Explore", tool: "Jupyter", role: "Lab notebook", why: "Interactive exploration: inspect distributions, plot relationships and write notes beside the code that produced them." },
+        { stage: "Wrangle", tool: "pandas", role: "Data cleaning", why: "Joins tables, handles missing values and engineers features — the shape of your data decides the ceiling of your model.", alt: "Polars" },
+        { stage: "Baseline", tool: "scikit-learn", role: "Splits, baselines & metrics", why: "Provides train/test splits, cross-validation and simple models; without an honest baseline you cannot tell if a fancier model helps." },
+        { stage: "Model", tool: "XGBoost", role: "The predictor", why: "Gradient-boosted trees remain the strongest general method on tabular data, and handle mixed feature types well.", alt: "LightGBM" },
+        { stage: "Record", tool: "MLflow", role: "Experiment ledger", why: "Logs every run's parameters, metrics and model file so you can compare attempts and reload the winner later." },
+        { stage: "Version", tool: "DVC", role: "Data versioning", why: "Ties each dataset version to a Git commit, so a result months from now can be regenerated exactly." },
+      ],
+    },
+    {
+      project: "Autonomous mobile robot", region: "Robotics", level: "Intermediate",
+      goal: "A wheeled robot that maps a room, knows where it is, and drives to a goal around obstacles.",
+      steps: [
+        { stage: "Foundation", tool: "Linux", role: "Operating system", why: "ROS 2 is developed and tested first on Ubuntu Linux; drivers, real-time tuning and tooling assume it." },
+        { stage: "Backbone", tool: "ROS 2", role: "Robot middleware", why: "Connects sensors, drivers and algorithms as nodes that talk over topics — and gives you a huge library of existing drivers." },
+        { stage: "Rehearse", tool: "Gazebo", role: "Simulator", why: "Simulated lidar, cameras and physics let you test navigation for hours before risking real hardware.", alt: "Webots" },
+        { stage: "Perceive", tool: "OpenCV", role: "Camera processing", why: "Calibrates cameras and detects visual markers or features the robot can use as landmarks." },
+        { stage: "Navigate", tool: "Nav2", role: "Planning & control", why: "Supplies localisation, global and local path planners, and recovery behaviours — the hardest parts of autonomy, ready to configure." },
+      ],
+    },
+    {
+      project: "Fine-tune an open model", region: "AI ∩ ML", level: "Advanced",
+      goal: "Adapt an open language model to your domain's vocabulary and tasks, then serve it to users.",
+      steps: [
+        { stage: "Choose", tool: "OLMo (AI2)", role: "Base model", why: "Weights, training data and code are all open, so you can trace the model's behaviour back to what it learned.", alt: "Qwen" },
+        { stage: "Load", tool: "Hugging Face Transformers", role: "Model toolkit", why: "Loads model and tokenizer in a few lines and provides training utilities, including parameter-efficient fine-tuning (LoRA)." },
+        { stage: "Train", tool: "PyTorch", role: "Training engine", why: "Executes the forward and backward passes on your GPU; everything above it is built on PyTorch tensors.", alt: "JAX" },
+        { stage: "Compare", tool: "MLflow", role: "Run comparison", why: "Fine-tuning is many small experiments — learning rates, data mixes — and you need a record of which one actually improved." },
+        { stage: "Serve", tool: "vLLM", role: "High-throughput server", why: "Serves the fine-tuned model to many users at once, with an OpenAI-compatible API your apps can call.", alt: "Ollama" },
+      ],
+    },
+    {
+      project: "Vision-guided pick & place", region: "ML ∩ Robotics", level: "Advanced",
+      goal: "A robot arm that recognises objects with a camera and picks them up reliably.",
+      steps: [
+        { stage: "Backbone", tool: "ROS 2", role: "Robot middleware", why: "Carries camera frames, detections and arm commands between components running at different rates." },
+        { stage: "See", tool: "OpenCV", role: "Camera & calibration", why: "Captures images and performs hand-eye calibration, so a pixel can be converted into a position the arm can reach." },
+        { stage: "Recognise", tool: "PyTorch", role: "Detector training", why: "Trains a neural network to find your specific objects in the camera image.", alt: "TensorFlow" },
+        { stage: "Accelerate", tool: "ONNX Runtime", role: "On-robot inference", why: "Runs the exported detector fast on the robot's computer, without bringing the whole training framework along." },
+        { stage: "Plan", tool: "MoveIt 2", role: "Motion planner", why: "Computes collision-free arm trajectories to the grasp pose — inverse kinematics and obstacle avoidance included." },
+        { stage: "Rehearse", tool: "Gazebo", role: "Simulator", why: "Tests grasps in a simulated scene first, so planning bugs cost nothing.", alt: "MuJoCo" },
+      ],
+    },
+    {
+      project: "Voice-commanded robot", region: "AI ∩ Robotics", level: "Intermediate",
+      goal: "Say “go to the kitchen” and the robot understands, plans and goes.",
+      steps: [
+        { stage: "Hear", tool: "Whisper", role: "Speech to text", why: "Turns spoken commands into text accurately and offline, even with accents and background noise." },
+        { stage: "Understand", tool: "Qwen", role: "Language understanding", why: "Interprets free-form speech into a structured goal, e.g. {action: navigate, place: kitchen}.", alt: "Mistral (open models)" },
+        { stage: "Host", tool: "Ollama", role: "On-board model server", why: "Runs the language model locally on the robot — no network dependency, low latency." },
+        { stage: "Connect", tool: "Model Context Protocol", role: "Tool bridge", why: "Exposes a fixed set of robot actions as tools the model may call, so it can only request what you allow." },
+        { stage: "Dispatch", tool: "ROS 2", role: "Robot middleware", why: "Receives the structured goal and routes it to the navigation stack." },
+        { stage: "Move", tool: "Nav2", role: "Navigation", why: "Drives to the named location safely, avoiding obstacles along the way." },
+      ],
+    },
+    {
+      project: "Vision-language-action robot", region: "AI ∩ ML ∩ Robotics", level: "Advanced",
+      goal: "Teach a low-cost arm new tasks by demonstration, guided by camera images and plain-language instructions.",
+      steps: [
+        { stage: "Rehearse", tool: "MuJoCo", role: "Physics simulation", why: "Fast, accurate contact physics for practice environments and repeatable policy evaluation.", alt: "Genesis" },
+        { stage: "Collect", tool: "LeRobot", role: "Data & policies", why: "Records teleoperated demonstrations into shared dataset formats and provides ready-made learning policies and low-cost arm support." },
+        { stage: "Perceive", tool: "Hugging Face Transformers", role: "Vision-language backbone", why: "Supplies a pretrained model that already understands images and text, so the policy learns actions, not vision from scratch." },
+        { stage: "Train", tool: "PyTorch", role: "Training engine", why: "Trains the policy that maps camera frames plus an instruction to motor commands." },
+        { stage: "Scale", tool: "Ray", role: "Distributed compute", why: "Spreads training and simulated evaluation across GPUs and machines when one is not enough." },
+        { stage: "Deploy", tool: "ROS 2", role: "Robot integration", why: "Connects the trained policy to the real arm's drivers, cameras and safety stops." },
+      ],
+    },
+    {
+      project: "Self-hosted deployment platform", region: "Computer Science", level: "Intermediate",
+      goal: "Take any project above from a laptop to a reliable, observable service.",
+      steps: [
+        { stage: "Track", tool: "Git", role: "Version control", why: "Every change is recorded and reversible; collaboration and automated builds start here." },
+        { stage: "Package", tool: "Docker Engine (Moby)", role: "Containers", why: "Freezes code, libraries and system dependencies together — “works on my machine” becomes works everywhere." },
+        { stage: "Orchestrate", tool: "Kubernetes", role: "Scheduler", why: "Runs containers across machines, restarts failures and scales with demand." },
+        { stage: "Observe", tool: "Grafana", role: "Dashboards & alerts", why: "Shows latency, errors and resource use, and alerts you before users notice a problem." },
+      ],
+    },
+  ],
+
   // Live headline topics, queried against the Hacker News Algolia API.
   wire: [
     { id: "ai", name: "AI", query: "AI" },
