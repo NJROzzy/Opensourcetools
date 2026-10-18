@@ -43,7 +43,7 @@ The design is futuristic and monochrome, with black and white throughout and onl
 
 Clicking a tool anywhere on the site opens a drawer with its licence, domains, its layer in each build path, and every project that uses it.
 
-**Live Wire sidebar.** Live headlines from the Hacker News index sit in a sidebar on the right: open beside the content on wide screens, and a slide-over panel (opened from the *Live news* edge tab or the nav) on smaller ones. It covers All, AI, Machine Learning, Robotics, Security, Networking, Databases, Distributed, Hardware, Quantum and Open Source, and refreshes every minute while the page is visible. Headlines that arrive between refreshes are marked **NEW**, and while the sidebar is closed the tab shows a count of unread headlines. Your open/closed choice is remembered.
+**Live Wire pop-up.** A rotating half-circle on the right edge of the screen, with *LIVE NEWS* circling it, a radar sweep and a glowing core, opens a compact pop-up that unfolds out of it with live headlines from the Hacker News index. You can also open it from *Live news* in the nav; Esc or a click outside closes it. It covers All, AI, Machine Learning, Robotics, Security, Networking, Databases, Distributed, Hardware, Quantum and Open Source, and refreshes every minute while the page is visible. Headlines that arrive between refreshes are marked **NEW**, and while the pop-up is closed the half-circle shows a count of unread headlines. On phones the half-circle sits in the bottom-right corner.
 
 ![Build paths](docs/paths.png)
 

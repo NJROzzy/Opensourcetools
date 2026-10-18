@@ -684,17 +684,14 @@
   showTrack(tracks[0].id);
 
   // ---------------------------------------------------------------------
-  // Live Wire sidebar — Hacker News via Algolia (CORS-enabled, no key).
-  // Polls every minute while the page is visible, marks headlines that
-  // arrived since the last poll, and counts unread ones while closed.
+  // Live Wire pop-up — Hacker News via Algolia (CORS-enabled, no key),
+  // opened from the rotating half-circle on the right edge. Polls every
+  // minute while the page is visible, marks headlines that arrived since
+  // the last poll, and counts unread ones while closed.
   const side = $("#wire-side"), wireTabs = $("#wire-tabs"), wireList = $("#wire-list");
   const badge = $("#ws-badge"), toggle = $("#ws-toggle"), updatedEl = $("#ws-updated");
   const POLL_MS = 60000;
   const topics = [{ id: "all", name: "All", query: wire.map((w) => w.query).join(" "), any: true }, ...wire];
-  const store = {
-    get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
-    set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* storage unavailable */ } },
-  };
   let topic = "all", items = [], seen = new Set(), firstLoad = true, unread = 0, lastFetch = 0, timer = null;
 
   const ago = (iso) => {
@@ -711,20 +708,21 @@
     badge.hidden = !unread;
     badge.textContent = unread > 99 ? "99+" : unread;
   }
-  function setOpen(open, { save = true } = {}) {
+  function setOpen(open) {
     document.body.classList.toggle("wire-open", open);
     toggle.setAttribute("aria-expanded", open);
+    toggle.setAttribute("aria-label", open ? "Close live news" : "Open live news");
     $("#ws-nav").classList.toggle("on", open);
-    if (open) { unread = 0; renderBadge(); }
-    if (save) store.set("amg-wire", open ? "open" : "closed");
+    if (open) { unread = 0; renderBadge(); side.focus({ preventScroll: true }); }
   }
-  toggle.addEventListener("click", () => { setOpen(true); side.focus(); });
-  $("#ws-close").addEventListener("click", () => setOpen(false));
-  $("#ws-nav").addEventListener("click", (e) => { e.preventDefault(); setOpen(!isOpen()); });
-  side.addEventListener("keydown", (e) => { if (e.key === "Escape" && !matchMedia("(min-width: 1200px)").matches) setOpen(false); });
-  // Open by default where there is room beside the content; remember the choice
-  const saved = store.get("amg-wire");
-  setOpen(saved ? saved === "open" : matchMedia("(min-width: 1200px)").matches, { save: false });
+  toggle.addEventListener("click", () => setOpen(!isOpen()));
+  $("#ws-close").addEventListener("click", () => { setOpen(false); toggle.focus(); });
+  $("#ws-nav").addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); setOpen(!isOpen()); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && isOpen() && !$("#drawer").open) { setOpen(false); toggle.focus(); } });
+  // A click anywhere outside the pop-up and its orb closes it
+  document.addEventListener("click", (e) => {
+    if (isOpen() && !side.contains(e.target) && !toggle.contains(e.target)) setOpen(false);
+  });
 
   wireTabs.innerHTML = topics.map((w) => `<button role="tab" data-id="${w.id}" aria-selected="${w.id === topic}">${esc(w.name)}</button>`).join("");
   wireTabs.addEventListener("click", (e) => {
@@ -863,9 +861,7 @@
     ctx.fillRect(0, 0, FW, FH);
 
     // Halo behind the globe
-    // Keep the globe in the content area when the news sidebar sits beside it
-    const sideW = document.body.classList.contains("wire-open") && innerWidth >= 1200 ? 360 * dpr : 0;
-    const gx = (FW - sideW) * (small ? 0.5 : 0.72), gy = FH * (small ? 0.3 : 0.42) - sy * 0.45;
+    const gx = FW * (small ? 0.5 : 0.72), gy = FH * (small ? 0.3 : 0.42) - sy * 0.45;
     const halo = ctx.createRadialGradient(gx, gy, 0, gx, gy, Math.max(FW, FH) * 0.55);
     halo.addColorStop(0, "rgba(255,255,255,0.08)");
     halo.addColorStop(1, "rgba(255,255,255,0)");

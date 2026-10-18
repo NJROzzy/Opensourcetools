@@ -29,7 +29,17 @@
     </div>
   </header>
 
-  <aside class="wire-side" id="wire-side" aria-label="Live news" tabindex="-1">
+  <button class="wire-orb" id="ws-toggle" aria-controls="wire-side" aria-expanded="false" aria-label="Open live news">
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <defs><path id="orb-ring" d="M60,60 m-47,0 a47,47 0 1,1 94,0 a47,47 0 1,1 -94,0" /></defs>
+      <g class="orb-spin"><text><textPath href="#orb-ring" textLength="292" lengthAdjust="spacing">LIVE NEWS · LIVE NEWS · LIVE NEWS · </textPath></text></g>
+      <circle class="orb-dash" cx="60" cy="60" r="35" />
+    </svg>
+    <span class="orb-sweep"></span>
+    <span class="orb-core"></span>
+    <span class="ws-badge" id="ws-badge" hidden></span>
+  </button>
+  <div class="wire-pop" id="wire-side" role="dialog" aria-label="Live news" tabindex="-1">
     <div class="ws-head">
       <span class="live"><i></i>Live Wire</span>
       <span class="ws-updated" id="ws-updated">connecting…</span>
@@ -39,8 +49,7 @@
     <div class="ws-topics" id="wire-tabs" role="tablist" aria-label="News topics"></div>
     <ul class="ws-list" id="wire-list" aria-live="polite"></ul>
     <p class="ws-foot">Headlines from the Hacker News index · refreshes every minute</p>
-  </aside>
-  <button class="ws-toggle" id="ws-toggle" aria-controls="wire-side" aria-expanded="false"><i></i>Live news<span class="ws-badge" id="ws-badge" hidden></span></button>
+  </div>
 
   <main id="top">
     <section class="hero wrap" id="hero">
