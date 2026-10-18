@@ -30,6 +30,11 @@
   });
   $("#q").addEventListener("input", renderAtlas);
 
+  // Simple Icons SVGs are black glyphs; GitHub avatars are photos shown in greyscale
+  const logo = (t, cls = "") => t?.logo
+    ? `<span class="plate ${cls}"><img src="${esc(t.logo)}" alt="" loading="lazy" class="${t.logo.endsWith(".svg") ? "glyph" : "photo"}" /></span>`
+    : `<span class="plate ${cls}"><b>${esc((t?.name || "?")[0])}</b></span>`;
+
   const discName = Object.fromEntries(disciplines.map((d) => [d.id, d.name]));
 
   function renderAtlas() {
@@ -40,7 +45,8 @@
     );
     $("#atlas-grid").innerHTML = list.map((t, i) => `
       <a class="card" href="${esc(t.url)}" target="_blank" rel="noopener" style="animation-delay:${Math.min(i, 20) * 25}ms">
-        <div class="top"><h3>${esc(t.name)}</h3><span class="idx">${String(i + 1).padStart(2, "0")}</span></div>
+        <div class="top">${logo(t)}<span class="idx">${String(i + 1).padStart(2, "0")}</span></div>
+        <h3>${esc(t.name)}</h3>
         <span class="arrow">↗</span>
         <p class="desc">${esc(t.desc)}</p>
         <div class="meta"><span>${esc(t.kind)}</span><span class="lic">${esc(t.license)}</span></div>
