@@ -30,7 +30,7 @@
   });
   $("#q").addEventListener("input", renderAtlas);
 
-  // Simple Icons SVGs are black glyphs; GitHub avatars are photos shown in greyscale
+  // Simple Icons SVGs are brand-colour marks; GitHub avatars are full-bleed photos
   const logo = (t, cls = "") => t?.logo
     ? `<span class="plate ${cls}"><img src="${esc(t.logo)}" alt="" loading="lazy" class="${t.logo.endsWith(".svg") ? "glyph" : "photo"}" /></span>`
     : `<span class="plate ${cls}"><b>${esc((t?.name || "?")[0])}</b></span>`;
