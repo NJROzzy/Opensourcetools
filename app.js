@@ -729,42 +729,160 @@
   }
   loadWire(wire[0].id);
 
-  // Monochrome constellation field
+  // ---------------------------------------------------------------------
+  // Hero instruments: typed boot line, UTC clock, stats that count up.
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const bootText = `> indexing ${tools.length} open-source tools · ${projects.length} projects · ${tracks.length} build paths … ready`;
+  const boot = $("#boot");
+  if (reduced) boot.textContent = bootText;
+  else { let i = 0; const tick = () => { boot.textContent = bootText.slice(0, ++i); if (i < bootText.length) setTimeout(tick, 22); }; setTimeout(tick, 400); }
+  const clock = () => { $("#clock").textContent = new Date().toISOString().slice(11, 19) + " UTC"; };
+  clock(); setInterval(clock, 1000);
+  document.querySelectorAll("#stats .stat b").forEach((b) => {
+    const target = +b.textContent;
+    if (reduced || !target) return;
+    const start = performance.now(), dur = 1400;
+    const step = (now) => {
+      const k = Math.min(1, (now - start) / dur);
+      b.textContent = Math.round(target * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) requestAnimationFrame(step);
+    };
+    b.textContent = "0";
+    requestAnimationFrame(step);
+  });
+
+  // ---------------------------------------------------------------------
+  // Field: a depth starfield, a rotating point-cloud globe with orbit rings
+  // that drifts away as you scroll, and a perspective grid to the horizon.
   const c = $("#field");
   const ctx = c.getContext("2d");
-  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let pts = [], FW, FH, dpr;
-  const mouse = { x: -1e4, y: -1e4 };
+  const root = document.documentElement;
+  let FW, FH, dpr, small, stars = [], globe = [];
+  const mouse = { x: 0, y: 0, tx: 0, ty: 0 }; // -1..1, eased toward the pointer
   function size() {
     dpr = Math.min(devicePixelRatio || 1, 2);
     FW = c.width = innerWidth * dpr;
     FH = c.height = innerHeight * dpr;
-    const n = Math.round(Math.min(110, (innerWidth * innerHeight) / 14000));
-    pts = Array.from({ length: n }, () => ({ x: Math.random() * FW, y: Math.random() * FH, vx: (Math.random() - .5) * .25 * dpr, vy: (Math.random() - .5) * .25 * dpr }));
+    small = innerWidth < 760;
+    stars = Array.from({ length: small ? 120 : 240 }, () => ({ x: Math.random() * 2 - 1, y: Math.random() * 2 - 1, z: Math.random() }));
+    // Evenly spread points on a sphere (Fibonacci lattice)
+    const n = small ? 300 : 560, golden = Math.PI * (3 - Math.sqrt(5));
+    globe = Array.from({ length: n }, (_, i) => {
+      const y = 1 - (i / (n - 1)) * 2, r = Math.sqrt(1 - y * y), th = golden * i;
+      return [Math.cos(th) * r, y, Math.sin(th) * r];
+    });
+    if (reduced) frame(0);
   }
   addEventListener("resize", size);
-  addEventListener("pointermove", (e) => { mouse.x = e.clientX * dpr; mouse.y = e.clientY * dpr; });
-  function frame() {
-    ctx.clearRect(0, 0, FW, FH);
-    const R = 130 * dpr;
-    for (const p of pts) {
-      p.x += p.vx; p.y += p.vy;
-      if (p.x < 0 || p.x > FW) p.vx *= -1;
-      if (p.y < 0 || p.y > FH) p.vy *= -1;
+  addEventListener("pointermove", (e) => { mouse.tx = e.clientX / innerWidth * 2 - 1; mouse.ty = e.clientY / innerHeight * 2 - 1; });
+  if (reduced) addEventListener("scroll", () => frame(0), { passive: true });
+
+  const rotate = ([x, y, z], ay, ax) => {
+    const x1 = x * Math.cos(ay) + z * Math.sin(ay), z1 = -x * Math.sin(ay) + z * Math.cos(ay);
+    return [x1, y * Math.cos(ax) - z1 * Math.sin(ax), y * Math.sin(ax) + z1 * Math.cos(ax)];
+  };
+
+  function frame(now) {
+    const t = now / 1000;
+    mouse.x += (mouse.tx - mouse.x) * 0.05;
+    mouse.y += (mouse.ty - mouse.y) * 0.05;
+    root.style.setProperty("--mx", mouse.x.toFixed(3));
+    root.style.setProperty("--my", mouse.y.toFixed(3));
+    const sy = scrollY * dpr;
+
+    ctx.fillStyle = "#020202";
+    ctx.fillRect(0, 0, FW, FH);
+
+    // Halo behind the globe
+    const gx = FW * (small ? 0.5 : 0.72), gy = FH * (small ? 0.3 : 0.42) - sy * 0.45;
+    const halo = ctx.createRadialGradient(gx, gy, 0, gx, gy, Math.max(FW, FH) * 0.55);
+    halo.addColorStop(0, "rgba(255,255,255,0.08)");
+    halo.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = halo;
+    ctx.fillRect(0, 0, FW, FH);
+
+    // Starfield flying gently toward the viewer
+    for (const s of stars) {
+      if (!reduced) s.z -= 0.0012;
+      let px = FW / 2 + (s.x / s.z) * FW * 0.22 - mouse.x * 20 * dpr * (1 - s.z);
+      let py = FH / 2 + (s.y / s.z) * FH * 0.22 - mouse.y * 20 * dpr * (1 - s.z);
+      if (s.z < 0.03 || px < 0 || px > FW || py < 0 || py > FH) { s.z = 1; s.x = Math.random() * 2 - 1; s.y = Math.random() * 2 - 1; continue; }
+      const k = 1 - s.z;
+      ctx.fillStyle = `rgba(255,255,255,${(0.15 + k * 0.85).toFixed(3)})`;
+      const r = (0.4 + k * 1.6) * dpr;
+      ctx.fillRect(px - r / 2, py - r / 2, r, r);
     }
-    for (let i = 0; i < pts.length; i++) {
-      const a = pts[i];
-      for (let j = i + 1; j < pts.length; j++) {
-        const b = pts[j], d = Math.hypot(a.x - b.x, a.y - b.y);
-        if (d < R) { ctx.strokeStyle = `rgba(255,255,255,${(1 - d / R) * .22})`; ctx.lineWidth = dpr * .6; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); }
+
+    // Perspective grid floor; scrolling moves you across it
+    const horizon = FH * 0.66;
+    const spacing = 0.5, off = ((t * 0.25 + sy * 0.0025) % spacing);
+    ctx.lineWidth = dpr;
+    for (let i = 0; i < 26; i++) {
+      const z = 0.35 + i * spacing - off;
+      if (z <= 0.3) continue;
+      const y = horizon + (FH * 0.22) / z;
+      if (y > FH) continue;
+      ctx.strokeStyle = `rgba(255,255,255,${Math.min(0.28, 0.5 / (z * 2.2)).toFixed(3)})`;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(FW, y); ctx.stroke();
+    }
+    const vx = FW / 2 - mouse.x * 60 * dpr;
+    for (let k = -18; k <= 18; k++) {
+      ctx.strokeStyle = `rgba(255,255,255,${(0.16 - Math.abs(k) * 0.006).toFixed(3)})`;
+      ctx.beginPath(); ctx.moveTo(vx + k * 6 * dpr, horizon); ctx.lineTo(FW / 2 + k * FW * 0.09, FH); ctx.stroke();
+    }
+    // Soften the horizon and draw its glow
+    const fade = ctx.createLinearGradient(0, horizon - 2, 0, horizon + FH * 0.12);
+    fade.addColorStop(0, "rgba(2,2,2,1)"); fade.addColorStop(1, "rgba(2,2,2,0)");
+    ctx.fillStyle = fade; ctx.fillRect(0, horizon - 2, FW, FH * 0.12 + 2);
+    const glow = ctx.createLinearGradient(0, 0, FW, 0);
+    glow.addColorStop(0, "rgba(255,255,255,0)"); glow.addColorStop(0.5, "rgba(255,255,255,0.45)"); glow.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = glow; ctx.fillRect(0, horizon - dpr, FW, dpr);
+
+    // Globe of points, with a scanning band and two orbit rings
+    const R = Math.min(FW, FH) * (small ? 0.3 : 0.28);
+    if (gy + R * 1.6 > 0) {
+      const ay = t * 0.12 + mouse.x * 0.5, ax = -0.35 + mouse.y * 0.25;
+      const band = Math.sin(t * 0.6);
+      for (const p of globe) {
+        const [x, y, z] = rotate(p, ay, ax);
+        const f = 2.8 / (2.8 - z);
+        const lit = Math.abs(y - band) < 0.035;
+        const a = lit ? 1 : 0.12 + 0.68 * (z + 1) / 2;
+        ctx.fillStyle = `rgba(255,255,255,${a.toFixed(3)})`;
+        const r = (lit ? 2.2 : 1.3) * dpr * f;
+        ctx.fillRect(gx + x * R * f - r / 2, gy + y * R * f - r / 2, r, r);
       }
-      const dm = Math.hypot(a.x - mouse.x, a.y - mouse.y);
-      if (dm < R * 1.4) { ctx.strokeStyle = `rgba(255,255,255,${(1 - dm / (R * 1.4)) * .45})`; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke(); }
-      ctx.fillStyle = "rgba(255,255,255,.7)";
-      ctx.fillRect(a.x - dpr, a.y - dpr, 2 * dpr, 2 * dpr);
+      for (const [tilt, speed, scale] of [[0.9, 0.5, 1.45], [-0.5, -0.35, 1.7]]) {
+        ctx.beginPath();
+        for (let i = 0; i <= 96; i++) {
+          const th = (i / 96) * Math.PI * 2;
+          const [x, y, z] = rotate([Math.cos(th) * scale, 0, Math.sin(th) * scale], 0.4, tilt + mouse.y * 0.1);
+          const f = 2.8 / (2.8 - z * 0.6);
+          const px = gx + x * R * f, py = gy + y * R * f;
+          i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+        }
+        ctx.strokeStyle = "rgba(255,255,255,0.16)";
+        ctx.stroke();
+        const th = t * speed;
+        const [x, y, z] = rotate([Math.cos(th) * scale, 0, Math.sin(th) * scale], 0.4, tilt + mouse.y * 0.1);
+        const f = 2.8 / (2.8 - z * 0.6);
+        const sat = [gx + x * R * f, gy + y * R * f];
+        ctx.fillStyle = "#fff";
+        ctx.beginPath(); ctx.arc(sat[0], sat[1], 2.6 * dpr, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,0.35)";
+        ctx.beginPath(); ctx.arc(sat[0], sat[1], 7 * dpr, 0, Math.PI * 2); ctx.stroke();
+      }
     }
-    if (!reduced) requestAnimationFrame(frame);
+
+    // A slow scan beam sweeping down the screen
+    if (!reduced) {
+      const by = ((t * 70 * dpr) % (FH * 1.6)) - FH * 0.3;
+      const beam = ctx.createLinearGradient(0, by - 60 * dpr, 0, by);
+      beam.addColorStop(0, "rgba(255,255,255,0)"); beam.addColorStop(1, "rgba(255,255,255,0.05)");
+      ctx.fillStyle = beam; ctx.fillRect(0, by - 60 * dpr, FW, 60 * dpr);
+      requestAnimationFrame(frame);
+    }
   }
   size();
-  frame();
+  if (!reduced) requestAnimationFrame(frame);
 })();

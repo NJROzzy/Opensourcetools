@@ -30,9 +30,17 @@
   </header>
 
   <main id="top">
-    <section class="hero wrap">
-      <p class="eyebrow">Vol. I &nbsp;·&nbsp; An Open Source Atlas &nbsp;·&nbsp; <span id="today"></span></p>
-      <h1>Amalgam</h1>
+    <section class="hero wrap" id="hero">
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <div class="hud-top">
+        <span class="live"><i></i>Live</span>
+        <span>AMG · Open Source Atlas · Vol. I</span>
+        <span id="today"></span>
+        <span id="clock">--:--:-- UTC</span>
+      </div>
+      <p class="boot" id="boot" aria-hidden="true"></p>
+      <h1 class="title" data-text="Amalgam"><span>Amalgam</span></h1>
+      <p class="byline"><span></span>by NJR</p>
       <p class="lede">
         A field guide to the <em>free and open-source</em> instruments with which one may build
         a proper project across <strong>Computer Science</strong> — from hardware, software and computation
@@ -41,6 +49,7 @@
         catalogued, annotated, and read against the currents of the day.
       </p>
       <div class="stats" id="stats"></div>
+      <a class="scroll-cue" href="#paths" aria-label="Scroll to Build Paths">Scroll<span></span></a>
     </section>
 
     <section id="paths" class="wrap section">
