@@ -16,6 +16,713 @@ window.ATLAS = {
     {id: "emerging", name: "Emerging Computing", short: "Emerging"},
   ],
 
+  // Build tracks shown first on the page, in order, with each one's
+  // common-path architecture in `architectures`.
+  tracks: [
+    {id: "web", group: "Software Engineering", name: "Web applications", blurb: "Sites, dashboards and full-stack products that run in the browser — from the interface down to the database and the server that delivers it."},
+    {id: "mobile", group: "Software Engineering", name: "Mobile applications", blurb: "Apps for Android and iOS: cross-platform or native, offline-first, with a backend, notifications and an automated release path.", note: "Every tool here is open source. Publishing to Apple's App Store additionally requires Xcode, which is free but not open source; Android builds use the free Android SDK built from the Apache-2.0 Android Open Source Project."},
+    {id: "aiml", group: "Intelligent Systems", name: "AI / ML", blurb: "From raw data to a served model and the applications on top — classical ML, deep learning and language-model systems."},
+    {id: "robotics", group: "Intelligent Systems", name: "Robotics", blurb: "Machines that sense, decide and act — designed, simulated, programmed and taught with open tools."},
+    {id: "data", group: "Systems & Infrastructure", name: "Data", blurb: "Moving, storing, transforming and analysing data, from a laptop to a cluster."},
+    {id: "distributed", group: "Systems & Infrastructure", name: "Distributed systems", blurb: "Many machines acting as one reliable system: packaged, orchestrated, connected and observed."},
+    {id: "networks", group: "Systems & Infrastructure", name: "Networks", blurb: "How computers reach each other — built, secured, inspected and studied."},
+    {id: "security", group: "Systems & Infrastructure", name: "Security", blurb: "Protecting code, systems and networks: prevent, detect, respond and test."},
+    {id: "hardware", group: "Foundations & Frontiers", name: "Hardware", blurb: "Boards, firmware and chips — from schematic to silicon layout."},
+    {id: "computation", group: "Foundations & Frontiers", name: "Computation", blurb: "Mathematics, algorithms and proof: model it, compute it, optimise it, verify it."},
+    {id: "emerging", group: "Foundations & Frontiers", name: "Emerging computing", blurb: "Paradigms beyond classical transistors — quantum and neuromorphic computing."},
+  ],
+
+  architectures: {
+    web: {
+      title: "The common path of a web application",
+      stages: [
+        {
+          name: "Interface",
+          role: "What the user sees and interacts with in the browser.",
+          tools: [
+            "React",
+            "Vue.js",
+            "Svelte",
+            "Astro"
+          ]
+        },
+        {
+          name: "Build & style",
+          role: "Types, bundling and styling that turn source into fast, consistent pages.",
+          tools: [
+            "TypeScript",
+            "Vite",
+            "Tailwind CSS"
+          ]
+        },
+        {
+          name: "Server & API",
+          role: "Business logic and the API the interface calls; may also render pages on the server.",
+          tools: [
+            "Node.js",
+            "Next.js",
+            "Django",
+            "FastAPI",
+            "Go"
+          ]
+        },
+        {
+          name: "Data",
+          role: "Durable storage, caching, search and the code that talks to them.",
+          tools: [
+            "PostgreSQL",
+            "SQLite",
+            "Prisma ORM",
+            "Valkey",
+            "Meilisearch"
+          ]
+        },
+        {
+          name: "Identity",
+          role: "Sign-up, login and single sign-on, kept out of your own code.",
+          tools: [
+            "Keycloak",
+            "Supabase",
+            "PocketBase"
+          ]
+        },
+        {
+          name: "Test",
+          role: "Automated checks that the app works the way users experience it.",
+          tools: [
+            "Playwright",
+            "pytest"
+          ]
+        },
+        {
+          name: "Deliver",
+          role: "HTTPS, routing and packaging that put the app on the internet.",
+          tools: [
+            "Caddy",
+            "NGINX",
+            "Docker Engine (Moby)"
+          ]
+        },
+        {
+          name: "Observe",
+          role: "Metrics, traces and dashboards that show it working in production.",
+          tools: [
+            "OpenTelemetry",
+            "Prometheus",
+            "Grafana"
+          ]
+        }
+      ]
+    },
+    mobile: {
+      title: "The common path of a mobile application",
+      stages: [
+        {
+          name: "UI framework",
+          role: "How screens are built — one codebase for both platforms, or native Android.",
+          tools: [
+            "Flutter",
+            "React Native",
+            "Jetpack Compose",
+            "Capacitor"
+          ]
+        },
+        {
+          name: "Language & tooling",
+          role: "The language and project tooling around the framework.",
+          tools: [
+            "Kotlin",
+            "TypeScript",
+            "Expo"
+          ]
+        },
+        {
+          name: "On-device data",
+          role: "Local storage so the app works offline and opens instantly.",
+          tools: [
+            "SQLite"
+          ]
+        },
+        {
+          name: "Backend & sync",
+          role: "Accounts, data sync and files on a server you control.",
+          tools: [
+            "PocketBase",
+            "Supabase",
+            "Appwrite"
+          ]
+        },
+        {
+          name: "Notifications",
+          role: "Reaching users when the app is closed.",
+          tools: [
+            "ntfy"
+          ]
+        },
+        {
+          name: "Test",
+          role: "Driving the real app on emulators and devices.",
+          tools: [
+            "Maestro",
+            "Detox"
+          ]
+        },
+        {
+          name: "Build & release",
+          role: "Signing, versioning and publishing builds automatically.",
+          tools: [
+            "fastlane",
+            "F-Droid"
+          ]
+        }
+      ]
+    },
+    aiml: {
+      title: "The common path of an AI / ML system",
+      stages: [
+        {
+          name: "Data",
+          role: "Collect, clean and version the data everything else depends on.",
+          tools: [
+            "pandas",
+            "Polars",
+            "DuckDB",
+            "DVC"
+          ]
+        },
+        {
+          name: "Explore",
+          role: "Understand the data and prototype ideas interactively.",
+          tools: [
+            "Jupyter"
+          ]
+        },
+        {
+          name: "Model",
+          role: "Choose and train the model — classical, deep or pretrained.",
+          tools: [
+            "scikit-learn",
+            "XGBoost",
+            "PyTorch",
+            "JAX",
+            "Hugging Face Transformers"
+          ]
+        },
+        {
+          name: "Scale",
+          role: "Spread training and data processing across machines.",
+          tools: [
+            "Ray",
+            "Apache Spark"
+          ]
+        },
+        {
+          name: "Track",
+          role: "Record every experiment so results can be compared and reproduced.",
+          tools: [
+            "MLflow"
+          ]
+        },
+        {
+          name: "Serve",
+          role: "Run the model behind an API, on a server or on a device.",
+          tools: [
+            "vLLM",
+            "Ollama",
+            "ONNX Runtime",
+            "llama.cpp"
+          ]
+        },
+        {
+          name: "Apply",
+          role: "Retrieval, agents and tools that turn a model into a product.",
+          tools: [
+            "LlamaIndex",
+            "LangChain",
+            "Qdrant",
+            "Model Context Protocol"
+          ]
+        },
+        {
+          name: "Monitor",
+          role: "Watch latency, errors and drift once real users arrive.",
+          tools: [
+            "Prometheus",
+            "Grafana"
+          ]
+        }
+      ]
+    },
+    robotics: {
+      title: "The common path of a robot",
+      stages: [
+        {
+          name: "Design",
+          role: "Mechanical parts and the electronics that carry sensors and motors.",
+          tools: [
+            "FreeCAD",
+            "KiCad"
+          ]
+        },
+        {
+          name: "Low-level control",
+          role: "Firmware on the microcontroller or flight controller.",
+          tools: [
+            "Arduino IDE",
+            "PX4",
+            "ArduPilot",
+            "Zephyr RTOS"
+          ]
+        },
+        {
+          name: "Middleware",
+          role: "The robot's nervous system — every component talks through it.",
+          tools: [
+            "ROS 2"
+          ]
+        },
+        {
+          name: "Perceive",
+          role: "Turn camera and sensor data into an understanding of the world.",
+          tools: [
+            "OpenCV",
+            "PyTorch"
+          ]
+        },
+        {
+          name: "Plan & act",
+          role: "Decide where to go and how to move safely.",
+          tools: [
+            "Nav2",
+            "MoveIt 2",
+            "Drake"
+          ]
+        },
+        {
+          name: "Simulate",
+          role: "Test everything in a virtual world before risking hardware.",
+          tools: [
+            "Gazebo",
+            "MuJoCo",
+            "Webots",
+            "Genesis"
+          ]
+        },
+        {
+          name: "Learn",
+          role: "Teach skills from demonstrations or trial and error.",
+          tools: [
+            "LeRobot",
+            "Ray",
+            "JAX"
+          ]
+        },
+        {
+          name: "Fleet",
+          role: "Collect telemetry from many robots and watch them.",
+          tools: [
+            "NATS",
+            "Grafana"
+          ]
+        }
+      ]
+    },
+    data: {
+      title: "The common path of a data platform",
+      stages: [
+        {
+          name: "Ingest",
+          role: "Capture events and records as they happen.",
+          tools: [
+            "Apache Kafka",
+            "NATS"
+          ]
+        },
+        {
+          name: "Store",
+          role: "Keep data in the engine that suits how it is queried.",
+          tools: [
+            "PostgreSQL",
+            "ClickHouse",
+            "DuckDB"
+          ]
+        },
+        {
+          name: "Transform",
+          role: "Clean and model raw data into trustworthy tables.",
+          tools: [
+            "dbt Core",
+            "Apache Spark",
+            "Polars"
+          ]
+        },
+        {
+          name: "Orchestrate",
+          role: "Run pipelines on schedule, with retries and lineage.",
+          tools: [
+            "Apache Airflow"
+          ]
+        },
+        {
+          name: "Exchange",
+          role: "Move tables between tools without copying.",
+          tools: [
+            "Apache Arrow"
+          ]
+        },
+        {
+          name: "Search",
+          role: "Find records by text or by meaning.",
+          tools: [
+            "Meilisearch",
+            "Qdrant",
+            "pgvector"
+          ]
+        },
+        {
+          name: "Visualise",
+          role: "Put the numbers in front of people.",
+          tools: [
+            "Grafana",
+            "Jupyter"
+          ]
+        }
+      ]
+    },
+    distributed: {
+      title: "The common path of a distributed system",
+      stages: [
+        {
+          name: "Build",
+          role: "Languages suited to concurrent network services.",
+          tools: [
+            "Go",
+            "Rust"
+          ]
+        },
+        {
+          name: "Package",
+          role: "Freeze each service with its dependencies.",
+          tools: [
+            "Docker Engine (Moby)"
+          ]
+        },
+        {
+          name: "Provision",
+          role: "Declare servers, networks and clusters as code.",
+          tools: [
+            "OpenTofu"
+          ]
+        },
+        {
+          name: "Orchestrate",
+          role: "Schedule, heal and scale services; agree on shared state.",
+          tools: [
+            "Kubernetes",
+            "etcd"
+          ]
+        },
+        {
+          name: "Connect",
+          role: "How services call and message each other.",
+          tools: [
+            "gRPC",
+            "Envoy",
+            "NATS",
+            "Apache Kafka"
+          ]
+        },
+        {
+          name: "Observe",
+          role: "Traces, metrics and dashboards across every service.",
+          tools: [
+            "OpenTelemetry",
+            "Prometheus",
+            "Grafana"
+          ]
+        },
+        {
+          name: "Secure",
+          role: "Secrets and scanning built into the platform.",
+          tools: [
+            "OpenBao",
+            "Trivy"
+          ]
+        }
+      ]
+    },
+    networks: {
+      title: "The common path of a networked system",
+      stages: [
+        {
+          name: "Model",
+          role: "Design and study a network before building it.",
+          tools: [
+            "Mininet",
+            "ns-3"
+          ]
+        },
+        {
+          name: "Edge",
+          role: "Serve and route traffic arriving from the internet.",
+          tools: [
+            "Caddy",
+            "NGINX",
+            "Envoy"
+          ]
+        },
+        {
+          name: "Encrypt",
+          role: "Private tunnels and TLS for everything in transit.",
+          tools: [
+            "WireGuard",
+            "OpenSSL",
+            "Certbot"
+          ]
+        },
+        {
+          name: "Message",
+          role: "Protocols for devices and services to talk.",
+          tools: [
+            "Eclipse Mosquitto",
+            "NATS",
+            "gRPC"
+          ]
+        },
+        {
+          name: "Inspect",
+          role: "See exactly what is on the wire.",
+          tools: [
+            "Wireshark",
+            "curl"
+          ]
+        },
+        {
+          name: "Monitor",
+          role: "Watch traffic and health continuously.",
+          tools: [
+            "Zeek",
+            "Prometheus",
+            "Grafana"
+          ]
+        }
+      ]
+    },
+    security: {
+      title: "The common path of a secure system",
+      stages: [
+        {
+          name: "Code",
+          role: "Find insecure patterns before they are merged.",
+          tools: [
+            "Semgrep CE"
+          ]
+        },
+        {
+          name: "Supply chain",
+          role: "Check dependencies and images for known flaws.",
+          tools: [
+            "Trivy"
+          ]
+        },
+        {
+          name: "Secrets & identity",
+          role: "Keep keys out of code; centralise login.",
+          tools: [
+            "OpenBao",
+            "Keycloak"
+          ]
+        },
+        {
+          name: "Transport",
+          role: "Encrypt every connection.",
+          tools: [
+            "OpenSSL",
+            "Certbot",
+            "WireGuard"
+          ]
+        },
+        {
+          name: "Detect",
+          role: "Spot attacks on the network as they happen.",
+          tools: [
+            "Zeek",
+            "Suricata"
+          ]
+        },
+        {
+          name: "Respond",
+          role: "Correlate events across machines and act.",
+          tools: [
+            "Wazuh"
+          ]
+        },
+        {
+          name: "Test & analyse",
+          role: "Attack your own systems and take binaries apart — with permission.",
+          tools: [
+            "ZAP",
+            "Metasploit Framework",
+            "Ghidra",
+            "Wireshark"
+          ]
+        }
+      ]
+    },
+    hardware: {
+      title: "The common path of a hardware project",
+      stages: [
+        {
+          name: "Board",
+          role: "Schematic and printed-circuit-board layout.",
+          tools: [
+            "KiCad"
+          ]
+        },
+        {
+          name: "Enclosure",
+          role: "The mechanical parts that hold it together.",
+          tools: [
+            "FreeCAD"
+          ]
+        },
+        {
+          name: "Firmware",
+          role: "Code that runs on the microcontroller.",
+          tools: [
+            "Zephyr RTOS",
+            "Arduino IDE",
+            "PlatformIO"
+          ]
+        },
+        {
+          name: "Emulate",
+          role: "Run and test firmware without the board.",
+          tools: [
+            "QEMU"
+          ]
+        },
+        {
+          name: "Chip: simulate",
+          role: "For custom silicon — prove the design computes correctly.",
+          tools: [
+            "Verilator"
+          ]
+        },
+        {
+          name: "Chip: synthesise",
+          role: "Turn the design into gates, or an FPGA bitstream.",
+          tools: [
+            "Yosys"
+          ]
+        },
+        {
+          name: "Chip: lay out",
+          role: "Place and route the gates into a manufacturable layout.",
+          tools: [
+            "OpenROAD"
+          ]
+        }
+      ]
+    },
+    computation: {
+      title: "The common path of a computational project",
+      stages: [
+        {
+          name: "Model",
+          role: "State the problem exactly, symbolically if possible.",
+          tools: [
+            "SymPy"
+          ]
+        },
+        {
+          name: "Compute",
+          role: "Solve it numerically at speed.",
+          tools: [
+            "Julia",
+            "NumPy",
+            "GNU Octave",
+            "JAX"
+          ]
+        },
+        {
+          name: "Optimise",
+          role: "Search for the best answer under constraints.",
+          tools: [
+            "OR-Tools"
+          ]
+        },
+        {
+          name: "Verify",
+          role: "Prove the method correct and check its edge cases.",
+          tools: [
+            "Lean 4",
+            "Z3"
+          ]
+        },
+        {
+          name: "Implement",
+          role: "Compile a fast, safe implementation.",
+          tools: [
+            "Rust",
+            "GHC (Haskell)",
+            "LLVM"
+          ]
+        },
+        {
+          name: "Communicate",
+          role: "Share the reasoning alongside the results.",
+          tools: [
+            "Jupyter"
+          ]
+        }
+      ]
+    },
+    emerging: {
+      title: "The common path of an emerging-computing experiment",
+      stages: [
+        {
+          name: "Notebook",
+          role: "Where experiments are written and explained.",
+          tools: [
+            "Jupyter"
+          ]
+        },
+        {
+          name: "Circuits",
+          role: "Build and run quantum circuits on simulators or hardware.",
+          tools: [
+            "Qiskit",
+            "Cirq"
+          ]
+        },
+        {
+          name: "Physics",
+          role: "Model noise and the physics of real devices.",
+          tools: [
+            "QuTiP"
+          ]
+        },
+        {
+          name: "Hybrid learning",
+          role: "Train quantum circuits inside classical neural networks.",
+          tools: [
+            "PennyLane",
+            "PyTorch"
+          ]
+        },
+        {
+          name: "Neuromorphic",
+          role: "Brain-inspired spiking networks and chips.",
+          tools: [
+            "snnTorch",
+            "Lava"
+          ]
+        }
+      ]
+    }
+  },
+
   // domains: [primary, ...also]. foundation: shown on the map's ground when
   // none of its domains is among the three chosen.
   tools: [
@@ -42,8 +749,8 @@ window.ATLAS = {
     {domains: ["ai"], name: "Whisper", logo: "logos/whisper.png", kind: "Speech recognition", license: "MIT", url: "https://github.com/openai/whisper", desc: "Robust multilingual speech-to-text, runnable offline."},
     {domains: ["ai"], name: "ComfyUI", logo: "logos/comfyui.png", kind: "Image generation", license: "GPL-3.0", url: "https://github.com/comfyanonymous/ComfyUI", desc: "Node-graph workbench for diffusion and generative pipelines."},
     {domains: ["ai","ml"], name: "OLMo (AI2)", logo: "logos/olmo.png", kind: "Fully open model", license: "Apache-2.0", url: "https://allenai.org/olmo", desc: "Open weights, open data, open training code — a model you can study end to end."},
-    {domains: ["ai"], name: "Qwen", logo: "logos/qwen.svg", kind: "Open-weight models", license: "Apache-2.0 (most)", url: "https://github.com/QwenLM", desc: "Capable open-weight language and vision models in many sizes."},
-    {domains: ["ai"], name: "Mistral (open models)", logo: "logos/mistral.svg", kind: "Open-weight models", license: "Apache-2.0 (select)", url: "https://github.com/mistralai", desc: "Efficient European open-weight models; check each model's licence."},
+    {domains: ["ai"], name: "Qwen", logo: "logos/qwen.svg", kind: "Open-weight models", license: "Apache-2.0", url: "https://github.com/QwenLM", desc: "Capable open-weight language and vision models; use the Apache-2.0 releases."},
+    {domains: ["ai"], name: "Mistral (open models)", logo: "logos/mistral.svg", kind: "Open-weight models", license: "Apache-2.0", url: "https://github.com/mistralai", desc: "Efficient open-weight models; use the Apache-2.0 releases such as Mistral Small."},
     {domains: ["ml","ai","robotics"], name: "PyTorch", logo: "logos/pytorch.svg", kind: "Deep learning", license: "BSD-3-Clause", url: "https://pytorch.org", desc: "The dominant research framework for neural networks."},
     {domains: ["ml","robotics","computation"], name: "JAX", logo: "logos/jax.png", kind: "Deep learning", license: "Apache-2.0", url: "https://github.com/jax-ml/jax", desc: "Composable transforms — grad, jit, vmap — for numerical research."},
     {domains: ["ml","ai"], name: "TensorFlow", logo: "logos/tensorflow.svg", kind: "Deep learning", license: "Apache-2.0", url: "https://www.tensorflow.org", desc: "Production-grade ML with mobile and edge deployment via LiteRT."},
@@ -134,62 +841,96 @@ window.ATLAS = {
     {domains: ["emerging","computation"], name: "QuTiP", logo: "logos/qutip.png", kind: "Quantum simulation", license: "BSD-3-Clause", url: "https://qutip.org", desc: "Simulates open quantum systems — noise, decoherence and dynamics."},
     {domains: ["emerging","ml"], name: "Lava", logo: "logos/lava.png", kind: "Neuromorphic framework", license: "BSD-3-Clause / LGPL-2.1", url: "https://lava-nc.org", desc: "Programs neuromorphic chips and simulates spiking networks."},
     {domains: ["emerging","ml"], name: "snnTorch", kind: "Spiking neural nets", license: "MIT", url: "https://snntorch.readthedocs.io", desc: "Trains brain-inspired spiking neural networks with PyTorch."},
+    {domains: ["software"], name: "Vue.js", logo: "logos/vuejs.svg", kind: "UI framework", license: "MIT", url: "https://vuejs.org", desc: "An approachable, progressive framework for web interfaces."},
+    {domains: ["software"], name: "Svelte", logo: "logos/svelte.svg", kind: "UI framework", license: "MIT", url: "https://svelte.dev", desc: "Compiles components to lean JavaScript; SvelteKit adds routing and server rendering."},
+    {domains: ["software","networks"], name: "Next.js", logo: "logos/nextjs.svg", kind: "Full-stack React framework", license: "MIT", url: "https://nextjs.org", desc: "Server rendering, routing and API routes for React applications."},
+    {domains: ["software"], name: "Astro", logo: "logos/astro.svg", kind: "Content site framework", license: "MIT", url: "https://astro.build", desc: "Fast content-first sites that ship almost no JavaScript by default."},
+    {domains: ["software"], name: "Tailwind CSS", logo: "logos/tailwind.svg", kind: "Styling", license: "MIT", url: "https://tailwindcss.com", desc: "Utility-first CSS for building consistent designs quickly."},
+    {domains: ["software"], name: "Vite", logo: "logos/vite.svg", kind: "Build tool", license: "MIT", url: "https://vite.dev", desc: "Instant dev server and optimised production builds for the web."},
+    {domains: ["software","networks"], name: "Django", logo: "logos/django.svg", kind: "Web framework", license: "BSD-3-Clause", url: "https://www.djangoproject.com", desc: "Batteries-included Python web framework with an admin, ORM and auth."},
+    {domains: ["software","networks"], name: "FastAPI", logo: "logos/fastapi.svg", kind: "API framework", license: "MIT", url: "https://fastapi.tiangolo.com", desc: "Typed, fast Python APIs with automatic interactive documentation."},
+    {domains: ["software","data"], name: "Prisma ORM", logo: "logos/prisma.svg", kind: "Database toolkit", license: "Apache-2.0", url: "https://github.com/prisma/prisma", desc: "Type-safe database access and migrations for TypeScript."},
+    {domains: ["software"], name: "Playwright", logo: "logos/playwright.svg", kind: "End-to-end testing", license: "Apache-2.0", url: "https://playwright.dev", desc: "Drives real browsers to test web apps exactly as users experience them."},
+    {domains: ["security","software"], name: "Keycloak", logo: "logos/keycloak.svg", kind: "Identity & SSO", license: "Apache-2.0", url: "https://www.keycloak.org", desc: "Single sign-on, social login and user management you host yourself."},
+    {domains: ["software","data"], name: "Supabase", logo: "logos/supabase.svg", kind: "Backend platform", license: "Apache-2.0", url: "https://github.com/supabase/supabase", desc: "Postgres with auth, storage, realtime and instant APIs — self-hostable."},
+    {domains: ["data","software"], name: "Meilisearch", logo: "logos/meilisearch.svg", kind: "Search engine", license: "MIT", url: "https://www.meilisearch.com", desc: "Typo-tolerant instant search for sites and apps."},
+    {domains: ["software","data"], name: "PocketBase", logo: "logos/pocketbase.svg", kind: "Backend in one file", license: "MIT", url: "https://pocketbase.io", desc: "Database, auth, files and realtime in a single executable."},
+    {domains: ["software","data"], name: "Appwrite", logo: "logos/appwrite.svg", kind: "Backend platform", license: "BSD-3-Clause", url: "https://appwrite.io", desc: "Self-hosted backend for web and mobile: auth, databases, storage, functions."},
+    {domains: ["software"], name: "Flutter", logo: "logos/flutter.svg", kind: "Cross-platform UI", license: "BSD-3-Clause", url: "https://flutter.dev", desc: "One Dart codebase for Android, iOS, web and desktop with native performance."},
+    {domains: ["software"], name: "React Native", logo: "logos/reactnative.svg", kind: "Cross-platform UI", license: "MIT", url: "https://reactnative.dev", desc: "Native mobile apps written in React and TypeScript."},
+    {domains: ["software"], name: "Expo", logo: "logos/expo.svg", kind: "React Native framework", license: "MIT", url: "https://github.com/expo/expo", desc: "Tooling and native modules that make React Native apps quick to build."},
+    {domains: ["software"], name: "Kotlin", logo: "logos/kotlin.svg", kind: "Language", license: "Apache-2.0", url: "https://kotlinlang.org", desc: "The modern language for Android, also on server and multiplatform."},
+    {domains: ["software"], name: "Jetpack Compose", logo: "logos/compose.svg", kind: "Android UI toolkit", license: "Apache-2.0", url: "https://developer.android.com/compose", desc: "Declarative native Android interfaces in Kotlin."},
+    {domains: ["software"], name: "Capacitor", logo: "logos/capacitor.svg", kind: "Web-to-native runtime", license: "MIT", url: "https://capacitorjs.com", desc: "Ships an existing web app as a native mobile app with device APIs."},
+    {domains: ["software"], name: "fastlane", logo: "logos/fastlane.svg", kind: "Release automation", license: "MIT", url: "https://fastlane.tools", desc: "Automates builds, signing, screenshots and store releases."},
+    {domains: ["software"], name: "Maestro", logo: "logos/maestro.png", kind: "Mobile UI testing", license: "Apache-2.0", url: "https://github.com/mobile-dev-inc/maestro", desc: "Readable end-to-end UI tests for mobile apps."},
+    {domains: ["software"], name: "Detox", logo: "logos/detox.png", kind: "Mobile UI testing", license: "MIT", url: "https://github.com/wix/Detox", desc: "Grey-box end-to-end testing for React Native apps."},
+    {domains: ["software","security"], name: "F-Droid", logo: "logos/fdroid.svg", kind: "App distribution", license: "GPL-3.0 / AGPL-3.0", url: "https://f-droid.org", desc: "A catalogue and build service for free and open-source Android apps."},
+    {domains: ["networks","software"], name: "ntfy", logo: "logos/ntfy.svg", kind: "Push notifications", license: "Apache-2.0 / GPL-2.0", url: "https://ntfy.sh", desc: "Self-hostable push notifications to phones over simple HTTP."},
   ],
 
-  // Projects, each tagged with the domains it combines. The map places a
-  // project in the region matching its domains among the three chosen.
+  // Projects, each in one build track and tagged with the domains it
+  // combines. The map places a project by its domains.
   projects: [
-    {name: "Private document assistant", short: "Doc assistant", domains: ["ai","data"], desc: "Chat with your own PDFs and notes, fully offline, using retrieval-augmented generation.", tools: ["Ollama","LlamaIndex","PostgreSQL","Qwen"]},
-    {name: "Meeting transcriber & summariser", short: "Meeting transcriber", domains: ["ai"], desc: "Record, transcribe, then summarise discussions into action items.", tools: ["Whisper","llama.cpp","SQLite"]},
-    {name: "Tool-using agent", short: "Tool-using agent", domains: ["ai","software"], desc: "An assistant that searches, files tickets and queries databases through open protocol servers.", tools: ["Model Context Protocol","LangChain","Ollama"]},
-    {name: "Tabular prediction model", short: "Tabular predictor", domains: ["ml","data"], desc: "Forecast churn, prices or risk from structured data with a tracked, reproducible pipeline.", tools: ["pandas","scikit-learn","XGBoost","MLflow"]},
-    {name: "Reproducible research pipeline", short: "Research pipeline", domains: ["ml","software"], desc: "Version data, notebooks and models so every figure in a paper can be regenerated.", tools: ["Jupyter","DVC","PyTorch","Git"]},
-    {name: "Large-scale data analysis", short: "Big-data analysis", domains: ["ml","data"], desc: "Explore millions of rows and train boosted models on a single machine.", tools: ["Polars","LightGBM","Jupyter"]},
-    {name: "Autonomous mobile robot", short: "Mobile robot", domains: ["robotics"], desc: "Map a room, localise and navigate around obstacles — first in simulation, then on hardware.", tools: ["ROS 2","Nav2","Gazebo"]},
-    {name: "Survey drone mission", short: "Survey drone", domains: ["robotics","hardware"], desc: "Plan and fly waypoint missions with failsafes, tested in software-in-the-loop.", tools: ["PX4","ROS 2","Gazebo"]},
-    {name: "Robot arm motion planner", short: "Arm planner", domains: ["robotics","computation"], desc: "Collision-free trajectories for a manipulator, with verified dynamics.", tools: ["MoveIt 2","Drake","ROS 2"]},
-    {name: "Fine-tune an open model", short: "Fine-tune an LLM", domains: ["ai","ml"], desc: "Adapt an open-weight language model to your domain, then serve it at speed.", tools: ["Hugging Face Transformers","PyTorch","OLMo (AI2)","vLLM"]},
-    {name: "Custom image generator", short: "Image generator", domains: ["ai","ml"], desc: "Train a style adapter and compose a reusable generation workflow.", tools: ["ComfyUI","PyTorch","Hugging Face Transformers"]},
-    {name: "Evaluated RAG system", short: "Evaluated RAG", domains: ["ai","ml","data"], desc: "Measure retrieval and answer quality across experiments, not by vibes.", tools: ["LlamaIndex","MLflow","Qwen","PostgreSQL"]},
-    {name: "Legged locomotion via RL", short: "RL walking", domains: ["ml","robotics"], desc: "Train a walking policy across thousands of parallel simulated robots.", tools: ["MuJoCo","JAX","Ray"]},
-    {name: "Vision-guided pick & place", short: "Pick & place", domains: ["ml","robotics"], desc: "Detect objects with a trained network and plan grasps for an arm.", tools: ["OpenCV","PyTorch","MoveIt 2","ROS 2"]},
-    {name: "Edge perception on a rover", short: "Edge rover", domains: ["ml","robotics","hardware"], desc: "Run a compact detector on-board for obstacle and lane awareness.", tools: ["ONNX Runtime","OpenCV","Nav2"]},
-    {name: "Voice-commanded robot", short: "Voice robot", domains: ["ai","robotics"], desc: "Speak a goal; the robot transcribes, reasons, and dispatches a navigation task.", tools: ["Whisper","Ollama","ROS 2","Nav2"]},
-    {name: "Agent-operated lab robot", short: "Agent lab robot", domains: ["ai","robotics"], desc: "Expose robot actions as protocol tools so an AI agent can run experiments.", tools: ["Model Context Protocol","ROS 2","MoveIt 2"]},
-    {name: "Vision-language-action robot", short: "VLA robot", domains: ["ai","ml","robotics"], desc: "Collect demonstrations, train a policy that maps camera + instruction to motion, deploy on a low-cost arm.", tools: ["LeRobot","PyTorch","Hugging Face Transformers","MuJoCo","ROS 2"]},
-    {name: "Sim-to-real humanoid skills", short: "Sim-to-real", domains: ["ai","ml","robotics"], desc: "Generate diverse simulated worlds, train at scale, and transfer behaviours to hardware.", tools: ["Genesis","PyTorch","Ray","ROS 2"]},
-    {name: "Self-hosted deployment platform", short: "Deploy platform", domains: ["distributed","software"], desc: "Containerise any project above, orchestrate it, and watch it in production.", tools: ["Docker Engine (Moby)","Kubernetes","Grafana","Linux"]},
-    {name: "High-performance core library", short: "Core library", domains: ["software","computation"], desc: "Rewrite a hot path in a memory-safe systems language and bind it to Python.", tools: ["Rust","LLVM","Python"]},
-    {name: "Custom sensor PCB", short: "Sensor PCB", domains: ["hardware"], desc: "Design a sensor board, model its enclosure, and flash firmware onto it.", tools: ["KiCad","FreeCAD","PlatformIO"]},
-    {name: "Design and simulate a RISC-V core", short: "RISC-V core", domains: ["hardware","computation"], desc: "Write a small processor in Verilog, simulate it, synthesise it and lay it out as a chip.", tools: ["Git","Verilator","Yosys","OpenROAD"]},
-    {name: "IoT environmental monitor", short: "IoT monitor", domains: ["hardware","networks","data"], desc: "Battery sensors report temperature and air quality over MQTT to a dashboard.", tools: ["KiCad","Zephyr RTOS","PlatformIO","Eclipse Mosquitto","PostgreSQL","Grafana"]},
-    {name: "Firmware in an emulator", short: "Emulated firmware", domains: ["hardware","software"], desc: "Develop and test embedded firmware before the hardware even exists.", tools: ["QEMU","Zephyr RTOS","pytest"]},
-    {name: "Arduino robot car", short: "Robot car", domains: ["robotics","hardware"], desc: "A first robot: design the chassis, wire the board and program obstacle avoidance.", tools: ["Arduino IDE","FreeCAD","KiCad"]},
-    {name: "Full-stack web app", short: "Web app", domains: ["software","data","networks"], desc: "A typed web application with a database, served securely over HTTPS.", tools: ["TypeScript","React","Node.js","PostgreSQL","Caddy","Docker Engine (Moby)"]},
-    {name: "Open-source Python package", short: "Python package", domains: ["software"], desc: "Publish a well-tested library others can install and contribute to.", tools: ["Python","pytest","Git","VS Code (Code OSS)"]},
-    {name: "Formally verified algorithm", short: "Verified algorithm", domains: ["computation","software"], desc: "Prove an algorithm correct, check edge cases automatically, then ship a fast implementation.", tools: ["Lean 4","Z3","Rust"]},
-    {name: "Scientific simulation", short: "Scientific sim", domains: ["computation"], desc: "Derive equations symbolically and solve them numerically at speed.", tools: ["SymPy","Julia","Jupyter"]},
-    {name: "Delivery route optimiser", short: "Route optimiser", domains: ["computation","data"], desc: "Plan the shortest delivery routes under time windows and vehicle limits.", tools: ["OR-Tools","Python","PostgreSQL"]},
-    {name: "Network lab on a laptop", short: "Network lab", domains: ["networks","computation"], desc: "Build virtual topologies, watch protocols at the packet level, and simulate at scale.", tools: ["Mininet","Wireshark","ns-3"]},
-    {name: "Self-hosted VPN & reverse proxy", short: "VPN & proxy", domains: ["networks","security"], desc: "Reach home services securely from anywhere, with automatic HTTPS.", tools: ["WireGuard","Caddy","Linux"]},
-    {name: "Real-time analytics pipeline", short: "Streaming analytics", domains: ["data","distributed"], desc: "Ingest events as they happen, process them in flight and query them in seconds.", tools: ["Apache Kafka","Apache Spark","ClickHouse","Apache Airflow","Grafana"]},
-    {name: "Analytics warehouse on a laptop", short: "Data warehouse", domains: ["data"], desc: "Model raw files into tested, documented analytics tables.", tools: ["DuckDB","dbt Core","Apache Airflow","Apache Arrow"]},
-    {name: "Semantic search engine", short: "Semantic search", domains: ["data","ai"], desc: "Search documents by meaning rather than keywords.", tools: ["Qdrant","Hugging Face Transformers","Python"]},
-    {name: "Big-data machine learning", short: "Big-data ML", domains: ["data","distributed","ml"], desc: "Train models on data too large for one machine, with every run tracked.", tools: ["Apache Spark","Apache Arrow","MLflow"]},
-    {name: "Observable microservices", short: "Microservices", domains: ["distributed","networks","software"], desc: "Services that talk over typed RPC, run on a cluster, and can be traced end to end.", tools: ["Go","gRPC","Envoy","Kubernetes","OpenTelemetry","Prometheus","Grafana"]},
-    {name: "Infrastructure as code", short: "Infra as code", domains: ["distributed","software"], desc: "Describe servers, networks and clusters in reviewed, versioned code.", tools: ["OpenTofu","Kubernetes","Git"]},
-    {name: "Build a Raft key-value store", short: "Raft KV store", domains: ["distributed","computation"], desc: "Implement consensus yourself, then compare with a production system.", tools: ["Go","etcd","gRPC"]},
-    {name: "Distributed LLM serving", short: "LLM cluster", domains: ["ai","distributed"], desc: "Serve open models to many users across GPUs, with autoscaling and metrics.", tools: ["vLLM","Kubernetes","Ray","Prometheus"]},
-    {name: "Robot fleet telemetry", short: "Fleet telemetry", domains: ["robotics","distributed","data"], desc: "Stream state from many robots into one queryable history.", tools: ["ROS 2","NATS","ClickHouse","Grafana"]},
-    {name: "Home network intrusion detection", short: "Intrusion detection", domains: ["security","networks"], desc: "Watch your own network for scans, malware and anomalies.", tools: ["Linux","Zeek","Suricata","Wazuh","Grafana"]},
-    {name: "Secure CI/CD pipeline", short: "Secure CI/CD", domains: ["security","software","distributed"], desc: "Every commit is scanned, every image checked, and no secret lives in code.", tools: ["Git","Semgrep CE","Docker Engine (Moby)","Trivy","OpenBao"]},
-    {name: "Firmware reverse-engineering lab", short: "Reverse-engineering lab", domains: ["security","hardware"], desc: "Take apart device firmware safely to understand and audit it.", tools: ["Ghidra","QEMU","Wireshark"]},
-    {name: "Web application pen-test lab", short: "Pen-test lab", domains: ["security","networks"], desc: "Practise authorised attacks against your own deliberately vulnerable apps.", tools: ["ZAP","Metasploit Framework","Wireshark"]},
-    {name: "Post-quantum TLS migration", short: "Post-quantum TLS", domains: ["security","networks"], desc: "Test servers and clients with post-quantum key exchange.", tools: ["OpenSSL","Caddy","Certbot"]},
-    {name: "AI-assisted security triage", short: "AI SOC triage", domains: ["ai","security"], desc: "Summarise and prioritise security alerts with a local model.", tools: ["Wazuh","Ollama","LlamaIndex"]},
-    {name: "Quantum algorithms playground", short: "Quantum algorithms", domains: ["emerging","computation"], desc: "Implement Grover and phase estimation, then study how noise degrades them.", tools: ["Jupyter","Qiskit","Cirq","QuTiP"]},
-    {name: "Hybrid quantum-classical ML", short: "Quantum ML", domains: ["emerging","ml"], desc: "Train a variational quantum circuit as a layer in a neural network.", tools: ["PennyLane","PyTorch","Jupyter"]},
-    {name: "Spiking-network robot controller", short: "Spiking controller", domains: ["emerging","ml","robotics"], desc: "Control a simulated robot with an energy-efficient spiking neural network.", tools: ["snnTorch","Lava","ROS 2","Gazebo"]},
+    {track: "aiml", name: "Private document assistant", short: "Doc assistant", domains: ["ai","data"], desc: "Chat with your own PDFs and notes, fully offline, using retrieval-augmented generation.", tools: ["Ollama","LlamaIndex","PostgreSQL","Qwen"]},
+    {track: "aiml", name: "Meeting transcriber & summariser", short: "Meeting transcriber", domains: ["ai"], desc: "Record, transcribe, then summarise discussions into action items.", tools: ["Whisper","llama.cpp","SQLite"]},
+    {track: "aiml", name: "Tool-using agent", short: "Tool-using agent", domains: ["ai","software"], desc: "An assistant that searches, files tickets and queries databases through open protocol servers.", tools: ["Model Context Protocol","LangChain","Ollama"]},
+    {track: "aiml", name: "Tabular prediction model", short: "Tabular predictor", domains: ["ml","data"], desc: "Forecast churn, prices or risk from structured data with a tracked, reproducible pipeline.", tools: ["pandas","scikit-learn","XGBoost","MLflow"]},
+    {track: "aiml", name: "Reproducible research pipeline", short: "Research pipeline", domains: ["ml","software"], desc: "Version data, notebooks and models so every figure in a paper can be regenerated.", tools: ["Jupyter","DVC","PyTorch","Git"]},
+    {track: "aiml", name: "Large-scale data analysis", short: "Big-data analysis", domains: ["ml","data"], desc: "Explore millions of rows and train boosted models on a single machine.", tools: ["Polars","LightGBM","Jupyter"]},
+    {track: "robotics", name: "Autonomous mobile robot", short: "Mobile robot", domains: ["robotics"], desc: "Map a room, localise and navigate around obstacles — first in simulation, then on hardware.", tools: ["ROS 2","Nav2","Gazebo"]},
+    {track: "robotics", name: "Survey drone mission", short: "Survey drone", domains: ["robotics","hardware"], desc: "Plan and fly waypoint missions with failsafes, tested in software-in-the-loop.", tools: ["PX4","ROS 2","Gazebo"]},
+    {track: "robotics", name: "Robot arm motion planner", short: "Arm planner", domains: ["robotics","computation"], desc: "Collision-free trajectories for a manipulator, with verified dynamics.", tools: ["MoveIt 2","Drake","ROS 2"]},
+    {track: "aiml", name: "Fine-tune an open model", short: "Fine-tune an LLM", domains: ["ai","ml"], desc: "Adapt an open-weight language model to your domain, then serve it at speed.", tools: ["Hugging Face Transformers","PyTorch","OLMo (AI2)","vLLM"]},
+    {track: "aiml", name: "Custom image generator", short: "Image generator", domains: ["ai","ml"], desc: "Train a style adapter and compose a reusable generation workflow.", tools: ["ComfyUI","PyTorch","Hugging Face Transformers"]},
+    {track: "aiml", name: "Evaluated RAG system", short: "Evaluated RAG", domains: ["ai","ml","data"], desc: "Measure retrieval and answer quality across experiments, not by vibes.", tools: ["LlamaIndex","MLflow","Qwen","PostgreSQL"]},
+    {track: "robotics", name: "Legged locomotion via RL", short: "RL walking", domains: ["ml","robotics"], desc: "Train a walking policy across thousands of parallel simulated robots.", tools: ["MuJoCo","JAX","Ray"]},
+    {track: "robotics", name: "Vision-guided pick & place", short: "Pick & place", domains: ["ml","robotics"], desc: "Detect objects with a trained network and plan grasps for an arm.", tools: ["OpenCV","PyTorch","MoveIt 2","ROS 2"]},
+    {track: "robotics", name: "Edge perception on a rover", short: "Edge rover", domains: ["ml","robotics","hardware"], desc: "Run a compact detector on-board for obstacle and lane awareness.", tools: ["ONNX Runtime","OpenCV","Nav2"]},
+    {track: "robotics", name: "Voice-commanded robot", short: "Voice robot", domains: ["ai","robotics"], desc: "Speak a goal; the robot transcribes, reasons, and dispatches a navigation task.", tools: ["Whisper","Ollama","ROS 2","Nav2"]},
+    {track: "robotics", name: "Agent-operated lab robot", short: "Agent lab robot", domains: ["ai","robotics"], desc: "Expose robot actions as protocol tools so an AI agent can run experiments.", tools: ["Model Context Protocol","ROS 2","MoveIt 2"]},
+    {track: "robotics", name: "Vision-language-action robot", short: "VLA robot", domains: ["ai","ml","robotics"], desc: "Collect demonstrations, train a policy that maps camera + instruction to motion, deploy on a low-cost arm.", tools: ["LeRobot","PyTorch","Hugging Face Transformers","MuJoCo","ROS 2"]},
+    {track: "robotics", name: "Sim-to-real humanoid skills", short: "Sim-to-real", domains: ["ai","ml","robotics"], desc: "Generate diverse simulated worlds, train at scale, and transfer behaviours to hardware.", tools: ["Genesis","PyTorch","Ray","ROS 2"]},
+    {track: "distributed", name: "Self-hosted deployment platform", short: "Deploy platform", domains: ["distributed","software"], desc: "Containerise any project above, orchestrate it, and watch it in production.", tools: ["Docker Engine (Moby)","Kubernetes","Grafana","Linux"]},
+    {track: "computation", name: "High-performance core library", short: "Core library", domains: ["software","computation"], desc: "Rewrite a hot path in a memory-safe systems language and bind it to Python.", tools: ["Rust","LLVM","Python"]},
+    {track: "hardware", name: "Custom sensor PCB", short: "Sensor PCB", domains: ["hardware"], desc: "Design a sensor board, model its enclosure, and flash firmware onto it.", tools: ["KiCad","FreeCAD","PlatformIO"]},
+    {track: "hardware", name: "Design and simulate a RISC-V core", short: "RISC-V core", domains: ["hardware","computation"], desc: "Write a small processor in Verilog, simulate it, synthesise it and lay it out as a chip.", tools: ["Git","Verilator","Yosys","OpenROAD"]},
+    {track: "hardware", name: "IoT environmental monitor", short: "IoT monitor", domains: ["hardware","networks","data"], desc: "Battery sensors report temperature and air quality over MQTT to a dashboard.", tools: ["KiCad","Zephyr RTOS","PlatformIO","Eclipse Mosquitto","PostgreSQL","Grafana"]},
+    {track: "hardware", name: "Firmware in an emulator", short: "Emulated firmware", domains: ["hardware","software"], desc: "Develop and test embedded firmware before the hardware even exists.", tools: ["QEMU","Zephyr RTOS","pytest"]},
+    {track: "robotics", name: "Arduino robot car", short: "Robot car", domains: ["robotics","hardware"], desc: "A first robot: design the chassis, wire the board and program obstacle avoidance.", tools: ["Arduino IDE","FreeCAD","KiCad"]},
+    {track: "web", name: "Full-stack web app", short: "Web app", domains: ["software","data","networks"], desc: "A typed web application with a database, served securely over HTTPS.", tools: ["TypeScript","React","Node.js","PostgreSQL","Caddy","Docker Engine (Moby)"]},
+    {track: "computation", name: "Formally verified algorithm", short: "Verified algorithm", domains: ["computation","software"], desc: "Prove an algorithm correct, check edge cases automatically, then ship a fast implementation.", tools: ["Lean 4","Z3","Rust"]},
+    {track: "computation", name: "Scientific simulation", short: "Scientific sim", domains: ["computation"], desc: "Derive equations symbolically and solve them numerically at speed.", tools: ["SymPy","Julia","Jupyter"]},
+    {track: "computation", name: "Delivery route optimiser", short: "Route optimiser", domains: ["computation","data"], desc: "Plan the shortest delivery routes under time windows and vehicle limits.", tools: ["OR-Tools","Python","PostgreSQL"]},
+    {track: "networks", name: "Network lab on a laptop", short: "Network lab", domains: ["networks","computation"], desc: "Build virtual topologies, watch protocols at the packet level, and simulate at scale.", tools: ["Mininet","Wireshark","ns-3"]},
+    {track: "networks", name: "Self-hosted VPN & reverse proxy", short: "VPN & proxy", domains: ["networks","security"], desc: "Reach home services securely from anywhere, with automatic HTTPS.", tools: ["WireGuard","Caddy","Linux"]},
+    {track: "data", name: "Real-time analytics pipeline", short: "Streaming analytics", domains: ["data","distributed"], desc: "Ingest events as they happen, process them in flight and query them in seconds.", tools: ["Apache Kafka","Apache Spark","ClickHouse","Apache Airflow","Grafana"]},
+    {track: "data", name: "Analytics warehouse on a laptop", short: "Data warehouse", domains: ["data"], desc: "Model raw files into tested, documented analytics tables.", tools: ["DuckDB","dbt Core","Apache Airflow","Apache Arrow"]},
+    {track: "data", name: "Semantic search engine", short: "Semantic search", domains: ["data","ai"], desc: "Search documents by meaning rather than keywords.", tools: ["Qdrant","Hugging Face Transformers","Python"]},
+    {track: "data", name: "Big-data machine learning", short: "Big-data ML", domains: ["data","distributed","ml"], desc: "Train models on data too large for one machine, with every run tracked.", tools: ["Apache Spark","Apache Arrow","MLflow"]},
+    {track: "distributed", name: "Observable microservices", short: "Microservices", domains: ["distributed","networks","software"], desc: "Services that talk over typed RPC, run on a cluster, and can be traced end to end.", tools: ["Go","gRPC","Envoy","Kubernetes","OpenTelemetry","Prometheus","Grafana"]},
+    {track: "distributed", name: "Infrastructure as code", short: "Infra as code", domains: ["distributed","software"], desc: "Describe servers, networks and clusters in reviewed, versioned code.", tools: ["OpenTofu","Kubernetes","Git"]},
+    {track: "distributed", name: "Build a Raft key-value store", short: "Raft KV store", domains: ["distributed","computation"], desc: "Implement consensus yourself, then compare with a production system.", tools: ["Go","etcd","gRPC"]},
+    {track: "distributed", name: "Distributed LLM serving", short: "LLM cluster", domains: ["ai","distributed"], desc: "Serve open models to many users across GPUs, with autoscaling and metrics.", tools: ["vLLM","Kubernetes","Ray","Prometheus"]},
+    {track: "distributed", name: "Robot fleet telemetry", short: "Fleet telemetry", domains: ["robotics","distributed","data"], desc: "Stream state from many robots into one queryable history.", tools: ["ROS 2","NATS","ClickHouse","Grafana"]},
+    {track: "security", name: "Home network intrusion detection", short: "Intrusion detection", domains: ["security","networks"], desc: "Watch your own network for scans, malware and anomalies.", tools: ["Linux","Zeek","Suricata","Wazuh","Grafana"]},
+    {track: "security", name: "Secure CI/CD pipeline", short: "Secure CI/CD", domains: ["security","software","distributed"], desc: "Every commit is scanned, every image checked, and no secret lives in code.", tools: ["Git","Semgrep CE","Docker Engine (Moby)","Trivy","OpenBao"]},
+    {track: "security", name: "Firmware reverse-engineering lab", short: "Reverse-engineering lab", domains: ["security","hardware"], desc: "Take apart device firmware safely to understand and audit it.", tools: ["Ghidra","QEMU","Wireshark"]},
+    {track: "security", name: "Web application pen-test lab", short: "Pen-test lab", domains: ["security","networks"], desc: "Practise authorised attacks against your own deliberately vulnerable apps.", tools: ["ZAP","Metasploit Framework","Wireshark"]},
+    {track: "security", name: "Post-quantum TLS migration", short: "Post-quantum TLS", domains: ["security","networks"], desc: "Test servers and clients with post-quantum key exchange.", tools: ["OpenSSL","Caddy","Certbot"]},
+    {track: "security", name: "AI-assisted security triage", short: "AI SOC triage", domains: ["ai","security"], desc: "Summarise and prioritise security alerts with a local model.", tools: ["Wazuh","Ollama","LlamaIndex"]},
+    {track: "emerging", name: "Quantum algorithms playground", short: "Quantum algorithms", domains: ["emerging","computation"], desc: "Implement Grover and phase estimation, then study how noise degrades them.", tools: ["Jupyter","Qiskit","Cirq","QuTiP"]},
+    {track: "emerging", name: "Hybrid quantum-classical ML", short: "Quantum ML", domains: ["emerging","ml"], desc: "Train a variational quantum circuit as a layer in a neural network.", tools: ["PennyLane","PyTorch","Jupyter"]},
+    {track: "emerging", name: "Spiking-network robot controller", short: "Spiking controller", domains: ["emerging","ml","robotics"], desc: "Control a simulated robot with an energy-efficient spiking neural network.", tools: ["snnTorch","Lava","ROS 2","Gazebo"]},
+    {track: "web", name: "Fast content site", short: "Content site", domains: ["software","networks"], desc: "A blog or documentation site that loads instantly, with search and HTTPS.", tools: ["Astro","Tailwind CSS","Meilisearch","Caddy"]},
+    {track: "web", name: "Internal dashboard with single sign-on", short: "SSO dashboard", domains: ["software","security","data"], desc: "A company dashboard where staff sign in once and see live data.", tools: ["Svelte","FastAPI","PostgreSQL","Keycloak","Docker Engine (Moby)"]},
+    {track: "web", name: "Search-first catalogue", short: "Search catalogue", domains: ["software","data"], desc: "A product or library catalogue where search is the main way in.", tools: ["Vue.js","Django","PostgreSQL","Meilisearch"]},
+    {track: "web", name: "Realtime web app on a backend platform", short: "Realtime app", domains: ["software","data"], desc: "Live-updating collaborative features without writing a backend from scratch.", tools: ["Next.js","Supabase","Tailwind CSS","Playwright"]},
+    {track: "mobile", name: "Cross-platform mobile app", short: "Cross-platform app", domains: ["software","data","networks"], desc: "One codebase on Android and iOS, offline-first, with accounts, sync and push notifications.", tools: ["Flutter","SQLite","PocketBase","ntfy","Maestro","fastlane"]},
+    {track: "mobile", name: "React Native app with Expo", short: "Expo app", domains: ["software","data"], desc: "A JavaScript team's route to a native app, sharing skills with the web.", tools: ["React Native","Expo","TypeScript","Supabase","Detox"]},
+    {track: "mobile", name: "Native Android app", short: "Android app", domains: ["software"], desc: "A fully native Android app published to an open app store.", tools: ["Kotlin","Jetpack Compose","SQLite","Maestro","F-Droid"]},
+    {track: "mobile", name: "Offline-first field data app", short: "Field data app", domains: ["software","data"], desc: "Collect forms and photos where there is no signal; sync when back online.", tools: ["Flutter","SQLite","Appwrite"]},
+    {track: "mobile", name: "Web app to mobile app", short: "Web-to-mobile", domains: ["software"], desc: "Wrap an existing web app as a store-ready mobile app with camera and storage access.", tools: ["Capacitor","Vue.js","Vite","fastlane"]},
   ],
 
   // Recommendation chains: tools in assembly order, with each one's role and
@@ -887,6 +1628,85 @@ window.ATLAS = {
           tool: "Rust",
           role: "Fast, safe code",
           why: "Memory safety without a garbage collector keeps the implementation both quick and trustworthy."
+        }
+      ]
+    },
+    {
+      project: "Cross-platform mobile app",
+      level: "Intermediate",
+      goal: "Ship one app to Android and iOS that works offline, syncs, and notifies users.",
+      steps: [
+        {
+          stage: "Build UI",
+          tool: "Flutter",
+          role: "Cross-platform UI",
+          why: "One codebase compiles to native apps on both platforms, halving the work of two native teams.",
+          alt: "React Native"
+        },
+        {
+          stage: "Work offline",
+          tool: "SQLite",
+          role: "On-device database",
+          why: "The app reads and writes locally, so it opens instantly and keeps working without signal."
+        },
+        {
+          stage: "Sync",
+          tool: "PocketBase",
+          role: "Backend",
+          why: "Accounts, a database and realtime sync in a single self-hosted executable.",
+          alt: "Supabase"
+        },
+        {
+          stage: "Notify",
+          tool: "ntfy",
+          role: "Push notifications",
+          why: "Reaches users when the app is closed, through a server you control."
+        },
+        {
+          stage: "Test",
+          tool: "Maestro",
+          role: "UI tests",
+          why: "Taps through real screens on emulators, catching broken flows before users do.",
+          alt: "Detox"
+        },
+        {
+          stage: "Release",
+          tool: "fastlane",
+          role: "Release automation",
+          why: "Builds, signs and uploads every version the same way, every time."
+        }
+      ]
+    },
+    {
+      project: "Fast content site",
+      level: "Beginner",
+      goal: "A site that is fast by default, easy to write for, and searchable.",
+      steps: [
+        {
+          stage: "Build",
+          tool: "Astro",
+          role: "Site framework",
+          why: "Renders pages to plain HTML at build time, so readers download almost no JavaScript.",
+          alt: "Next.js"
+        },
+        {
+          stage: "Style",
+          tool: "Tailwind CSS",
+          role: "Design system",
+          why: "Consistent spacing, type and colour without a growing pile of custom CSS."
+        },
+        {
+          stage: "Search",
+          tool: "Meilisearch",
+          role: "Instant search",
+          why: "Typo-tolerant results as you type, which static sites otherwise lack."
+        },
+        {
+          stage: "Serve",
+          tool: "Caddy",
+          role: "HTTPS server",
+          why: "Serves the files with automatic HTTPS and sensible caching.",
+          alt: "NGINX"
         }
       ]
     }
