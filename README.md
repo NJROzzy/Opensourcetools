@@ -8,7 +8,8 @@
 
 [![Live](https://img.shields.io/badge/live-amalgambynjr.vercel.app-000000?style=flat-square&logo=vercel&logoColor=white)](https://amalgambynjr.vercel.app)
 ![Domains](https://img.shields.io/badge/domains-11-000000?style=flat-square)
-![Tools](https://img.shields.io/badge/open--source%20tools-141-000000?style=flat-square)
+![Tools](https://img.shields.io/badge/open--source%20tools-148-000000?style=flat-square)
+![System designs](https://img.shields.io/badge/system%20designs-25-000000?style=flat-square)
 ![Build paths](https://img.shields.io/badge/build%20paths-11-000000?style=flat-square)
 ![Projects](https://img.shields.io/badge/projects-59-000000?style=flat-square)
 ![Chains](https://img.shields.io/badge/recommendation%20chains-20-000000?style=flat-square)
@@ -22,7 +23,7 @@
 
 ## About
 
-**Amalgam** is a research-style field guide to building real projects with **only free, open-source tools**. Start from what you want to build (a web app, a mobile app, an AI/ML system, a robot), see the **common architecture** for that kind of project with the open tools for every layer, and explore project recipes across **eleven domains of computer science**, alongside **current trends and live news**:
+**Amalgam** is a research-style field guide to building real projects with **only free, open-source tools**. Open with the **System Design Canvas**, an editable architecture graph with ready-made system designs for every domain. Then start from what you want to build (a web app, a mobile app, an AI/ML system, a robot), see the **common architecture** for that kind of project with the open tools for every layer, and explore project recipes across **eleven domains of computer science**, alongside **current trends and live news**:
 
 > Hardware · Software · Computation · Computer Networks · Data & Databases · Distributed Systems · Cybersecurity · Artificial Intelligence · Machine Learning · Robotics · Emerging Computing
 
@@ -34,17 +35,20 @@ The design is futuristic and monochrome, with black and white throughout and onl
 
 | Section | What it does |
 |---|---|
-| **§1 Build Paths** | Start here. Choose a path: **Software Engineering → Web applications / Mobile applications**, **AI / ML**, **Robotics**, then Data, Distributed systems, Networks, Security, Hardware, Computation and Emerging computing. Each path shows its **common-path architecture**: the layers a typical project passes through (e.g. *Interface → Build & style → Server & API → Data → Identity → Test → Deliver → Observe*), with the open-source tools for every layer. Below it are **explorable project cards**; hover one to light up the layers and tools it uses, or open it in a drawer showing the full stack, each tool's role and why it's needed, where it sits in the architecture, and links to its chain and its place on the map. |
-| **§2 Architecture Studio** | A drag-and-drop **grid** for assembling your own architecture. Pick a path and its layers become drop lanes (plus *Extras*). Drag tools from the palette into lanes, move them between lanes, or drag them back to remove them. You can also drop a whole **project** to load its stack (switching to its path), or simply click to add. An **Advisor** tile inside the grid recommends tools as you build: layer coverage, the best picks for empty layers, tools that pair well with yours (based on how often they appear together in the projects), the closest real projects with a match percentage, notes when a layer holds tools that do the same job, and a licence summary. Name it, copy it as text, or clear it; your board is saved in your browser. Works with mouse, pen and touch (press and hold to drag). |
-| **§3 The Amalgam Map** | An interactive **Venn diagram of any three domains**, picked by hand or from presets. Each project and tool lands in the overlap matching its domains. **By project** writes project names inside each region; **by tool** places tool logos there, with *+N more* when a region is crowded. |
-| **§4 Recommendation Chains** | Step-by-step tool chains for 20 projects. Every link names the tool, the **role** it plays, **why the project needs it**, and an alternative. |
-| **§5 Currents & Trends** | Twelve movements across the field, each linked to its tools. |
-| **§6 Method** | How tools were chosen: open-source licences only, no paid plans, and open community forks where a project left open source. |
-| **§7 The Atlas** | The full catalogue at the bottom: 141 open-source tools with logos, licences and domains. Filter by domain or search; every card opens the tool drawer. |
+| **§1 System Design Canvas** | The first thing on the page: a full diagram editor for system designs. Start from **25 ready-made system designs** across all 11 domains (URL shortener, real-time chat, e-commerce, video streaming, ride-hailing, food delivery, RAG chatbot, recommendations, fraud detection, warehouse robot fleet, drone delivery, clickstream analytics, lakehouse, job platform, API gateway, CDN edge, IoT telemetry, zero-trust access, SOC pipeline, smart-home hub, optimisation service, quantum workflow and more), a path's common architecture, or any recommended project. **Editing tools:** Select & move (V), Connect (C, or drag a box's ● port), add Component (B) and Note (N), drag tools between components, Delete, Undo/Redo (⌘/Ctrl Z, ⇧⌘/Ctrl Z), Auto-layout, Fit, zoom and pan, and **Export PNG**. The **Inspector** renames components, edits roles and connection labels (with quick picks), reverses connections, duplicates components, and adds or removes tools, with suggestions based on a component's name and role. You can copy the design as text; it is saved in your browser. |
+| **§2 Build Paths** | Choose a path: **Software Engineering → Web applications / Mobile applications**, **AI / ML**, **Robotics**, then Data, Distributed systems, Networks, Security, Hardware, Computation and Emerging computing. Each path shows its **common-path architecture**: the layers a typical project passes through (e.g. *Interface → Build & style → Server & API → Data → Identity → Test → Deliver → Observe*), with the open-source tools for every layer. Below it are **explorable project cards**; hover one to light up the layers and tools it uses, or open it in a drawer showing the full stack, each tool's role and why it's needed, where it sits in the architecture, and links to its chain and its place on the map. |
+| **§3 Architecture Studio** | A drag-and-drop **grid** for assembling your own architecture. Pick a path and its layers become drop lanes (plus *Extras*). Drag tools from the palette into lanes, move them between lanes, or drag them back to remove them. You can also drop a whole **project** to load its stack (switching to its path), or simply click to add. An **Advisor** tile inside the grid recommends tools as you build: layer coverage, the best picks for empty layers, tools that pair well with yours (based on how often they appear together in the projects), the closest real projects with a match percentage, notes when a layer holds tools that do the same job, and a licence summary. Name it, copy it as text, or clear it; your board is saved in your browser. Works with mouse, pen and touch (press and hold to drag). |
+| **§4 The Amalgam Map** | An interactive **Venn diagram of any three domains**, picked by hand or from presets. Each project and tool lands in the overlap matching its domains. **By project** writes project names inside each region; **by tool** places tool logos there, with *+N more* when a region is crowded. |
+| **§5 Recommendation Chains** | Step-by-step tool chains for 20 projects. Every link names the tool, the **role** it plays, **why the project needs it**, and an alternative. |
+| **§6 Currents & Trends** | Twelve movements across the field, each linked to its tools. |
+| **§7 Method** | How tools were chosen: open-source licences only, no paid plans, and open community forks where a project left open source. |
+| **§8 The Atlas** | The full catalogue at the bottom: 148 open-source tools with logos, licences and domains. Filter by domain or search; every card opens the tool drawer. |
 
 **Architecture graphs.** Every project and every build path can be opened as a connected architecture graph, much like a node-graph editor. Layers are nodes ranked left to right by how they connect: "calls", "reads & writes", "verifies with", "deploys to" and so on, defined for all 11 paths. Tools sit inside their layers, and animated lines show how they connect. Search, *Connections*, *Collapse*, *Empty layers*, *Fit*, zoom (Ctrl/⌘ + scroll, pinch, or the buttons) and drag-to-pan are all there. Remove a tool with ×, add one from a layer's *+ add tool* (best fits first) or from *Add any tool*, compare against the original (*+2 added · −1 removed*, *Reset*), then *Open in Studio*. The Studio has the same graph as a *Graph* view of your board, alongside the grid, with *Undo*. On narrow screens the graph flows top to bottom, two layers per row.
 
 ![Architecture graph](docs/graph.png)
+
+![System Design Canvas](docs/canvas.png)
 
 Clicking a tool anywhere on the site opens a drawer with its licence, domains, its layer in each build path, and every project that uses it.
 
@@ -107,7 +111,7 @@ Plain **HTML, CSS and vanilla JavaScript**, with no framework and no build step.
 ├── styles.css   # Monochrome, research-style design
 ├── data.js      # Domains, build tracks, architectures, tools, projects, chains, trends, map presets, news topics
 ├── app.js       # Paths, Studio, map, chains, drawers, live news, background animation
-├── graph.js     # Pannable, zoomable architecture graph (layers, tools, connections)
+├── graph.js     # Architecture graph engine: layout, pan/zoom, viewing and full diagram editing, PNG export
 ├── logos/       # Self-hosted tool logos
 └── docs/        # README screenshots
 ```
@@ -128,6 +132,7 @@ All content lives in **`data.js`**.
 - **Domains:** `hardware`, `software`, `computation`, `networks`, `data`, `distributed`, `security`, `ai`, `ml`, `robotics`, `emerging`.
 - **Add a tool:** append to `tools` with `domains` (primary first, then any others it serves), `name`, `logo`, `kind`, `license`, `url` and `desc`. Set `foundation: true` for tools every project relies on; they sit on the map's ground when none of their domains is chosen.
 - **Add a project:** append to `projects` with its `track` (build path), `name`, a `short` label for the map, its `domains`, `desc` and `tools`. Tool names must exactly match a tool's `name`. The path, the drawer and the map pick it up automatically.
+- **Add a system design:** append to `designs` with `id`, `track`, `name`, `summary`, `nodes` (`{ id, name, role, tools }`) and `edges` (`{ from, to, label }`). It appears under its domain on the canvas.
 - **Edit an architecture:** each build path's common path lives in `architectures[track].stages` as `{ name, role, tools }`, in order, and `architectures[track].links` lists how layers connect as `[from, to, "what it does"]`. Links must not form a cycle, because the graph ranks layers from them.
 - **Add a chain:** append to `chains` with `project` (matching a project name), `level`, `goal` and ordered `steps` of `{ stage, tool, role, why, alt? }`.
 - **Add a map preset:** append `{ name, domains: [three ids] }` to `venn.presets`.

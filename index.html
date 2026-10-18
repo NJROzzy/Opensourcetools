@@ -18,6 +18,7 @@
     <div class="wrap bar">
       <a class="mark" href="#top">Amalgam<span>by NJR</span></a>
       <nav>
+        <a href="#canvas">Canvas</a>
         <a href="#paths">Paths</a>
         <a href="#studio">Studio</a>
         <a href="#map">Map</a>
@@ -72,12 +73,31 @@
         catalogued, annotated, and read against the currents of the day.
       </p>
       <div class="stats" id="stats"></div>
-      <a class="scroll-cue" href="#paths" aria-label="Scroll to Build Paths">Scroll<span></span></a>
+      <a class="scroll-cue" href="#canvas" aria-label="Scroll to the System Design Canvas">Scroll<span></span></a>
+    </section>
+
+    <section id="canvas" class="wrap wide section">
+      <div class="section-head">
+        <span class="num">§ 1</span>
+        <h2>System Design Canvas</h2>
+        <p class="sub">Start with the graph. Load a ready-made system design for any domain, a path's common architecture or a recommended project, then make it yours: move boxes, connect components, add or swap open-source tools, leave notes, and export it as an image.</p>
+      </div>
+      <div class="cv">
+        <div class="cv-bar">
+          <div class="pills" id="cv-domains" aria-label="Domains"></div>
+          <span class="st-status" id="cv-status" aria-live="polite"></span>
+        </div>
+        <div class="cv-templates" id="cv-templates" aria-label="Designs to start from"></div>
+        <div class="cv-main">
+          <div class="ag-host cv-graph" id="cv-graph" aria-label="System design editor"></div>
+          <aside class="cv-inspector" id="cv-inspector" aria-label="Inspector"></aside>
+        </div>
+      </div>
     </section>
 
     <section id="paths" class="wrap section">
       <div class="section-head">
-        <span class="num">§ 1</span>
+        <span class="num">§ 2</span>
         <h2>Build Paths</h2>
         <p class="sub">Pick what you want to build. Each path shows the common architecture — the layers almost every project of that kind passes through, with the free, open-source tools for each layer — and projects you can open to see their full stack.</p>
       </div>
@@ -87,7 +107,7 @@
 
     <section id="studio" class="wrap section">
       <div class="section-head">
-        <span class="num">§ 2</span>
+        <span class="num">§ 3</span>
         <h2>Architecture Studio</h2>
         <p class="sub">Drag tools, or a whole project, onto the grid to assemble an architecture layer by layer, then switch to <em>Graph</em> to see how every layer and tool connects, and add or remove tools right there. The advisor points out empty layers, tools that pair well with yours, and the real projects your stack resembles.</p>
       </div>
@@ -122,7 +142,7 @@
 
     <section id="map" class="wrap section">
       <div class="section-head">
-        <span class="num">§ 3</span>
+        <span class="num">§ 4</span>
         <h2>The Amalgam Map</h2>
         <p class="sub">Where domains overlap, projects appear. Choose any three of the eleven domains, then view the map <em>by project</em> to see what can be built in each overlap, or <em>by tool</em> to see where every tool lives. Select a region or a logo for the full picture.</p>
       </div>
@@ -147,7 +167,7 @@
 
     <section id="chains" class="wrap section">
       <div class="section-head">
-        <span class="num">§ 4</span>
+        <span class="num">§ 5</span>
         <h2>Recommendation Chains</h2>
         <p class="sub">Choose a project and follow its chain: each link is a tool, the role it plays, and why the project needs it — in the order you would assemble them.</p>
       </div>
@@ -159,7 +179,7 @@
 
     <section id="trends" class="wrap section">
       <div class="section-head">
-        <span class="num">§ 5</span>
+        <span class="num">§ 6</span>
         <h2>Currents &amp; Trends</h2>
         <p class="sub">The movements shaping open tooling right now, and the tools they touch.</p>
       </div>
@@ -168,7 +188,7 @@
 
     <section id="method" class="wrap section">
       <div class="section-head">
-        <span class="num">§ 6</span>
+        <span class="num">§ 7</span>
         <h2>Method</h2>
       </div>
       <div class="method">
@@ -179,7 +199,7 @@
     </section>
     <section id="atlas" class="wrap section">
       <div class="section-head">
-        <span class="num">§ 7</span>
+        <span class="num">§ 8</span>
         <h2>The Atlas</h2>
         <p class="sub">The full catalogue. Every entry is free to use and published under an open-source licence. Filter by any of the eleven domains, search by name, purpose, domain or licence, and open any card for details.</p>
       </div>
@@ -212,7 +232,8 @@
       <div class="gm-titles"><p class="eyebrow" id="gm-kicker"></p><h3 class="vp-title" id="gm-title"></h3></div>
       <span class="gm-diff" id="gm-diff" aria-live="polite"></span>
       <button class="st-btn" id="gm-reset">Reset</button>
-      <button class="st-btn solid" id="gm-studio">Open in Studio →</button>
+      <button class="st-btn" id="gm-studio">Open in Studio</button>
+      <button class="st-btn solid" id="gm-canvas">Edit on the canvas ↑</button>
       <button class="drawer-close gm-close" id="gm-close" aria-label="Close">×</button>
     </div>
     <div class="ag-host gm-graph" id="gm-graph"></div>

@@ -1,5 +1,5 @@
 (() => {
-  const { disciplines, tracks, architectures, tools, projects, chains, trends, wire, venn } = window.ATLAS;
+  const { disciplines, tracks, architectures, designs, tools, projects, chains, trends, wire, venn } = window.ATLAS;
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
@@ -24,7 +24,7 @@
 
   // Simple Icons SVGs are brand-colour marks; GitHub avatars are full-bleed photos
   const logo = (t, cls = "") => t?.logo
-    ? `<span class="plate ${cls}"><img src="${esc(t.logo)}" alt="" loading="lazy" class="${t.logo.endsWith(".svg") ? "glyph" : "photo"}" /></span>`
+    ? `<span class="plate ${cls}"><img src="${esc(t.logo)}" alt="" loading="lazy" draggable="false" class="${t.logo.endsWith(".svg") ? "glyph" : "photo"}" /></span>`
     : `<span class="plate ${cls}"><b>${esc((t?.name || "?")[0])}</b></span>`;
   const toolChip = (n) => `<button class="chip" data-tool="${esc(n)}" title="${esc(toolByName[n]?.kind || "")}">${logo(toolByName[n], "xs")}${esc(n)}</button>`;
 
@@ -909,23 +909,46 @@
     $("#st-advisor").style.gridColumn = `span ${rest >= 2 ? rest : cols}`;
     renderPalette();
   }
+  // A path's layers plus the tools placed in them, as a design the graph can draw
+  function trackDesign(track, slots, { includeEmpty, root } = {}) {
+    const arch = architectures[track];
+    const nodes = arch.stages.map((s, i) => ({ id: String(i), num: String(i + 1).padStart(2, "0"), name: s.name, role: s.role, tools: slots[i] || [] }))
+      .filter((n) => includeEmpty || n.tools.length);
+    if ((slots.extra || []).length || includeEmpty) nodes.push({ id: "extra", num: "+", name: "Extras", role: "Anything else the project needs.", tools: slots.extra || [] });
+    const keyOf = Object.fromEntries(arch.stages.map((s, i) => [s.name, String(i)]));
+    const ids = new Set(nodes.map((n) => n.id));
+    const edges = (arch.links || []).map(([a, b, label]) => ({ from: keyOf[a], to: keyOf[b], label })).filter((e) => ids.has(e.from) && ids.has(e.to));
+    return { title: root?.title, root, nodes, edges };
+  }
+  // Group tool names into a path's layers
+  function slotsFor(track, names) {
+    const arch = architectures[track], slots = {};
+    for (const n of names) {
+      const i = arch.stages.findIndex((s) => s.tools.includes(n));
+      (slots[i < 0 ? "extra" : String(i)] ||= []).push(n);
+    }
+    return slots;
+  }
+  // A layer's own options, best fit with the given tools first
+  const layerSuggest = (track, id, with_) => id === "extra" ? [] : [...architectures[track].stages[+id].tools]
+    .sort((a, b) => with_.reduce((s, m) => s + ((together[m] || {})[b] || 0) - ((together[m] || {})[a] || 0), 0));
+
   // Graph view of the board: the same state, drawn as a connected architecture
   let stGraph = null, stGraphTrack = null;
   function renderStudioGraph() {
     board.classList.add("graph-mode");
     if (!stGraph || !board.contains(stGraph.host)) {
       board.innerHTML = `<div class="ag-host st-graph"></div><div class="advisor" id="st-advisor" aria-live="polite"></div>`;
-      const host = board.querySelector(".st-graph");
-      stGraph = createArchGraph(host, {
-        arch: stArch,
-        getModel: () => ({ title: st.title || titleIn.placeholder, subtitle: `${trackById[st.track].name} · your architecture`, slots: st.slots }),
-        editable: true,
-        onAdd: (n, lane) => { addTool(n, lane); stChanged(`Added ${n}`); },
-        onRemove: (n) => { removeTool(n); stChanged(`Removed ${n}`); },
-        onOpenTool: openTool,
-        affinity: stAffinity, esc, logo, toolByName, tools,
+      stGraph = createArchGraph(board.querySelector(".st-graph"), {
+        mode: "tools", dragTools: true,
+        getDesign: () => trackDesign(st.track, st.slots, { includeEmpty: true, root: { title: st.title || titleIn.placeholder, subtitle: `${trackById[st.track].name} · your architecture` } }),
+        onEdit: (a) => {
+          if (a.type === "addTool") { addTool(a.tool, a.node); stChanged(`Added ${a.tool}`); }
+          if (a.type === "removeTool") { removeTool(a.tool); stChanged(`Removed ${a.tool}`); }
+        },
+        suggest: (id) => layerSuggest(st.track, id, placed()),
+        onOpenTool: openTool, esc, logo, toolByName, tools,
       });
-      stGraph.host = host;
       stGraphTrack = st.track;
     }
     $("#st-advisor").innerHTML = advise();
@@ -1019,7 +1042,7 @@
     if (!drag) return;
     if (!drag.started) return endDrag();
     const { kind, name } = drag;
-    const target = laneAt(e.clientX, e.clientY);
+    const lane = laneAt(e.clientX, e.clientY), target = lane && board.contains(lane) ? lane : null;
     const onBoard = document.elementFromPoint(e.clientX, e.clientY)?.closest("#st-board");
     const onPalette = document.elementFromPoint(e.clientX, e.clientY)?.closest("[data-trash]");
     board.classList.remove("over");
@@ -1035,38 +1058,27 @@
 
 
   // ---------------------------------------------------------------------
-  // Architecture viewer: any project (or a whole path) as a connected graph
-  // you can edit, then send to the Studio.
+  // Architecture viewer: any project (or a whole path) as a connected graph.
+  // Add or remove tools, then edit it on the canvas or send it to the Studio.
   const gm = $("#gmodal");
   let gmState = null; // { kind, name, track, title, kicker, slots, original }
-  const slotsFor = (track, names) => {
-    const arch = architectures[track], slots = {};
-    for (const n of names) {
-      const i = arch.stages.findIndex((s) => s.tools.includes(n));
-      (slots[i < 0 ? "extra" : String(i)] ||= []).push(n);
-    }
-    return slots;
-  };
   const gmNames = () => Object.values(gmState.slots).flat();
-  // Paths list every alternative per layer, so they connect layers, not tool pairs
-  const gmOpts = (toolEdges) => ({
-    arch: () => architectures[gmState.track],
-    getModel: () => ({ title: gmState.title, subtitle: gmState.kicker, slots: gmState.slots }),
-    editable: true,
-    onAdd: (n, lane) => {
-      for (const k in gmState.slots) gmState.slots[k] = gmState.slots[k].filter((x) => x !== n);
-      const arch = architectures[gmState.track];
-      const best = arch.stages.findIndex((s) => s.tools.includes(n));
-      lane ??= best < 0 ? "extra" : String(best);
-      (gmState.slots[lane] ||= []).push(n);
+  const gmDesign = () => trackDesign(gmState.track, gmState.slots, { includeEmpty: gmState.kind === "path", root: { title: gmState.title, subtitle: gmState.kicker } });
+  const gmGraph = createArchGraph($("#gm-graph"), {
+    mode: "tools", getDesign: gmDesign,
+    onEdit: (a) => {
+      const strip = (n) => { for (const k in gmState.slots) gmState.slots[k] = gmState.slots[k].filter((x) => x !== n); };
+      if (a.type === "addTool") {
+        strip(a.tool);
+        const best = architectures[gmState.track].stages.findIndex((s) => s.tools.includes(a.tool));
+        (gmState.slots[a.node ?? (best < 0 ? "extra" : String(best))] ||= []).push(a.tool);
+      }
+      if (a.type === "removeTool") strip(a.tool);
       gmUpdate();
     },
-    onRemove: (n) => { for (const k in gmState.slots) gmState.slots[k] = gmState.slots[k].filter((x) => x !== n); gmUpdate(); },
-    onOpenTool: openTool,
-    affinity: (n) => gmNames().reduce((s, m) => s + ((together[m] || {})[n] || 0), 0),
-    esc, logo, toolByName, tools, showEmpty: false, toolEdges,
+    suggest: (id) => layerSuggest(gmState.track, id, gmNames()),
+    onOpenTool: openTool, esc, logo, toolByName, tools,
   });
-  let gmGraph = null, gmGraphKind = null;
   function gmUpdate() {
     const now = new Set(gmNames()), was = new Set(gmState.original);
     const added = [...now].filter((n) => !was.has(n)).length, removed = [...was].filter((n) => !now.has(n)).length;
@@ -1076,8 +1088,6 @@
   }
   function openGraph(state) {
     gmState = state;
-    // A fresh graph per kind keeps each one's own view settings
-    if (gmGraphKind !== state.kind) { gmGraph = createArchGraph($("#gm-graph"), gmOpts(state.kind === "project")); gmGraphKind = state.kind; }
     $("#gm-kicker").textContent = state.kicker;
     $("#gm-title").textContent = state.title;
     if (!gm.open) gm.showModal();
@@ -1088,16 +1098,14 @@
     const p = projectByName[name];
     openGraph({ kind: "project", name, track: p.track, title: p.name, kicker: `${trackById[p.track].name} · ${domainLine(p.domains)} · recommended architecture`, slots: slotsFor(p.track, p.tools), original: [...p.tools] });
   }
+  const pathTitle = (id) => architectures[id].title.replace(/^The common path of /, "").replace(/^./, (c) => c.toUpperCase());
   function openPathGraph(id) {
     const names = architectures[id].stages.flatMap((s) => s.tools);
-    openGraph({ kind: "path", name: id, track: id, title: architectures[id].title.replace(/^The common path of /, "").replace(/^./, (c) => c.toUpperCase()), kicker: `${trackById[id].name} · every open-source option, by layer`, slots: slotsFor(id, names), original: names });
+    openGraph({ kind: "path", name: id, track: id, title: pathTitle(id), kicker: `${trackById[id].name} · every open-source option, by layer`, slots: slotsFor(id, names), original: names });
   }
   $("#gm-close").addEventListener("click", () => gm.close());
   gm.addEventListener("click", (e) => { if (e.target === gm) gm.close(); });
-  $("#gm-reset").addEventListener("click", () => {
-    gmState.slots = slotsFor(gmState.track, gmState.original);
-    gmUpdate();
-  });
+  $("#gm-reset").addEventListener("click", () => { gmState.slots = slotsFor(gmState.track, gmState.original); gmUpdate(); });
   $("#gm-studio").addEventListener("click", () => {
     snapshot();
     st = { track: gmState.track, title: gmState.kind === "project" ? gmState.title : "", slots: JSON.parse(JSON.stringify(gmState.slots)), view: "graph" };
@@ -1105,6 +1113,290 @@
     stChanged("Loaded into the Studio · Undo restores your previous board");
     $("#studio").scrollIntoView();
   });
+  $("#gm-canvas").addEventListener("click", () => {
+    const d = gmDesign();
+    gm.close();
+    loadCanvas({ title: gmState.title, source: `${gmState.kind === "path" ? "Common path" : "Project"} · ${trackById[gmState.track].name}`, nodes: d.nodes.map(({ num, ...n }) => n), edges: d.edges }, gmState.track);
+    $("#canvas").scrollIntoView();
+  });
+
+  // ---------------------------------------------------------------------
+  // System Design Canvas — the first section: a full diagram editor with
+  // ready-made system designs, common paths and projects for every domain.
+  const CV_KEY = "amg-canvas";
+  const cvHost = $("#cv-graph"), inspector = $("#cv-inspector");
+  let cvTrack = "web", sel = null, past = [], future = [];
+  const newId = () => Math.random().toString(36).slice(2, 9);
+  const designToCanvas = (d) => ({ title: d.name, source: `System design · ${trackById[d.track].name}`, nodes: d.nodes.map((n) => ({ ...n, tools: [...n.tools] })), edges: d.edges.map((e) => ({ ...e })), notes: [] });
+  let cv = (() => {
+    try {
+      const v = JSON.parse(localStorage.getItem(CV_KEY));
+      if (v && Array.isArray(v.nodes)) {
+        v.nodes.forEach((n) => { n.tools = (n.tools || []).filter((t) => toolByName[t]); });
+        v.edges ||= []; v.notes ||= [];
+        if (trackById[v.track]) cvTrack = v.track;
+        return v;
+      }
+    } catch { /* storage unavailable */ }
+    return null;
+  })() || designToCanvas(designs[0]);
+  const cvSave = () => { try { localStorage.setItem(CV_KEY, JSON.stringify({ ...cv, track: cvTrack })); } catch { /* storage unavailable */ } };
+
+  // Suggest tools for a component from its name and role, plus what the rest of the design uses
+  const toolText = Object.fromEntries(tools.map((t) => [t.name, {
+    kind: t.kind.toLowerCase(), desc: t.desc.toLowerCase(),
+    layers: Object.values(architectures).flatMap((a) => a.stages.filter((s) => s.tools.includes(t.name)).map((s) => s.name.toLowerCase())).join(" "),
+  }]));
+  function suggestFor(name, role, inDesign) {
+    const stop = ["and", "the", "for", "with", "service", "new", "component", "copy", "what", "does", "this"];
+    const split = (t) => t.toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length > 2 && !stop.includes(w)).map((w) => w.slice(0, 4));
+    // The name's last word is usually the noun ("Response cache", "Load balancer"), so it counts most
+    const nameWords = split(name), weights = new Map();
+    nameWords.forEach((w, i) => weights.set(w, Math.max(weights.get(w) || 0, i === nameWords.length - 1 ? 3 : 1)));
+    split(role).forEach((w) => weights.set(w, Math.max(weights.get(w) || 0, 0.5)));
+    return tools.map((t) => {
+      const x = toolText[t.name];
+      let s = 0;
+      for (const [w, k] of weights) s += k * ((x.kind.includes(w) ? 3 : 0) + (x.layers.includes(w) ? 2 : 0) + (x.desc.includes(w) ? 1 : 0));
+      // Being used alongside the rest of the design only breaks ties
+      if (s) s += Math.min(1, inDesign.reduce((a, m) => a + ((together[m] || {})[t.name] || 0), 0)) * 0.5;
+      return [t.name, s];
+    }).filter(([n, s]) => s > 0 && !inDesign.includes(n)).sort((a, b) => b[1] - a[1])
+      // Drop weak, incidental matches
+      .filter(([, s], _, all) => s >= all[0][1] * 0.25).map(([n]) => n);
+  }
+  const cvTools = () => cv.nodes.flatMap((n) => n.tools);
+
+  const cvGraph = createArchGraph(cvHost, {
+    mode: "full",
+    getDesign: () => ({ title: cv.title, nodes: cv.nodes, edges: cv.edges, notes: cv.notes }),
+    selected: () => sel,
+    onSelect: (s) => { sel = s; renderCanvas(); if (s?.focus === "name") $("#ci-name")?.select(); },
+    onEdit: canvasEdit,
+    suggest: (id) => { const n = cv.nodes.find((x) => x.id === id); return n ? suggestFor(n.name, n.role || "", cvTools()) : []; },
+    canUndo: () => past.length > 0, canRedo: () => future.length > 0,
+    onOpenTool: openTool, esc, logo, toolByName, tools,
+  });
+
+  function commit(fn, msg) {
+    past.push(JSON.stringify(cv)); if (past.length > 80) past.shift();
+    future = [];
+    fn();
+    cvSave(); renderCanvas();
+    if (msg) cvFlash(msg);
+  }
+  function placeNew() {
+    if (!cv.nodes.length) return { x: 0, y: 0 };
+    const maxX = Math.max(...cv.nodes.map((n) => n.x ?? 0)), minY = Math.min(...cv.nodes.map((n) => n.y ?? 0));
+    return { x: maxX + 316, y: minY };
+  }
+  function canvasEdit(a) {
+    if (a.type === "undo" || a.type === "redo") {
+      const [from, to] = a.type === "undo" ? [past, future] : [future, past];
+      if (!from.length) return;
+      to.push(JSON.stringify(cv)); cv = JSON.parse(from.pop()); sel = null;
+      cvSave(); renderCanvas(); return cvFlash(a.type === "undo" ? "Undone" : "Redone");
+    }
+    const node = (id) => cv.nodes.find((n) => n.id === id);
+    switch (a.type) {
+      case "addTool": {
+        const target = a.node ?? (sel?.type === "node" ? sel.id : null);
+        return commit(() => {
+          if (target && node(target)) { if (!node(target).tools.includes(a.tool)) node(target).tools.push(a.tool); }
+          else { const id = newId(); cv.nodes.push({ id, name: toolByName[a.tool].kind, role: "", tools: [a.tool], ...placeNew() }); sel = { type: "node", id }; }
+        }, `Added ${a.tool}`);
+      }
+      case "removeTool": return commit(() => { const n = node(a.node); if (n) n.tools = n.tools.filter((t) => t !== a.tool); }, `Removed ${a.tool}`);
+      case "moveTool": return commit(() => {
+        const f = node(a.from), t = node(a.to);
+        f.tools = f.tools.filter((x) => x !== a.tool);
+        if (!t.tools.includes(a.tool)) t.tools.push(a.tool);
+      }, `Moved ${a.tool} to ${node(a.to).name}`);
+      case "move": return commit(() => { Object.assign(node(a.id), { x: a.x, y: a.y }); });
+      case "moveNote": return commit(() => { Object.assign(cv.notes.find((n) => n.id === a.id), { x: a.x, y: a.y }); });
+      case "connect": {
+        const i = cv.edges.findIndex((e) => e.from === a.from && e.to === a.to);
+        if (i >= 0) { sel = { type: "edge", index: i }; return renderCanvas(); }
+        return commit(() => { cv.edges.push({ from: a.from, to: a.to, label: "connects to" }); sel = { type: "edge", index: cv.edges.length - 1, focus: "label" }; }, "Connected · name the connection in the inspector");
+      }
+      case "addNode": {
+        const id = newId();
+        commit(() => { cv.nodes.push({ id, name: "New component", role: "", tools: [], x: a.x, y: a.y }); sel = { type: "node", id }; }, "Component added");
+        return $("#ci-name")?.select();
+      }
+      case "addNote": {
+        const id = newId();
+        commit(() => { cv.notes.push({ id, text: "Note", x: a.x, y: a.y }); sel = { type: "note", id }; });
+        return $("#ci-note")?.select();
+      }
+      case "noteText": return commit(() => { const n = cv.notes.find((x) => x.id === a.id); if (n) n.text = a.text; });
+      case "delete": {
+        if (!sel) return;
+        const s = sel;
+        return commit(() => {
+          if (s.type === "node") { cv.nodes = cv.nodes.filter((n) => n.id !== s.id); cv.edges = cv.edges.filter((e) => e.from !== s.id && e.to !== s.id); }
+          if (s.type === "edge") cv.edges.splice(s.index, 1);
+          if (s.type === "note") cv.notes = cv.notes.filter((n) => n.id !== s.id);
+          sel = null;
+        }, "Deleted");
+      }
+      case "autoLayout": return commit(() => {
+        const pos = cvGraph.autoPositions();
+        cv.nodes.forEach((n) => Object.assign(n, pos[n.id]));
+      }, "Arranged by connections");
+    }
+  }
+
+  // Load a design onto the canvas (undoable), laying it out once so moving one box never reflows the rest
+  function loadCanvas(d, track) {
+    commit(() => {
+      cv = { title: d.title, source: d.source, nodes: d.nodes.map((n) => { const { x, y, ...rest } = n; return { ...rest, tools: [...(n.tools || [])] }; }), edges: d.edges.map((e) => ({ ...e })), notes: [] };
+      if (track) cvTrack = track;
+      sel = null;
+      const pos = cvGraph.autoPositions();
+      cv.nodes.forEach((n) => Object.assign(n, pos[n.id]));
+    }, `Loaded ${d.title} · Undo brings back your previous canvas`);
+    cvGraph.refit();
+  }
+  function loadTemplate(kind, id) {
+    if (kind === "design") return loadCanvas(designToCanvas(designs.find((d) => d.id === id)), cvTrack);
+    if (kind === "path") {
+      const d = trackDesign(id, slotsFor(id, architectures[id].stages.flatMap((s) => s.tools)), { includeEmpty: true });
+      return loadCanvas({ title: pathTitle(id), source: `Common path · ${trackById[id].name}`, nodes: d.nodes.map(({ num, ...n }) => n), edges: d.edges }, id);
+    }
+    if (kind === "project") {
+      const p = projectByName[id], d = trackDesign(p.track, slotsFor(p.track, p.tools), { includeEmpty: false });
+      return loadCanvas({ title: p.name, source: `Project · ${trackById[p.track].name}`, nodes: d.nodes.map(({ num, ...n }) => n), edges: d.edges }, p.track);
+    }
+    if (kind === "blank") return loadCanvas({ title: "Untitled system", source: "Blank canvas", nodes: [], edges: [] }, cvTrack);
+  }
+
+  // Templates: system designs, the common path and projects for the chosen domain
+  $("#cv-domains").innerHTML = tracks.map((t) => `<button data-cv-track="${t.id}">${esc(t.name)} <span>${designs.filter((d) => d.track === t.id).length}</span></button>`).join("");
+  function renderTemplates() {
+    $("#cv-domains").querySelectorAll("[data-cv-track]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.cvTrack === cvTrack));
+    const ds = designs.filter((d) => d.track === cvTrack), ps = projects.filter((p) => p.track === cvTrack);
+    const stack = (names) => `<span class="tc-stack">${[...new Set(names)].slice(0, 7).map((n) => logo(toolByName[n], "xs")).join("")}</span>`;
+    $("#cv-templates").innerHTML = `
+      ${ds.map((d) => `<button class="tcard design" data-cv-load="design" data-id="${esc(d.id)}">
+        <span class="tc-kind">System design · ${d.nodes.length} components</span><b>${esc(d.name)}</b><span class="tc-sum">${esc(d.summary)}</span>${stack(d.nodes.flatMap((n) => n.tools))}</button>`).join("")}
+      <button class="tcard path" data-cv-load="path" data-id="${cvTrack}">
+        <span class="tc-kind">Common path · ${architectures[cvTrack].stages.length} layers</span><b>${esc(pathTitle(cvTrack))}</b><span class="tc-sum">Every layer, with all its open-source options.</span>${stack(architectures[cvTrack].stages.flatMap((s) => s.tools))}</button>
+      ${ps.map((p) => `<button class="tcard project" data-cv-load="project" data-id="${esc(p.name)}">
+        <span class="tc-kind">Project · ${p.tools.length} tools</span><b>${esc(p.name)}</b><span class="tc-sum">${esc(p.desc)}</span>${stack(p.tools)}</button>`).join("")}
+      <button class="tcard blank" data-cv-load="blank" data-id=""><span class="tc-kind">Start fresh</span><b>Blank canvas</b><span class="tc-sum">Draw your own system from scratch.</span></button>`;
+  }
+  $("#cv-domains").addEventListener("click", (e) => { const b = e.target.closest("[data-cv-track]"); if (b) { cvTrack = b.dataset.cvTrack; cvSave(); renderTemplates(); } });
+  $("#cv-templates").addEventListener("click", (e) => { const b = e.target.closest("[data-cv-load]"); if (b) loadTemplate(b.dataset.cvLoad, b.dataset.id); });
+
+  // Inspector: edit whatever is selected
+  let cvFlashT;
+  const cvFlash = (msg) => { const el = $("#cv-status"); el.textContent = msg; clearTimeout(cvFlashT); cvFlashT = setTimeout(() => { el.textContent = ""; }, 3200); };
+  function renderInspector() {
+    const n = sel?.type === "node" && cv.nodes.find((x) => x.id === sel.id);
+    const e = sel?.type === "edge" && cv.edges[sel.index];
+    const t = sel?.type === "note" && cv.notes.find((x) => x.id === sel.id);
+    const nameOf = (id) => cv.nodes.find((x) => x.id === id)?.name || "?";
+    if (n) {
+      const sugg = suggestFor(n.name, n.role || "", cvTools()).slice(0, 8);
+      const links = cv.edges.map((x, i) => ({ ...x, i })).filter((x) => x.from === n.id || x.to === n.id);
+      inspector.innerHTML = `
+        <p class="eyebrow">Component</p>
+        <label class="ci-field"><span>Name</span><input id="ci-name" value="${esc(n.name)}" maxlength="60" /></label>
+        <label class="ci-field"><span>Role</span><textarea id="ci-role" rows="2" maxlength="160" placeholder="What does this component do?">${esc(n.role || "")}</textarea></label>
+        <p class="vp-label">Tools · ${n.tools.length}</p>
+        ${n.tools.length ? `<ul class="ci-tools">${n.tools.map((x) => `<li>
+          <button class="ci-tool" data-open-tool="${esc(x)}">${logo(toolByName[x], "xs")}<span><b>${esc(x)}</b><i>${esc(toolByName[x].kind)} · ${esc(toolByName[x].license)}</i></span></button>
+          <button class="ci-x" data-ci-remove="${esc(x)}" aria-label="Remove ${esc(x)}">×</button></li>`).join("")}</ul>` : `<p class="ci-empty">No tools yet: pick a suggestion or search below.</p>`}
+        ${sugg.length ? `<p class="vp-label">Suggested for “${esc(n.name)}”</p><div class="ci-sugg">${sugg.map((x) => `<button data-ci-add="${esc(x)}" title="${esc(toolByName[x].kind)}">${logo(toolByName[x], "xs")}+ ${esc(x)}</button>`).join("")}</div>` : ""}
+        <input class="ci-q" id="ci-q" type="search" placeholder="Search every open-source tool…" aria-label="Search tools to add" />
+        <div class="ci-results" id="ci-results"></div>
+        <p class="vp-label">Connections · ${links.length}</p>
+        ${links.length ? `<ul class="ci-links">${links.map((x) => `<li><button data-ci-edge="${x.i}">${x.from === n.id ? `→ ${esc(nameOf(x.to))}` : `← ${esc(nameOf(x.from))}`} <i>${esc(x.label || "")}</i></button></li>`).join("")}</ul>` : `<p class="ci-empty">Drag the ● on the box's edge to another component to connect it.</p>`}
+        <div class="ci-actions"><button class="st-btn" data-ci="dup">Duplicate</button><button class="st-btn danger" data-ci="del">Delete component</button></div>`;
+    } else if (e) {
+      inspector.innerHTML = `
+        <p class="eyebrow">Connection</p>
+        <p class="ci-route"><button data-ci-node="${esc(e.from)}">${esc(nameOf(e.from))}</button><span>→</span><button data-ci-node="${esc(e.to)}">${esc(nameOf(e.to))}</button></p>
+        <label class="ci-field"><span>Label</span><input id="ci-label" value="${esc(e.label || "")}" maxlength="40" placeholder="e.g. reads & writes" /></label>
+        <div class="ci-chips">${["calls", "reads & writes", "publishes", "subscribes", "caches", "streams", "authenticates", "monitors"].map((l) => `<button data-ci-label="${l}">${l}</button>`).join("")}</div>
+        <div class="ci-actions"><button class="st-btn" data-ci="reverse">⇄ Reverse</button><button class="st-btn danger" data-ci="del">Delete connection</button></div>`;
+    } else if (t) {
+      inspector.innerHTML = `
+        <p class="eyebrow">Note</p>
+        <label class="ci-field"><span>Text</span><textarea id="ci-note" rows="5" maxlength="400">${esc(t.text || "")}</textarea></label>
+        <div class="ci-actions"><button class="st-btn danger" data-ci="del">Delete note</button></div>`;
+    } else {
+      const lic = new Set(cvTools().map((x) => toolByName[x].license));
+      inspector.innerHTML = `
+        <p class="eyebrow">${esc(cv.source || "Design")}</p>
+        <label class="ci-field"><span>System name</span><input id="ci-title" value="${esc(cv.title || "")}" maxlength="60" /></label>
+        <div class="ci-stats"><span><b>${cv.nodes.length}</b>components</span><span><b>${cv.edges.length}</b>connections</span><span><b>${new Set(cvTools()).size}</b>tools</span><span><b>${lic.size}</b>licences</span></div>
+        <p class="vp-label">Editing</p>
+        <ul class="ci-tips">
+          <li><kbd>V</kbd> select & drag boxes · <kbd>C</kbd> connect · <kbd>B</kbd> new component · <kbd>N</kbd> note</li>
+          <li>Drag the <b>●</b> port on a box onto another box to connect them</li>
+          <li>Drag a tool from one box to another to move it</li>
+          <li><kbd>Delete</kbd> removes the selection · <kbd>⌘/Ctrl Z</kbd> undo · <kbd>⇧⌘/Ctrl Z</kbd> redo</li>
+          <li>Select a box to rename it and get tool suggestions</li>
+        </ul>
+        <div class="ci-actions"><button class="st-btn" data-ci="copy">Copy as text</button><button class="st-btn" data-ci="png">Download PNG</button></div>`;
+    }
+    if (sel?.focus === "label") $("#ci-label")?.select();
+  }
+  function renderCanvas() { cvGraph.render(); renderInspector(); }
+
+  // Typing in the inspector updates live, with one undo step per field visit
+  let typing = null;
+  inspector.addEventListener("focusin", (e) => { if (e.target.matches("input:not(.ci-q), textarea")) typing = null; });
+  inspector.addEventListener("input", (e) => {
+    const id = e.target.id;
+    if (id === "ci-q") {
+      const v = e.target.value.trim().toLowerCase(), n = cv.nodes.find((x) => x.id === sel?.id);
+      $("#ci-results").innerHTML = v ? tools.filter((t) => !n?.tools.includes(t.name) && `${t.name} ${t.kind}`.toLowerCase().includes(v)).slice(0, 8)
+        .map((t) => `<button data-ci-add="${esc(t.name)}">${logo(t, "xs")}<span>${esc(t.name)}</span><i>${esc(t.kind)}</i></button>`).join("") : "";
+      return;
+    }
+    if (!["ci-name", "ci-role", "ci-label", "ci-note", "ci-title"].includes(id)) return;
+    if (typing !== id) { past.push(JSON.stringify(cv)); future = []; typing = id; }
+    const v = e.target.value;
+    if (id === "ci-name") cv.nodes.find((x) => x.id === sel.id).name = v || "Untitled";
+    if (id === "ci-role") cv.nodes.find((x) => x.id === sel.id).role = v;
+    if (id === "ci-label") cv.edges[sel.index].label = v;
+    if (id === "ci-note") cv.notes.find((x) => x.id === sel.id).text = v;
+    if (id === "ci-title") cv.title = v;
+    cvSave(); cvGraph.render();
+  });
+  // Suggestions follow the name and role once you finish typing
+  inspector.addEventListener("change", (e) => { if (e.target.id === "ci-name" || e.target.id === "ci-role") renderInspector(); });
+  inspector.addEventListener("click", async (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    if (b.dataset.openTool) return openTool(b.dataset.openTool);
+    if (b.dataset.ciAdd) return canvasEdit({ type: "addTool", tool: b.dataset.ciAdd, node: sel.id });
+    if (b.dataset.ciRemove) return canvasEdit({ type: "removeTool", tool: b.dataset.ciRemove, node: sel.id });
+    if (b.dataset.ciEdge) { sel = { type: "edge", index: +b.dataset.ciEdge }; return renderCanvas(); }
+    if (b.dataset.ciNode) { sel = { type: "node", id: b.dataset.ciNode }; return renderCanvas(); }
+    if (b.dataset.ciLabel) return commit(() => { cv.edges[sel.index].label = b.dataset.ciLabel; });
+    const a = b.dataset.ci;
+    if (a === "del") return canvasEdit({ type: "delete" });
+    if (a === "reverse") return commit(() => { const x = cv.edges[sel.index]; [x.from, x.to] = [x.to, x.from]; }, "Reversed");
+    if (a === "dup") {
+      const n = cv.nodes.find((x) => x.id === sel.id), id = newId();
+      return commit(() => { cv.nodes.push({ ...JSON.parse(JSON.stringify(n)), id, name: `${n.name} (copy)`, x: (n.x || 0) + 40, y: (n.y || 0) + 40 }); sel = { type: "node", id }; }, "Duplicated");
+    }
+    if (a === "png") return cvGraph.exportPNG();
+    if (a === "copy") {
+      const nameOf = (id) => cv.nodes.find((x) => x.id === id)?.name;
+      const lines = [cv.title || "Untitled system", "", "Components:", ...cv.nodes.map((n) => `- ${n.name}${n.role ? ` — ${n.role}` : ""}: ${n.tools.join(", ") || "—"}`), "", "Connections:", ...cv.edges.map((x) => `- ${nameOf(x.from)} → ${nameOf(x.to)}${x.label ? ` (${x.label})` : ""}`), "", "Every tool is free and open source. Designed with Amalgam: https://amalgambynjr.vercel.app"];
+      try { await navigator.clipboard.writeText(lines.join("\n")); cvFlash("Copied"); } catch { cvFlash("Copy unavailable here"); }
+    }
+  });
+
+  // First visit: lay the default design out once and save it
+  if (cv.nodes.some((n) => n.x == null)) { const pos = cvGraph.autoPositions(); cv.nodes.forEach((n) => Object.assign(n, pos[n.id])); cvSave(); }
+  renderTemplates();
+  renderCanvas();
 
   renderStudio();
 
