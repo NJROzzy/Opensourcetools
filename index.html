@@ -22,12 +22,25 @@
         <a href="#map">Map</a>
         <a href="#chains">Chains</a>
         <a href="#trends">Trends</a>
-        <a href="#wire">Live Wire</a>
+        <a href="#wire-side" class="nav-live" id="ws-nav"><i></i>Live news</a>
         <a href="#method">Method</a>
         <a href="#atlas">Atlas</a>
       </nav>
     </div>
   </header>
+
+  <aside class="wire-side" id="wire-side" aria-label="Live news" tabindex="-1">
+    <div class="ws-head">
+      <span class="live"><i></i>Live Wire</span>
+      <span class="ws-updated" id="ws-updated">connecting…</span>
+      <button class="ws-btn" id="ws-refresh" aria-label="Refresh now" title="Refresh now">↻</button>
+      <button class="ws-btn" id="ws-close" aria-label="Close live news" title="Close">×</button>
+    </div>
+    <div class="ws-topics" id="wire-tabs" role="tablist" aria-label="News topics"></div>
+    <ul class="ws-list" id="wire-list" aria-live="polite"></ul>
+    <p class="ws-foot">Headlines from the Hacker News index · refreshes every minute</p>
+  </aside>
+  <button class="ws-toggle" id="ws-toggle" aria-controls="wire-side" aria-expanded="false"><i></i>Live news<span class="ws-badge" id="ws-badge" hidden></span></button>
 
   <main id="top">
     <section class="hero wrap" id="hero">
@@ -108,19 +121,9 @@
       <ol class="trends" id="trend-list"></ol>
     </section>
 
-    <section id="wire" class="wrap section">
-      <div class="section-head">
-        <span class="num">§ 5</span>
-        <h2>The Live Wire</h2>
-        <p class="sub">Freshly published headlines, pulled live from the Hacker News index each time this page loads.</p>
-      </div>
-      <div class="tabs" id="wire-tabs" role="tablist"></div>
-      <ul class="wire" id="wire-list" aria-live="polite"></ul>
-    </section>
-
     <section id="method" class="wrap section">
       <div class="section-head">
-        <span class="num">§ 6</span>
+        <span class="num">§ 5</span>
         <h2>Method</h2>
       </div>
       <div class="method">
@@ -131,7 +134,7 @@
     </section>
     <section id="atlas" class="wrap section">
       <div class="section-head">
-        <span class="num">§ 7</span>
+        <span class="num">§ 6</span>
         <h2>The Atlas</h2>
         <p class="sub">The full catalogue. Every entry is free to use and published under an open-source licence. Filter by any of the eleven domains, search by name, purpose, domain or licence, and open any card for details.</p>
       </div>

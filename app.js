@@ -683,51 +683,120 @@
 
   showTrack(tracks[0].id);
 
-  // Live wire — Hacker News via Algolia (CORS-enabled, no key needed)
-  const wireTabs = $("#wire-tabs");
-  const wireList = $("#wire-list");
-  const cache = {};
-  wireTabs.innerHTML = wire.map((w, i) => `<button role="tab" data-id="${w.id}" aria-selected="${i === 0}">${esc(w.name)}</button>`).join("");
-  wireTabs.addEventListener("click", (e) => {
-    const b = e.target.closest("button");
-    if (!b) return;
-    wireTabs.querySelectorAll("button").forEach((x) => x.setAttribute("aria-selected", x === b));
-    loadWire(b.dataset.id);
-  });
+  // ---------------------------------------------------------------------
+  // Live Wire sidebar — Hacker News via Algolia (CORS-enabled, no key).
+  // Polls every minute while the page is visible, marks headlines that
+  // arrived since the last poll, and counts unread ones while closed.
+  const side = $("#wire-side"), wireTabs = $("#wire-tabs"), wireList = $("#wire-list");
+  const badge = $("#ws-badge"), toggle = $("#ws-toggle"), updatedEl = $("#ws-updated");
+  const POLL_MS = 60000;
+  const topics = [{ id: "all", name: "All", query: wire.map((w) => w.query).join(" "), any: true }, ...wire];
+  const store = {
+    get: (k) => { try { return localStorage.getItem(k); } catch { return null; } },
+    set: (k, v) => { try { localStorage.setItem(k, v); } catch { /* storage unavailable */ } },
+  };
+  let topic = "all", items = [], seen = new Set(), firstLoad = true, unread = 0, lastFetch = 0, timer = null;
 
   const ago = (iso) => {
-    const m = Math.round((Date.now() - new Date(iso)) / 60000);
+    const m = Math.max(0, Math.round((Date.now() - new Date(iso)) / 60000));
+    if (m < 1) return "just now";
     if (m < 60) return `${m}m ago`;
     if (m < 1440) return `${Math.round(m / 60)}h ago`;
     return `${Math.round(m / 1440)}d ago`;
   };
   const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return "news.ycombinator.com"; } };
+  const isOpen = () => document.body.classList.contains("wire-open");
 
-  async function loadWire(id) {
-    const topic = wire.find((w) => w.id === id);
-    wireList.innerHTML = `<li class="note">Receiving transmission…</li>`;
+  function renderBadge() {
+    badge.hidden = !unread;
+    badge.textContent = unread > 99 ? "99+" : unread;
+  }
+  function setOpen(open, { save = true } = {}) {
+    document.body.classList.toggle("wire-open", open);
+    toggle.setAttribute("aria-expanded", open);
+    $("#ws-nav").classList.toggle("on", open);
+    if (open) { unread = 0; renderBadge(); }
+    if (save) store.set("amg-wire", open ? "open" : "closed");
+  }
+  toggle.addEventListener("click", () => { setOpen(true); side.focus(); });
+  $("#ws-close").addEventListener("click", () => setOpen(false));
+  $("#ws-nav").addEventListener("click", (e) => { e.preventDefault(); setOpen(!isOpen()); });
+  side.addEventListener("keydown", (e) => { if (e.key === "Escape" && !matchMedia("(min-width: 1200px)").matches) setOpen(false); });
+  // Open by default where there is room beside the content; remember the choice
+  const saved = store.get("amg-wire");
+  setOpen(saved ? saved === "open" : matchMedia("(min-width: 1200px)").matches, { save: false });
+
+  wireTabs.innerHTML = topics.map((w) => `<button role="tab" data-id="${w.id}" aria-selected="${w.id === topic}">${esc(w.name)}</button>`).join("");
+  wireTabs.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b || b.dataset.id === topic) return;
+    topic = b.dataset.id;
+    wireTabs.querySelectorAll("button").forEach((x) => x.setAttribute("aria-selected", x === b));
+    seen = new Set(); items = []; firstLoad = true;
+    wireList.innerHTML = `<li class="ws-note">Tuning in…</li>`;
+    poll();
+  });
+
+  function render(fresh) {
+    if (!items.length) { wireList.innerHTML = `<li class="ws-note">The wire is quiet on this topic.</li>`; return; }
+    wireList.innerHTML = items.map((h) => {
+      const link = h.url || `https://news.ycombinator.com/item?id=${h.objectID}`;
+      const isNew = fresh.has(h.objectID);
+      return `<li class="ws-item${isNew ? " new" : ""}">
+        <a class="ws-link" href="${esc(link)}" target="_blank" rel="noopener">
+          <span class="ws-meta">${isNew ? `<b>New</b>` : ""}<time data-t="${esc(h.created_at)}">${ago(h.created_at)}</time> · ${esc(host(link))}</span>
+          <span class="ws-title">${esc(h.title)}</span>
+        </a>
+        <a class="ws-hn" href="https://news.ycombinator.com/item?id=${esc(h.objectID)}" target="_blank" rel="noopener">▲ ${h.points ?? 0} · ${h.num_comments ?? 0} comment${h.num_comments === 1 ? "" : "s"}</a>
+      </li>`;
+    }).join("");
+  }
+
+  async function poll() {
+    const tp = topics.find((t) => t.id === topic);
+    const q = encodeURIComponent(tp.query);
+    const url = "https://hn.algolia.com/api/v1/search_by_date?tags=story&hitsPerPage=20&numericFilters=points%3E2"
+      + `&restrictSearchableAttributes=title&typoTolerance=false&query=${q}${tp.any ? `&optionalWords=${q}` : ""}`;
+    side.classList.add("ws-busy");
     try {
-      if (!cache[id]) {
-        const url = `https://hn.algolia.com/api/v1/search_by_date?tags=story&hitsPerPage=12&numericFilters=points%3E10&query=${encodeURIComponent(topic.query)}`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(res.status);
-        cache[id] = (await res.json()).hits;
-      }
-      const hits = cache[id].filter((h) => h.title);
-      if (!hits.length) { wireList.innerHTML = `<li class="note">The wire is quiet on this topic.</li>`; return; }
-      wireList.innerHTML = hits.map((h) => {
-        const link = h.url || `https://news.ycombinator.com/item?id=${h.objectID}`;
-        return `<li><a href="${esc(link)}" target="_blank" rel="noopener">
-          <time datetime="${esc(h.created_at)}">${ago(h.created_at)}</time>
-          <span class="t">${esc(h.title)}</span>
-          <span class="src">${esc(host(link))}</span>
-        </a></li>`;
-      }).join("");
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(res.status);
+      if (tp.id !== topic) return; // the topic changed while this was in flight
+      const hits = (await res.json()).hits.filter((h) => h.title);
+      const fresh = firstLoad ? new Set() : new Set(hits.filter((h) => !seen.has(h.objectID)).map((h) => h.objectID));
+      hits.forEach((h) => seen.add(h.objectID));
+      if (fresh.size && !isOpen()) { unread += fresh.size; renderBadge(); }
+      items = hits; firstLoad = false; lastFetch = Date.now();
+      side.classList.remove("ws-error");
+      render(fresh);
+      tickClock();
     } catch {
-      wireList.innerHTML = `<li class="note">The wire could not be reached just now — try again shortly.</li>`;
+      side.classList.add("ws-error");
+      updatedEl.textContent = "offline · retrying";
+      if (!items.length) wireList.innerHTML = `<li class="ws-note">The wire could not be reached — retrying shortly.</li>`;
+    } finally {
+      side.classList.remove("ws-busy");
     }
   }
-  loadWire(wire[0].id);
+  function schedule() {
+    clearTimeout(timer);
+    timer = setTimeout(async () => { if (!document.hidden) await poll(); schedule(); }, POLL_MS);
+  }
+  function tickClock() {
+    if (lastFetch && !side.classList.contains("ws-error")) {
+      const s = Math.round((Date.now() - lastFetch) / 1000);
+      updatedEl.textContent = s < 5 ? "updated just now" : `updated ${s < 60 ? `${s}s` : `${Math.round(s / 60)}m`} ago`;
+    }
+    wireList.querySelectorAll("time[data-t]").forEach((t) => { t.textContent = ago(t.dataset.t); });
+  }
+  setInterval(tickClock, 5000);
+  $("#ws-refresh").addEventListener("click", () => { poll(); schedule(); });
+  // Catch up straight away when returning to the tab
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && Date.now() - lastFetch > POLL_MS) { poll(); schedule(); }
+  });
+  poll();
+  schedule();
 
   // ---------------------------------------------------------------------
   // Hero instruments: typed boot line, UTC clock, stats that count up.
@@ -794,7 +863,9 @@
     ctx.fillRect(0, 0, FW, FH);
 
     // Halo behind the globe
-    const gx = FW * (small ? 0.5 : 0.72), gy = FH * (small ? 0.3 : 0.42) - sy * 0.45;
+    // Keep the globe in the content area when the news sidebar sits beside it
+    const sideW = document.body.classList.contains("wire-open") && innerWidth >= 1200 ? 360 * dpr : 0;
+    const gx = (FW - sideW) * (small ? 0.5 : 0.72), gy = FH * (small ? 0.3 : 0.42) - sy * 0.45;
     const halo = ctx.createRadialGradient(gx, gy, 0, gx, gy, Math.max(FW, FH) * 0.55);
     halo.addColorStop(0, "rgba(255,255,255,0.08)");
     halo.addColorStop(1, "rgba(255,255,255,0)");

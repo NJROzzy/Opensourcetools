@@ -38,11 +38,12 @@ The design is futuristic and monochrome, with black and white throughout and onl
 | **§2 The Amalgam Map** | An interactive **Venn diagram of any three domains**, picked by hand or from presets. Each project and tool lands in the overlap matching its domains. **By project** writes project names inside each region; **by tool** places tool logos there, with *+N more* when a region is crowded. |
 | **§3 Recommendation Chains** | Step-by-step tool chains for 20 projects. Every link names the tool, the **role** it plays, **why the project needs it**, and an alternative. |
 | **§4 Currents & Trends** | Twelve movements across the field, each linked to its tools. |
-| **§5 The Live Wire** | Headlines on AI, ML, Robotics, Security, Networking, Databases, Distributed Systems, Hardware, Quantum and Open Source, fetched live from the Hacker News index each time the page loads. |
-| **§6 Method** | How tools were chosen: open-source licences only, no paid plans, and open community forks where a project left open source. |
-| **§7 The Atlas** | The full catalogue at the bottom: 141 open-source tools with logos, licences and domains. Filter by domain or search; every card opens the tool drawer. |
+| **§5 Method** | How tools were chosen: open-source licences only, no paid plans, and open community forks where a project left open source. |
+| **§6 The Atlas** | The full catalogue at the bottom: 141 open-source tools with logos, licences and domains. Filter by domain or search; every card opens the tool drawer. |
 
 Clicking a tool anywhere on the site opens a drawer with its licence, domains, its layer in each build path, and every project that uses it.
+
+**Live Wire sidebar.** Live headlines from the Hacker News index sit in a sidebar on the right: open beside the content on wide screens, and a slide-over panel (opened from the *Live news* edge tab or the nav) on smaller ones. It covers All, AI, Machine Learning, Robotics, Security, Networking, Databases, Distributed, Hardware, Quantum and Open Source, and refreshes every minute while the page is visible. Headlines that arrive between refreshes are marked **NEW**, and while the sidebar is closed the tab shows a count of unread headlines. Your open/closed choice is remembered.
 
 ![Build paths](docs/paths.png)
 
