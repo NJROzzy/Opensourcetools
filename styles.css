@@ -330,3 +330,40 @@ nav a { white-space: nowrap; }
 .region-link:hover { background: var(--ink); color: var(--paper); }
 .vp-region { font-family: var(--mono); font-size: 11px !important; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint) !important; margin: 0 0 6px !important; }
 .vp-role { color: var(--ink); font-weight: 500; font-style: italic; }
+
+/* eleven domains: pill rows instead of joined tab bars */
+#tabs, #wire-tabs, .pills { display: flex; flex-wrap: wrap; gap: 6px; border: 0; }
+#tabs button, #wire-tabs button, .pills button {
+  appearance: none; background: transparent; cursor: pointer;
+  border: 1px solid var(--rule-strong); color: var(--ink-soft);
+  font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  padding: 7px 11px; transition: background .2s, color .2s, border-color .2s;
+}
+#tabs button:last-child, #wire-tabs button:last-child { border-right: 1px solid var(--rule-strong); }
+#tabs button:hover, #wire-tabs button:hover, .pills button:hover { color: var(--ink); border-color: var(--ink); }
+#tabs button[aria-selected="true"], #wire-tabs button[aria-selected="true"], .pills button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.controls { align-items: flex-start; }
+.controls .search { flex: 0 1 300px; }
+.presets button { font-family: var(--serif); font-style: italic; text-transform: none; letter-spacing: 0; font-size: 16px; padding: 4px 12px; }
+.venn-controls { margin-bottom: 18px; }
+.venn-controls .vp-label:first-child { margin-top: 0; }
+.card .doms { margin: 0; font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
+.card:hover .doms { color: #555; }
+
+/* map additions for any-three domains */
+.v-more { font-style: italic; fill: var(--ink-soft); }
+.v-name-group.on .v-more { fill: #444; }
+.v-more-tile { cursor: pointer; }
+.v-more-tile rect { fill: #000; stroke: var(--ink); stroke-dasharray: 3 3; }
+.v-more-tile text { font-family: var(--mono); font-size: 11px; fill: var(--ink); }
+.v-more-tile:hover rect { fill: #222; }
+.v-mono { font-family: var(--serif); font-style: italic; font-size: 18px; fill: #111; pointer-events: none; }
+.venn-keys button span { opacity: .6; margin-left: 4px; }
+.dom-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.dom-tags span { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; border: 1px solid var(--rule-strong); padding: 4px 9px; color: var(--ink); }
+.dom-tags span:first-child { background: var(--ink); color: var(--paper); }
+.chips .chip { display: inline-flex; align-items: center; appearance: none; background: transparent; cursor: pointer; }
+.chips .chip:hover { color: var(--ink); border-color: var(--ink); }
+
+/* eighteen chains: the desktop list scrolls within the viewport */
+@media (min-width: 901px) { .chain-picker { max-height: calc(100vh - 120px); overflow-y: auto; scrollbar-width: thin; } }

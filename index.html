@@ -34,9 +34,10 @@
       <h1>Amalgam</h1>
       <p class="lede">
         A field guide to the <em>free and open-source</em> instruments with which one may build
-        a proper project in <strong>Computer Science</strong>, <strong>Artificial Intelligence</strong>,
-        <strong>Machine Learning</strong> and <strong>Robotics</strong> — catalogued, annotated,
-        and read against the currents of the day.
+        a proper project across <strong>Computer Science</strong> — from hardware, software and computation
+        to networks, data, distributed systems and security — and in <strong>Artificial Intelligence</strong>,
+        <strong>Machine Learning</strong>, <strong>Robotics</strong> and <strong>emerging computing</strong>:
+        catalogued, annotated, and read against the currents of the day.
       </p>
       <div class="stats" id="stats"></div>
     </section>
@@ -45,14 +46,14 @@
       <div class="section-head">
         <span class="num">§ 1</span>
         <h2>The Atlas</h2>
-        <p class="sub">Every entry is free to use and published under an open licence. Filter by discipline or search by name, purpose, or licence.</p>
+        <p class="sub">Every entry is free to use and published under an open licence. Filter by any of the eleven domains, or search by name, purpose, domain or licence.</p>
       </div>
 
       <div class="controls">
         <div class="tabs" id="tabs" role="tablist"></div>
         <label class="search">
           <span class="sr">Search tools</span>
-          <input id="q" type="search" placeholder="search — e.g. simulation, LLM, MIT…" autocomplete="off" />
+          <input id="q" type="search" placeholder="search — e.g. quantum, VPN, LLM, MIT…" autocomplete="off" />
         </label>
       </div>
 
@@ -64,10 +65,16 @@
       <div class="section-head">
         <span class="num">§ 2</span>
         <h2>The Amalgam Map</h2>
-        <p class="sub">Where the disciplines overlap, projects appear. View the map <em>by project</em> to see what can be built in each region, or <em>by tool</em> to see where every tool lives — then select a region or a logo for the full picture.</p>
+        <p class="sub">Where domains overlap, projects appear. Choose any three of the eleven domains, then view the map <em>by project</em> to see what can be built in each overlap, or <em>by tool</em> to see where every tool lives. Select a region or a logo for the full picture.</p>
       </div>
       <div class="venn">
         <figure class="venn-fig">
+          <div class="venn-controls">
+            <p class="vp-label">Choose three domains</p>
+            <div class="pills" id="venn-domains" aria-label="Domains on the map"></div>
+            <p class="vp-label">Or start from a preset</p>
+            <div class="pills presets" id="venn-presets"></div>
+          </div>
           <div class="tabs venn-mode" id="venn-mode" role="tablist" aria-label="Diagram view">
             <button role="tab" data-mode="projects" aria-selected="true">By project</button>
             <button role="tab" data-mode="tools" aria-selected="false">By tool</button>
@@ -116,8 +123,8 @@
         <h2>Method</h2>
       </div>
       <div class="method">
-        <p><span class="drop">O</span>n inclusion. A tool enters the Atlas only if it can be used at no cost and its source is published under a recognised open licence (MIT, Apache-2.0, BSD, GPL and kin). Open-<em>weight</em> models are noted separately, as their licences vary.</p>
-        <p>On assembly. A proper project is rarely one tool — it is an <em>amalgam</em>. A typical robotics study might braid ROS 2, MuJoCo, PyTorch and OpenCV; a language-model product might braid llama.cpp, LlamaIndex and PostgreSQL with pgvector. Read the Atlas as a set of parts, not a ranking.</p>
+        <p><span class="drop">O</span>n inclusion. A tool enters the Atlas only if it can be used at no cost and its source is published under a recognised open licence (MIT, Apache-2.0, BSD, GPL, MPL and kin). Open-<em>weight</em> models are noted separately, as their licences vary. Where a project moved to a source-available licence, the Atlas lists its open community fork instead.</p>
+        <p>On assembly. A proper project is rarely one tool, or one domain — it is an <em>amalgam</em>. A robotics study might braid ROS 2, MuJoCo and PyTorch; an IoT monitor braids KiCad, Zephyr, MQTT and Grafana across hardware, networks and data. Every tool is tagged with each domain it serves, which is how the map places it. Read the Atlas as a set of parts, not a ranking.</p>
         <p>On currency. Licences change. Always verify the licence file in a project's repository before you build upon it.</p>
       </div>
     </section>
