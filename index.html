@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AmalgambyNJR — Open Source Atlas</title>
-  <meta name="description" content="A research-style atlas of free, open-source tools for building real projects in Computer Science, Artificial Intelligence, Machine Learning and Robotics — with live trends." />
+  <meta name="description" content="Build paths, architectures and project recipes using only free, open-source tools — for web and mobile apps, AI/ML, robotics and every domain of computer science." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet" />
@@ -18,12 +18,13 @@
     <div class="wrap bar">
       <a class="mark" href="#top">Amalgam<span>by NJR</span></a>
       <nav>
-        <a href="#atlas">Atlas</a>
+        <a href="#paths">Paths</a>
         <a href="#map">Map</a>
         <a href="#chains">Chains</a>
         <a href="#trends">Trends</a>
         <a href="#wire">Live Wire</a>
         <a href="#method">Method</a>
+        <a href="#atlas">Atlas</a>
       </nav>
     </div>
   </header>
@@ -42,23 +43,14 @@
       <div class="stats" id="stats"></div>
     </section>
 
-    <section id="atlas" class="wrap section">
+    <section id="paths" class="wrap section">
       <div class="section-head">
         <span class="num">§ 1</span>
-        <h2>The Atlas</h2>
-        <p class="sub">Every entry is free to use and published under an open licence. Filter by any of the eleven domains, or search by name, purpose, domain or licence.</p>
+        <h2>Build Paths</h2>
+        <p class="sub">Pick what you want to build. Each path shows the common architecture — the layers almost every project of that kind passes through, with the free, open-source tools for each layer — and projects you can open to see their full stack.</p>
       </div>
-
-      <div class="controls">
-        <div class="tabs" id="tabs" role="tablist"></div>
-        <label class="search">
-          <span class="sr">Search tools</span>
-          <input id="q" type="search" placeholder="search — e.g. quantum, VPN, LLM, MIT…" autocomplete="off" />
-        </label>
-      </div>
-
-      <div id="atlas-grid" class="grid"></div>
-      <p id="empty" class="empty" hidden>No instrument matches that inquiry.</p>
+      <div class="track-groups" id="track-groups" role="tablist" aria-label="Build paths"></div>
+      <div class="track-view" id="track-view" aria-live="polite"></div>
     </section>
 
     <section id="map" class="wrap section">
@@ -102,7 +94,7 @@
       <div class="section-head">
         <span class="num">§ 4</span>
         <h2>Currents &amp; Trends</h2>
-        <p class="sub">The movements shaping open tooling right now, and which instruments in the Atlas they touch.</p>
+        <p class="sub">The movements shaping open tooling right now, and the tools they touch.</p>
       </div>
       <ol class="trends" id="trend-list"></ol>
     </section>
@@ -123,10 +115,28 @@
         <h2>Method</h2>
       </div>
       <div class="method">
-        <p><span class="drop">O</span>n inclusion. A tool enters the Atlas only if it can be used at no cost and its source is published under a recognised open licence (MIT, Apache-2.0, BSD, GPL, MPL and kin). Open-<em>weight</em> models are noted separately, as their licences vary. Where a project moved to a source-available licence, the Atlas lists its open community fork instead.</p>
+        <p><span class="drop">O</span>n inclusion. A tool enters the Atlas only if it can be used at no cost and its source is published under a recognised open licence (MIT, Apache-2.0, BSD, GPL, MPL and kin). For open-<em>weight</em> AI models, only releases under an open-source licence (Apache-2.0) are recommended. Nothing here requires a paid plan. Where a project moved to a source-available licence, the Atlas lists its open community fork instead.</p>
         <p>On assembly. A proper project is rarely one tool, or one domain — it is an <em>amalgam</em>. A robotics study might braid ROS 2, MuJoCo and PyTorch; an IoT monitor braids KiCad, Zephyr, MQTT and Grafana across hardware, networks and data. Every tool is tagged with each domain it serves, which is how the map places it. Read the Atlas as a set of parts, not a ranking.</p>
         <p>On currency. Licences change. Always verify the licence file in a project's repository before you build upon it.</p>
       </div>
+    </section>
+    <section id="atlas" class="wrap section">
+      <div class="section-head">
+        <span class="num">§ 7</span>
+        <h2>The Atlas</h2>
+        <p class="sub">The full catalogue. Every entry is free to use and published under an open-source licence. Filter by any of the eleven domains, search by name, purpose, domain or licence, and open any card for details.</p>
+      </div>
+
+      <div class="controls">
+        <div class="tabs" id="tabs" role="tablist"></div>
+        <label class="search">
+          <span class="sr">Search tools</span>
+          <input id="q" type="search" placeholder="search — e.g. quantum, VPN, LLM, MIT…" autocomplete="off" />
+        </label>
+      </div>
+
+      <div id="atlas-grid" class="grid"></div>
+      <p id="empty" class="empty" hidden>No instrument matches that inquiry.</p>
     </section>
   </main>
 
@@ -134,6 +144,11 @@
     <span class="script">Amalgam</span>
     <span>Compiled by NJR · Black on white on black · <span id="year"></span></span>
   </footer>
+
+  <dialog class="drawer" id="drawer" aria-labelledby="drawer-title">
+    <button class="drawer-close" id="drawer-close" aria-label="Close">×</button>
+    <div class="drawer-body" id="drawer-body"></div>
+  </dialog>
 
   <script src="data.js"></script>
   <script src="app.js"></script>
