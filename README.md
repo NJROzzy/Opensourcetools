@@ -35,17 +35,20 @@ The design is futuristic and monochrome, with black and white throughout and onl
 | Section | What it does |
 |---|---|
 | **§1 Build Paths** | Start here. Choose a path: **Software Engineering → Web applications / Mobile applications**, **AI / ML**, **Robotics**, then Data, Distributed systems, Networks, Security, Hardware, Computation and Emerging computing. Each path shows its **common-path architecture**: the layers a typical project passes through (e.g. *Interface → Build & style → Server & API → Data → Identity → Test → Deliver → Observe*), with the open-source tools for every layer. Below it are **explorable project cards**; hover one to light up the layers and tools it uses, or open it in a drawer showing the full stack, each tool's role and why it's needed, where it sits in the architecture, and links to its chain and its place on the map. |
-| **§2 The Amalgam Map** | An interactive **Venn diagram of any three domains**, picked by hand or from presets. Each project and tool lands in the overlap matching its domains. **By project** writes project names inside each region; **by tool** places tool logos there, with *+N more* when a region is crowded. |
-| **§3 Recommendation Chains** | Step-by-step tool chains for 20 projects. Every link names the tool, the **role** it plays, **why the project needs it**, and an alternative. |
-| **§4 Currents & Trends** | Twelve movements across the field, each linked to its tools. |
-| **§5 Method** | How tools were chosen: open-source licences only, no paid plans, and open community forks where a project left open source. |
-| **§6 The Atlas** | The full catalogue at the bottom: 141 open-source tools with logos, licences and domains. Filter by domain or search; every card opens the tool drawer. |
+| **§2 Architecture Studio** | A drag-and-drop **grid** for assembling your own architecture. Pick a path and its layers become drop lanes (plus *Extras*). Drag tools from the palette into lanes, move them between lanes, or drag them back to remove them. You can also drop a whole **project** to load its stack (switching to its path), or simply click to add. An **Advisor** tile inside the grid recommends tools as you build: layer coverage, the best picks for empty layers, tools that pair well with yours (based on how often they appear together in the projects), the closest real projects with a match percentage, notes when a layer holds tools that do the same job, and a licence summary. Name it, copy it as text, or clear it; your board is saved in your browser. Works with mouse, pen and touch (press and hold to drag). |
+| **§3 The Amalgam Map** | An interactive **Venn diagram of any three domains**, picked by hand or from presets. Each project and tool lands in the overlap matching its domains. **By project** writes project names inside each region; **by tool** places tool logos there, with *+N more* when a region is crowded. |
+| **§4 Recommendation Chains** | Step-by-step tool chains for 20 projects. Every link names the tool, the **role** it plays, **why the project needs it**, and an alternative. |
+| **§5 Currents & Trends** | Twelve movements across the field, each linked to its tools. |
+| **§6 Method** | How tools were chosen: open-source licences only, no paid plans, and open community forks where a project left open source. |
+| **§7 The Atlas** | The full catalogue at the bottom: 141 open-source tools with logos, licences and domains. Filter by domain or search; every card opens the tool drawer. |
 
 Clicking a tool anywhere on the site opens a drawer with its licence, domains, its layer in each build path, and every project that uses it.
 
 **Live Wire pop-up.** A rotating half-circle on the right edge of the screen, with *LIVE NEWS* circling it, a radar sweep and a glowing core, opens a compact pop-up that unfolds out of it with live headlines from the Hacker News index. You can also open it from *Live news* in the nav; Esc or a click outside closes it. It covers All, AI, Machine Learning, Robotics, Security, Networking, Databases, Distributed, Hardware, Quantum and Open Source, and refreshes every minute while the page is visible. Headlines that arrive between refreshes are marked **NEW**, and while the pop-up is closed the half-circle shows a count of unread headlines. On phones the half-circle sits in the bottom-right corner.
 
 ![Build paths](docs/paths.png)
+
+![Architecture Studio](docs/studio.png)
 
 | By project | By tool |
 |---|---|

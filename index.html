@@ -19,6 +19,7 @@
       <a class="mark" href="#top">Amalgam<span>by NJR</span></a>
       <nav>
         <a href="#paths">Paths</a>
+        <a href="#studio">Studio</a>
         <a href="#map">Map</a>
         <a href="#chains">Chains</a>
         <a href="#trends">Trends</a>
@@ -84,9 +85,39 @@
       <div class="track-view" id="track-view" aria-live="polite"></div>
     </section>
 
-    <section id="map" class="wrap section">
+    <section id="studio" class="wrap section">
       <div class="section-head">
         <span class="num">§ 2</span>
+        <h2>Architecture Studio</h2>
+        <p class="sub">Drag tools, or a whole project, onto the grid to assemble an architecture layer by layer. The advisor inside the grid points out empty layers, tools that pair well with yours, and the real projects your stack resembles.</p>
+      </div>
+      <div class="studio">
+        <div class="studio-bar">
+          <label class="st-field">Path <select id="st-track"></select></label>
+          <input id="st-title" class="st-title" maxlength="60" aria-label="Architecture name" />
+          <span class="st-spacer"></span>
+          <span class="st-status" id="st-status" aria-live="polite"></span>
+          <button class="st-btn" id="st-copy">Copy as text</button>
+          <button class="st-btn" id="st-clear">Clear</button>
+        </div>
+        <div class="studio-body">
+          <aside class="palette" id="st-palette" data-trash aria-label="Tool palette">
+            <div class="pal-tabs" role="tablist">
+              <button role="tab" data-tab="tools" aria-selected="true">Tools</button>
+              <button role="tab" data-tab="projects" aria-selected="false">Projects</button>
+            </div>
+            <input id="st-q" class="pal-q" type="search" placeholder="search tools…" autocomplete="off" aria-label="Search the palette" />
+            <div class="pal-list" id="st-list"></div>
+            <p class="pal-hint">Drag onto the grid, or click to add. Drag a placed tool back here to remove it. On touch screens, press and hold to drag.</p>
+          </aside>
+          <div class="board" id="st-board" aria-label="Architecture grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="map" class="wrap section">
+      <div class="section-head">
+        <span class="num">§ 3</span>
         <h2>The Amalgam Map</h2>
         <p class="sub">Where domains overlap, projects appear. Choose any three of the eleven domains, then view the map <em>by project</em> to see what can be built in each overlap, or <em>by tool</em> to see where every tool lives. Select a region or a logo for the full picture.</p>
       </div>
@@ -111,7 +142,7 @@
 
     <section id="chains" class="wrap section">
       <div class="section-head">
-        <span class="num">§ 3</span>
+        <span class="num">§ 4</span>
         <h2>Recommendation Chains</h2>
         <p class="sub">Choose a project and follow its chain: each link is a tool, the role it plays, and why the project needs it — in the order you would assemble them.</p>
       </div>
@@ -123,7 +154,7 @@
 
     <section id="trends" class="wrap section">
       <div class="section-head">
-        <span class="num">§ 4</span>
+        <span class="num">§ 5</span>
         <h2>Currents &amp; Trends</h2>
         <p class="sub">The movements shaping open tooling right now, and the tools they touch.</p>
       </div>
@@ -132,7 +163,7 @@
 
     <section id="method" class="wrap section">
       <div class="section-head">
-        <span class="num">§ 5</span>
+        <span class="num">§ 6</span>
         <h2>Method</h2>
       </div>
       <div class="method">
@@ -143,7 +174,7 @@
     </section>
     <section id="atlas" class="wrap section">
       <div class="section-head">
-        <span class="num">§ 6</span>
+        <span class="num">§ 7</span>
         <h2>The Atlas</h2>
         <p class="sub">The full catalogue. Every entry is free to use and published under an open-source licence. Filter by any of the eleven domains, search by name, purpose, domain or licence, and open any card for details.</p>
       </div>

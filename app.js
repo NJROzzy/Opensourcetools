@@ -684,6 +684,305 @@
   showTrack(tracks[0].id);
 
   // ---------------------------------------------------------------------
+  // Architecture Studio — drag tools (or whole projects) into the lanes of
+  // a path's architecture; an advisor tile inside the grid recommends tools.
+  const ST_KEY = "amg-studio";
+  const stSave = () => { try { localStorage.setItem(ST_KEY, JSON.stringify(st)); } catch { /* storage unavailable */ } };
+  const stLoad = () => {
+    try {
+      const v = JSON.parse(localStorage.getItem(ST_KEY));
+      if (!v || !architectures[v.track]) return null;
+      const slots = {};
+      for (const [k, names] of Object.entries(v.slots || {})) slots[k] = (names || []).filter((n) => toolByName[n]);
+      return { track: v.track, title: String(v.title || "").slice(0, 60), slots };
+    } catch { return null; }
+  };
+  let st = stLoad() || { track: "web", title: "", slots: {} };
+  let palTab = "tools";
+
+  const stArch = () => architectures[st.track];
+  const laneKeys = () => [...stArch().stages.map((_, i) => String(i)), "extra"];
+  const placed = () => laneKeys().flatMap((k) => st.slots[k] || []);
+  const bestLane = (name) => { const i = stArch().stages.findIndex((s) => s.tools.includes(name)); return i < 0 ? "extra" : String(i); };
+  const removeTool = (name) => { for (const k in st.slots) st.slots[k] = st.slots[k].filter((n) => n !== name); };
+  function addTool(name, lane = bestLane(name)) {
+    removeTool(name);
+    (st.slots[lane] ||= []).push(name);
+  }
+  function setTrack(id) {
+    const names = placed();
+    st.track = id; st.slots = {};
+    names.forEach((n) => addTool(n));
+  }
+  function loadProject(name) {
+    const p = projectByName[name];
+    if (p.track !== st.track) setTrack(p.track);
+    p.tools.forEach((n) => { if (!placed().includes(n)) addTool(n); });
+    if (!st.title) st.title = p.name;
+    stChanged(`Loaded ${p.name}`);
+  }
+
+  // Two tools overlap when their kinds match once "library", "framework" and
+  // the like are set aside, or when a chain lists one as the other's alternative
+  const kindKey = (n) => toolByName[n].kind.toLowerCase().replace(/\b(library|framework|engine|toolkit|& proxy|in one file)\b/g, "").replace(/\s+/g, " ").trim();
+  const altPairs = new Set(chains.flatMap((c) => c.steps.filter((x) => x.alt).flatMap((x) => [`${x.tool}|${x.alt}`, `${x.alt}|${x.tool}`])));
+  const overlaps = (a, b) => kindKey(a) === kindKey(b) || altPairs.has(`${a}|${b}`);
+
+  // How often two tools appear in the same project
+  const together = {};
+  for (const p of projects) for (const a of p.tools) for (const b of p.tools) if (a !== b) {
+    (together[a] ||= {})[b] = (together[a][b] || 0) + 1;
+  }
+
+  const trackSel = $("#st-track"), titleIn = $("#st-title"), board = $("#st-board"), list = $("#st-list"), qIn = $("#st-q");
+  trackSel.innerHTML = tracks.map((t) => `<option value="${t.id}">${esc(t.group === "Software Engineering" ? `Software · ${t.name}` : t.name)}</option>`).join("");
+  trackSel.addEventListener("change", () => { setTrack(trackSel.value); stChanged(); });
+  titleIn.addEventListener("input", () => { st.title = titleIn.value; stSave(); });
+  $("#st-clear").addEventListener("click", () => { st.slots = {}; st.title = ""; stChanged("Cleared"); });
+  $("#st-copy").addEventListener("click", async () => {
+    const arch = stArch(), tr = trackById[st.track];
+    const lines = [`${st.title || "Untitled architecture"} — ${tr.name}`, ""];
+    arch.stages.forEach((s, i) => lines.push(`${String(i + 1).padStart(2, "0")} ${s.name}: ${(st.slots[i] || []).join(", ") || "—"}`));
+    if ((st.slots.extra || []).length) lines.push(`+  Extras: ${st.slots.extra.join(", ")}`);
+    lines.push("", "Every tool is free and open source. Assembled with Amalgam: https://amalgambynjr.vercel.app");
+    try { await navigator.clipboard.writeText(lines.join("\n")); flash("Copied"); }
+    catch { flash("Copy unavailable here"); }
+  });
+  let flashT;
+  const flash = (msg) => { const el = $("#st-status"); el.textContent = msg; clearTimeout(flashT); flashT = setTimeout(() => { el.textContent = ""; }, 2200); };
+  function stChanged(msg) { stSave(); renderStudio(); if (msg) flash(msg); }
+
+  document.querySelectorAll(".pal-tabs [data-tab]").forEach((b) => b.addEventListener("click", () => {
+    palTab = b.dataset.tab;
+    document.querySelectorAll(".pal-tabs [data-tab]").forEach((x) => x.setAttribute("aria-selected", x === b));
+    qIn.placeholder = palTab === "tools" ? "search tools…" : "search projects…";
+    renderPalette();
+  }));
+  qIn.addEventListener("input", renderPalette);
+
+  function renderPalette() {
+    const q = qIn.value.trim().toLowerCase();
+    const on = new Set(placed());
+    if (palTab === "projects") {
+      const ps = projects.filter((p) => !q || `${p.name} ${p.desc} ${p.tools.join(" ")}`.toLowerCase().includes(q))
+        .sort((a, b) => (b.track === st.track) - (a.track === st.track));
+      list.innerHTML = ps.map((p) => `
+        <button class="pal-proj" data-drag="project" data-name="${esc(p.name)}">
+          <span class="pp-track">${esc(trackById[p.track].name)}</span>
+          <b>${esc(p.name)}</b>
+          <span class="pp-stack">${p.tools.slice(0, 6).map((n) => logo(toolByName[n], "xs")).join("")}</span>
+        </button>`).join("") || `<p class="pal-none">No project matches.</p>`;
+      return;
+    }
+    const chip = (n) => `<button class="pal-tool${on.has(n) ? " on" : ""}" data-drag="tool" data-name="${esc(n)}" title="${esc(toolByName[n].kind)}">${logo(toolByName[n], "xs")}<span>${esc(n)}</span>${on.has(n) ? "<i>✓</i>" : ""}</button>`;
+    if (q) {
+      const hits = tools.filter((t) => `${t.name} ${t.kind} ${t.desc}`.toLowerCase().includes(q)).map((t) => t.name);
+      list.innerHTML = hits.length ? `<div class="pal-group">${hits.map(chip).join("")}</div>` : `<p class="pal-none">No tool matches.</p>`;
+      return;
+    }
+    const arch = stArch();
+    const inArch = new Set(arch.stages.flatMap((s) => s.tools));
+    list.innerHTML = arch.stages.map((s) => `<p class="pal-label">${esc(s.name)}</p><div class="pal-group">${s.tools.map(chip).join("")}</div>`).join("")
+      + `<p class="pal-label">Everything else</p><div class="pal-group">${tools.filter((t) => !inArch.has(t.name)).map((t) => chip(t.name)).join("")}</div>`;
+  }
+
+  // Advisor: coverage, empty layers, good pairings, closest projects, notes
+  function advise() {
+    const arch = stArch();
+    const names = placed(), on = new Set(names);
+    const filled = arch.stages.filter((_, i) => (st.slots[i] || []).length).length;
+    const affinity = (n) => names.reduce((s, m) => s + ((together[m] || {})[n] || 0), 0);
+    const addBtn = (n, lane = bestLane(n), why = "") => `<button class="adv-add" data-add="${esc(n)}" data-to="${lane}" title="${esc(why || toolByName[n].kind)}">${logo(toolByName[n], "xs")}+ ${esc(n)}</button>`;
+    const pct = Math.round(filled / arch.stages.length * 100);
+    let html = `
+      <div class="adv-head">
+        <span class="live"><i></i>Advisor</span>
+        <span class="adv-cov">${filled}/${arch.stages.length} layers</span>
+      </div>
+      <div class="adv-meter" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="Layer coverage"><span style="width:${pct}%"></span></div>`;
+
+    if (!names.length) {
+      const starters = projects.filter((p) => p.track === st.track);
+      return html + `
+        <p class="adv-text">Drop tools into the lanes and I'll suggest what's missing. Or start from a project on this path:</p>
+        <div class="adv-row">${starters.map((p) => `<button class="adv-load" data-load="${esc(p.name)}">${esc(p.name)}</button>`).join("")}</div>`;
+    }
+
+    const empty = arch.stages.map((s, i) => ({ s, i })).filter(({ i }) => !(st.slots[i] || []).length);
+    if (empty.length) {
+      html += `<p class="adv-label">Fill the empty layers</p><ul class="adv-list">${empty.slice(0, 4).map(({ s, i }) => {
+        const picks = [...s.tools].sort((a, b) => affinity(b) - affinity(a)).slice(0, 2);
+        return `<li><b>${esc(s.name)}</b><span>${picks.map((n) => addBtn(n, String(i), s.role)).join("")}</span></li>`;
+      }).join("")}${empty.length > 4 ? `<li class="adv-more">+${empty.length - 4} more empty layers</li>` : ""}</ul>`;
+    } else {
+      html += `<p class="adv-text"><b>Every layer is covered.</b> This is a complete ${esc(trackById[st.track].name.toLowerCase())} architecture.</p>`;
+    }
+
+    const pairs = Object.keys(toolByName).filter((n) => !on.has(n)).map((n) => {
+      let best = null, score = 0;
+      for (const m of names) { const c = (together[m] || {})[n] || 0; score += c; if (c && (!best || c > best[1])) best = [m, c]; }
+      return { n, score, best };
+    }).filter((x) => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 4);
+    if (pairs.length) {
+      html += `<p class="adv-label">Pairs well with your stack</p><div class="adv-row">${pairs.map(({ n, best }) => addBtn(n, bestLane(n), `Often used with ${best[0]}`)).join("")}</div>`;
+    }
+
+    const matches = projects.map((p) => {
+      const inter = p.tools.filter((n) => on.has(n)).length;
+      return { p, inter, score: inter / new Set([...p.tools, ...names]).size };
+    }).filter((m) => m.inter).sort((a, b) => b.score - a.score).slice(0, 3);
+    if (matches.length) {
+      html += `<p class="adv-label">Closest real projects</p><ul class="adv-match">${matches.map(({ p, score }) => `
+        <li><button class="adv-proj" data-open-project="${esc(p.name)}"><b>${esc(p.name)}</b><span>${esc(trackById[p.track].name)}</span></button>
+        <span class="adv-pct">${Math.round(score * 100)}%</span>
+        <button class="adv-load sm" data-load="${esc(p.name)}" title="Add this project's missing tools">merge</button></li>`).join("")}</ul>`;
+    }
+
+    // Notes: layers holding tools that do the same job, and licences
+    const notes = [];
+    arch.stages.forEach((s, i) => {
+      const lane = st.slots[i] || [];
+      const groups = [];
+      for (const n of lane) {
+        const g = groups.find((grp) => grp.some((m) => overlaps(m, n)));
+        g ? g.push(n) : groups.push([n]);
+      }
+      groups.filter((g) => g.length > 1).forEach((g) => notes.push(`<b>${esc(s.name)}</b> has ${g.map(esc).join(" and ")}, which do the same job. Most projects pick one.`));
+    });
+    const lic = {};
+    names.forEach((n) => { const l = toolByName[n].license; lic[l] = (lic[l] || 0) + 1; });
+    notes.push(`${names.length === 1 ? "This tool is" : `All ${names.length} tools are`} free and open source: ${Object.entries(lic).sort((a, b) => b[1] - a[1]).map(([l, c]) => `${esc(l)}${c > 1 ? ` ×${c}` : ""}`).join(", ")}.`);
+    html += `<p class="adv-label">Notes</p><ul class="adv-notes">${notes.map((n) => `<li>${n}</li>`).join("")}</ul>`;
+    return html;
+  }
+
+  const boardCols = () => getComputedStyle(board).gridTemplateColumns.split(" ").filter(Boolean).length;
+  function renderStudio() {
+    trackSel.value = st.track;
+    if (document.activeElement !== titleIn) titleIn.value = st.title;
+    titleIn.placeholder = `My ${trackById[st.track].name.toLowerCase()} architecture`;
+    const arch = stArch();
+    const lane = (key, num, name, role) => {
+      const items = st.slots[key] || [];
+      return `<div class="lane${items.length ? "" : " empty"}${key === "extra" ? " extra" : ""}" data-lane="${key}">
+        <div class="lane-head"><span class="step">${num}</span><b>${esc(name)}</b>${items.length ? `<span class="lane-n">${items.length}</span>` : ""}</div>
+        <p class="lane-role">${esc(role)}</p>
+        <div class="lane-nodes">${items.map((n) => `
+          <div class="nchip" data-drag="node" data-name="${esc(n)}" data-from="${key}">
+            <button class="nchip-open" data-open-tool="${esc(n)}">${logo(toolByName[n], "sm")}<span><b>${esc(n)}</b><i>${esc(toolByName[n].kind)}</i></span></button>
+            <button class="nchip-x" data-remove="${esc(n)}" aria-label="Remove ${esc(n)}">×</button>
+          </div>`).join("") || `<span class="lane-drop">drop a tool here</span>`}</div>
+      </div>`;
+    };
+    board.innerHTML = arch.stages.map((s, i) => lane(String(i), String(i + 1).padStart(2, "0"), s.name, s.role)).join("")
+      + lane("extra", "+", "Extras", "Anything else your project needs.")
+      + `<div class="advisor" id="st-advisor" aria-live="polite">${advise()}</div>`;
+    // The advisor fills the rest of the last row, or takes a row of its own
+    const cols = boardCols(), rest = (cols - ((arch.stages.length + 1) % cols)) % cols;
+    $("#st-advisor").style.gridColumn = `span ${rest >= 2 ? rest : cols}`;
+    renderPalette();
+  }
+  addEventListener("resize", () => {
+    const adv = $("#st-advisor");
+    if (!adv) return;
+    const cols = boardCols(), rest = (cols - ((stArch().stages.length + 1) % cols)) % cols;
+    adv.style.gridColumn = `span ${rest >= 2 ? rest : cols}`;
+  });
+
+  // Clicks: add from the palette, remove or open placed tools, advisor actions
+  let suppressClick = false;
+  $(".studio").addEventListener("click", (e) => {
+    if (suppressClick) { suppressClick = false; e.preventDefault(); return; }
+    const rm = e.target.closest("[data-remove]");
+    if (rm) { removeTool(rm.dataset.remove); return stChanged(`Removed ${rm.dataset.remove}`); }
+    const add = e.target.closest("[data-add]");
+    if (add) { addTool(add.dataset.add, add.dataset.to); return stChanged(`Added ${add.dataset.add}`); }
+    const load = e.target.closest("[data-load]");
+    if (load) return loadProject(load.dataset.load);
+    const op = e.target.closest("[data-open-tool]");
+    if (op) return openTool(op.dataset.openTool);
+    const pp = e.target.closest("[data-open-project]");
+    if (pp) return openProject(pp.dataset.openProject);
+    const src = e.target.closest("[data-drag]");
+    if (src?.dataset.drag === "tool") {
+      if (placed().includes(src.dataset.name)) return flash(`${src.dataset.name} is already on the grid`);
+      addTool(src.dataset.name); return stChanged(`Added ${src.dataset.name}`);
+    }
+    if (src?.dataset.drag === "project") return loadProject(src.dataset.name);
+  });
+
+  // Drag and drop with pointer events, so mouse, pen and touch all work.
+  // Touch needs a short press-and-hold first, so the palette still scrolls.
+  let drag = null;
+  const laneAt = (x, y) => document.elementFromPoint(x, y)?.closest("[data-lane]");
+  function endDrag() {
+    if (!drag) return;
+    clearTimeout(drag.timer);
+    drag.ghost?.remove();
+    document.body.classList.remove("st-dragging");
+    board.querySelectorAll(".lane.over, .lane.fit").forEach((l) => l.classList.remove("over", "fit"));
+    drag = null;
+  }
+  function beginDrag(x, y) {
+    drag.started = true;
+    document.body.classList.add("st-dragging");
+    const g = drag.el.cloneNode(true);
+    g.classList.add("st-ghost");
+    g.style.width = `${Math.min(drag.el.offsetWidth, 280)}px`;
+    document.body.appendChild(g);
+    drag.ghost = g;
+    if (drag.kind !== "project") {
+      const fit = board.querySelector(`[data-lane="${bestLane(drag.name)}"]`);
+      fit?.classList.add("fit");
+    }
+    moveGhost(x, y);
+  }
+  function moveGhost(x, y) {
+    drag.ghost.style.transform = `translate(${x + 12}px, ${y + 12}px) rotate(-2deg)`;
+    const over = laneAt(x, y);
+    board.querySelectorAll(".lane.over").forEach((l) => { if (l !== over) l.classList.remove("over"); });
+    if (over && drag.kind !== "project") over.classList.add("over");
+    board.classList.toggle("over", drag.kind === "project" && !!document.elementFromPoint(x, y)?.closest("#st-board"));
+  }
+  $(".studio").addEventListener("pointerdown", (e) => {
+    const src = e.target.closest("[data-drag]");
+    if (!src || e.button > 0 || e.target.closest(".nchip-x")) return;
+    drag = { kind: src.dataset.drag, name: src.dataset.name, el: src, x0: e.clientX, y0: e.clientY, started: false, armed: e.pointerType !== "touch" };
+    if (!drag.armed) drag.timer = setTimeout(() => { if (drag && !drag.started) { drag.armed = true; beginDrag(drag.x0, drag.y0); navigator.vibrate?.(12); } }, 280);
+  });
+  document.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    if (!drag.started) {
+      const moved = Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0);
+      if (!drag.armed) { if (moved > 8) endDrag(); return; } // a touch that moves first is a scroll
+      if (moved < 5) return;
+      beginDrag(e.clientX, e.clientY);
+    }
+    moveGhost(e.clientX, e.clientY);
+  });
+  document.addEventListener("touchmove", (e) => { if (drag?.started) e.preventDefault(); }, { passive: false });
+  document.addEventListener("pointerup", (e) => {
+    if (!drag) return;
+    if (!drag.started) return endDrag();
+    const { kind, name } = drag;
+    const target = laneAt(e.clientX, e.clientY);
+    const onBoard = document.elementFromPoint(e.clientX, e.clientY)?.closest("#st-board");
+    const onPalette = document.elementFromPoint(e.clientX, e.clientY)?.closest("[data-trash]");
+    board.classList.remove("over");
+    endDrag();
+    suppressClick = true; setTimeout(() => { suppressClick = false; }, 0);
+    if (kind === "project") { if (onBoard) loadProject(name); return; }
+    if (target) { addTool(name, target.dataset.lane); return stChanged(`${kind === "node" ? "Moved" : "Added"} ${name}`); }
+    if (kind === "node" && onPalette) { removeTool(name); return stChanged(`Removed ${name}`); }
+    if (kind === "tool" && onBoard) { addTool(name); return stChanged(`Added ${name}`); }
+  });
+  document.addEventListener("pointercancel", () => { board.classList.remove("over"); endDrag(); });
+  addEventListener("keydown", (e) => { if (e.key === "Escape" && drag) { board.classList.remove("over"); endDrag(); } });
+
+  renderStudio();
+
+
+  // ---------------------------------------------------------------------
   // Live Wire pop-up — Hacker News via Algolia (CORS-enabled, no key),
   // opened from the rotating half-circle on the right edge. Polls every
   // minute while the page is visible, marks headlines that arrived since
