@@ -1,46 +1,48 @@
 :root {
-  --ink: #f4f4f1;
-  --ink-soft: #b9b9b4;
-  --ink-faint: #6d6d69;
-  --paper: #050505;
-  --panel: #0c0c0c;
-  --rule: #262624;
-  --rule-strong: #4a4a47;
+  /* Night: blueprint — white line work on Prussian-blue paper */
+  --ink: #eef4ff;
+  --ink-soft: #b9cde8;
+  --ink-faint: #82a2cb;
+  --paper: #0d3b70;
+  --panel: #0f4278;
+  --rule: #2b5c94;
+  --rule-strong: #6189c0;
   --script: "Pinyon Script", cursive;
   --serif: "Cormorant Garamond", Georgia, serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
-  /* Theme tokens: night is the default */
-  --fg: 255,255,255;         /* lines, glows and overlays */
-  --bg: 0,0,0;               /* washes behind content */
-  --wash: 8,8,8;             /* translucent panels */
-  --hi: #fff;                /* strongest ink, accents */
-  --lo: #000;                /* deepest ground */
-  --s0: #050505; --s1: #0b0b0b; --s2: #121212; --s3: #161616; /* surfaces, low to high */
-  --shade: 1;                /* shadow strength */
-  --plate-border: #fff;
-  --inv-soft: #333; --inv-faint: #bbb; --inv-hover: #ddd; /* on inverted (hover) surfaces */
-  --chrome: linear-gradient(100deg, #6f6f6b 0%, #ffffff 18%, #cfcfca 30%, #ffffff 42%, #777773 56%, #ffffff 72%, #9a9a96 100%);
+  --fg: 236,243,255;         /* lines, glows and overlays */
+  --bg: 9,44,86;             /* washes behind content */
+  --wash: 12,52,98;          /* translucent panels */
+  --ground: 13,59,112;       /* the paper itself, painted by the field */
+  --hi: #ffffff;             /* strongest ink, accents */
+  --lo: #082a52;             /* deepest ground */
+  --s0: #0c386a; --s1: #0f4076; --s2: #134a85; --s3: #17538f; /* surfaces, low to high */
+  --shade: .55;              /* shadow strength */
+  --plate-border: #dbe7f7;
+  --inv-soft: #2c4f7c; --inv-faint: #9db5d6; --inv-hover: #d8e6f8; /* on inverted (hover) surfaces */
+  --chrome: linear-gradient(100deg, #9fbbe0 0%, #ffffff 18%, #d7e6f8 30%, #ffffff 42%, #a9c3e6 56%, #ffffff 72%, #b9cfea 100%);
   color-scheme: dark;
 }
-/* Day: ink on warm paper */
+/* Day: whiteprint — blue line work on cream drafting paper */
 :root[data-theme="day"] {
-  --ink: #141413;
-  --ink-soft: #4a4945;
-  --ink-faint: #8a8883;
-  --paper: #f6f4ee;
-  --panel: #ffffff;
-  --rule: #e2dfd6;
-  --rule-strong: #bfbcb2;
-  --fg: 20,20,19;
-  --bg: 246,244,238;
-  --wash: 255,255,253;
-  --hi: #141413;
-  --lo: #fbfaf6;
-  --s0: #f6f4ee; --s1: #fffffd; --s2: #f2f0ea; --s3: #e9e6de;
-  --shade: .16;
-  --plate-border: #d9d6cd;
-  --inv-soft: #c9c7bf; --inv-faint: #6a6863; --inv-hover: #3a3936;
-  --chrome: linear-gradient(100deg, #8d8b85 0%, #141413 18%, #4a4945 30%, #141413 42%, #9a9892 56%, #141413 72%, #6a6863 100%);
+  --ink: #102f5a;
+  --ink-soft: #3c5c88;
+  --ink-faint: #7f94b3;
+  --paper: #f3f0e4;
+  --panel: #fffdf6;
+  --rule: #cfd6df;
+  --rule-strong: #98abc5;
+  --fg: 22,62,118;
+  --bg: 243,240,228;
+  --wash: 255,253,246;
+  --ground: 243,240,228;
+  --hi: #102f5a;
+  --lo: #fbf9f1;
+  --s0: #f3f0e4; --s1: #fffdf6; --s2: #efecdf; --s3: #e6e2d3;
+  --shade: .14;
+  --plate-border: #cdd5de;
+  --inv-soft: #c4d0e2; --inv-faint: #6f86a8; --inv-hover: #29497a;
+  --chrome: linear-gradient(100deg, #6f86a8 0%, #102f5a 18%, #3c5c88 30%, #102f5a 42%, #8095b4 56%, #102f5a 72%, #4d6a95 100%);
   color-scheme: light;
 }
 
@@ -511,9 +513,11 @@ body:has(.drawer[open]) { overflow: hidden; }
 /* ---------------- Futuristic field & hero ---------------- */
 /* Scanlines and film grain over the canvas, under the content */
 body::before, body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 1; }
-body::before { background: repeating-linear-gradient(to bottom, rgba(var(--fg),.028) 0 1px, transparent 1px 3px); }
+/* The drawing sheet's double border */
+body::before { inset: 7px; border: 1px solid rgba(var(--fg),.28); box-shadow: inset 0 0 0 5px transparent, inset 0 0 0 6px rgba(var(--fg),.14); }
+@media (max-width: 640px) { body::before { inset: 4px; } }
 body::after {
-  opacity: .07; mix-blend-mode: overlay;
+  opacity: .09; mix-blend-mode: soft-light;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 .masthead::after {
@@ -540,8 +544,8 @@ body::after {
 .boot { font-family: var(--mono); font-size: 13px; color: var(--ink-soft); margin: 26px 0 0; min-height: 1.6em; }
 .boot::after { content: "▌"; margin-left: 2px; animation: blink 1s steps(1) infinite; }
 
-/* The title: chrome script with a moving sheen, an outline echo that
-   follows the pointer, and an occasional glitch slice */
+/* The title: inked script with a moving sheen and an offset outline
+   (like a drafted construction line) that follows the pointer */
 .title {
   position: relative; display: inline-block; align-self: flex-start;
   font-family: var(--script); font-weight: 400; font-size: clamp(76px, 20vw, 300px); font-size: clamp(76px, 24cqi, 300px);
@@ -561,14 +565,8 @@ body::after {
   color: transparent; -webkit-text-stroke: 1px rgba(var(--fg),.32); z-index: 0;
   transform: translate(calc(var(--mx, 0) * -0.08em + 0.035em), calc(var(--my, 0) * -0.05em + 0.028em));
 }
-.title::after { color: var(--hi); z-index: 2; opacity: 0; animation: glitch 7s steps(1) infinite; }
-@keyframes glitch {
-  0%, 90%, 100% { opacity: 0; transform: none; clip-path: inset(0 0 100% 0); }
-  91% { opacity: .85; clip-path: inset(18% 0 72% 0); transform: translateX(-7px); }
-  92% { opacity: .6; clip-path: inset(52% 0 34% 0); transform: translateX(9px); }
-  93% { opacity: .85; clip-path: inset(74% 0 12% 0); transform: translateX(-4px); }
-  94% { opacity: 0; }
-}
+.title::after { display: none; }
+
 .byline { display: flex; align-items: center; gap: 14px; margin: 4px 0 26px; font-family: var(--mono); font-size: 12px; letter-spacing: .4em; text-transform: uppercase; color: var(--ink); }
 .byline span { width: 56px; height: 1px; background: linear-gradient(90deg, transparent, var(--hi)); }
 
@@ -730,7 +728,7 @@ body.wire-open .wire-pop { clip-path: circle(900px at calc(100% + var(--orb) / 2
 /* The board: a dotted grid of lanes, one per architecture layer */
 .board {
   display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 16px; align-content: start;
-  background-image: radial-gradient(rgba(var(--fg),.12) 1px, transparent 1.2px); background-size: 22px 22px;
+  background-image: linear-gradient(rgba(var(--fg),.06) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--fg),.06) 1px, transparent 1px); background-size: 22px 22px;
   transition: box-shadow .2s;
 }
 @media (max-width: 1250px) { .board { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
@@ -818,7 +816,10 @@ body.st-dragging, body.st-dragging * { cursor: grabbing !important; user-select:
 /* ---------------- Architecture graph ---------------- */
 .ag-host {
   position: relative; height: 640px; overflow: hidden; border: 1px solid var(--rule-strong); border-radius: 14px;
-  background-color: var(--s0); background-image: radial-gradient(rgba(var(--fg),.13) 1px, transparent 1.2px); background-size: 20px 20px;
+  background-color: var(--s0);
+  background-image: linear-gradient(rgba(var(--fg),.14) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--fg),.14) 1px, transparent 1px),
+    linear-gradient(rgba(var(--fg),.055) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--fg),.055) 1px, transparent 1px);
+  background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
   isolation: isolate;
 }
 @media (max-width: 640px) { .ag-host { height: 68vh; min-height: 460px; } }
@@ -1112,6 +1113,28 @@ nav { gap: 18px; }
 }
 /* Day mode details: logo tiles get an edge, grain is lighter, the hero title keeps its depth */
 :root[data-theme="day"] .plate { box-shadow: 0 1px 0 rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.06); }
-:root[data-theme="day"] body::after { opacity: .045; mix-blend-mode: multiply; }
+:root[data-theme="day"] body::after { opacity: .06; mix-blend-mode: multiply; }
 :root[data-theme="day"] .title span { filter: drop-shadow(0 6px 18px rgba(0,0,0,.12)); }
 :root[data-theme="day"] .orb-core { box-shadow: 0 0 14px 2px rgba(0,0,0,.25); }
+
+/* ---------------- Engineering title block (footer) ---------------- */
+.foot { display: block; padding-top: 48px; }
+.titleblock {
+  margin-left: auto; max-width: 760px; display: grid; grid-template-columns: 2.2fr repeat(3, 1fr);
+  border: 1.5px solid rgba(var(--fg),.6); background: rgba(var(--wash),.55); backdrop-filter: blur(2px);
+}
+.tb-cell { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-right: 1px solid rgba(var(--fg),.35); border-bottom: 1px solid rgba(var(--fg),.35); min-width: 0; }
+.tb-cell:nth-child(4n) { border-right: 0; }
+.tb-cell span { font-family: var(--mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-faint); text-transform: uppercase; }
+.tb-cell b { font-family: var(--mono); font-weight: 400; font-size: 13px; letter-spacing: .08em; color: var(--ink); text-transform: uppercase; }
+.tb-title { grid-row: span 2; justify-content: center; }
+.tb-title b.script { font-family: var(--script); font-size: 40px; letter-spacing: 0; text-transform: none; line-height: 1; }
+.tb-title em { font-family: var(--serif); font-size: 15px; color: var(--ink-soft); text-transform: none; letter-spacing: 0; }
+.tb-wide { grid-column: 1 / -1; border-bottom: 0; border-right: 0; }
+.tb-wide b { font-size: 11px; letter-spacing: .06em; }
+@media (max-width: 640px) {
+  .titleblock { grid-template-columns: repeat(2, 1fr); }
+  .tb-title { grid-column: 1 / -1; grid-row: auto; }
+  .tb-cell:nth-child(4n) { border-right: 1px solid rgba(var(--fg),.35); }
+  .tb-cell:nth-child(2n+1):not(.tb-title):not(.tb-wide) { border-right: 0; }
+}

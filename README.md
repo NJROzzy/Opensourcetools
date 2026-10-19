@@ -15,7 +15,7 @@
 ![Chains](https://img.shields.io/badge/recommendation%20chains-20-000000?style=flat-square)
 ![Stack](https://img.shields.io/badge/stack-HTML%20·%20CSS%20·%20JS-000000?style=flat-square)
 
-| Night | Day |
+| Night · blueprint | Day · whiteprint |
 |---|---|
 | ![Amalgam at night](docs/hero.png) | ![Amalgam by day](docs/day.png) |
 
@@ -31,9 +31,9 @@
 
 A real project is rarely one tool, or one domain. It is an *amalgam*: ROS 2 braided with MuJoCo and PyTorch, or an IoT monitor built from KiCad, Zephyr, MQTT and Grafana across hardware, networks and data. This site catalogues those parts, shows which combinations produce which kinds of projects, and keeps you current with what is happening in the field.
 
-The design is futuristic and monochrome, with black and white throughout and only the tool logos in colour. A calligraphic chrome title, with a moving sheen and an outline echo that follows the pointer, sits over a live canvas scene: a depth starfield, a rotating point-cloud globe with orbiting satellites, and a perspective grid running to a glowing horizon that moves as you scroll. Scanlines and grain sit over the scene, and on-screen readouts (live clock, typed boot line, counting stats) frame the title. Section text is set in a classical serif in the style of a research paper. Everything respects `prefers-reduced-motion`.
+The design is an **engineering drawing sheet**. At night it is a classic **blueprint** (white line work on Prussian-blue paper); by day it is a **whiteprint** (blue line work on cream drafting paper). The background is a live Canvas drawing: fine and major grid lines on mottled, folded paper, with technical drawings that drift past as you scroll. They include a spur gear meshing with a pinion, a bearing cross-section with hatching, an isometric enclosure with hidden edges, a moving 2-DOF robot-arm linkage and PCB traces, all with centre lines, dimensions and callouts. A drafting crosshair with X/Y coordinates follows the mouse. The page sits inside a double sheet border, and the footer is a drawing title block (title, drawn by, dwg no., scale, sheet, rev, date). The calligraphic *Amalgam* title and the research-paper serif remain. Everything respects `prefers-reduced-motion`.
 
-**Day and night.** A sun/moon switch in the header swaps between the original night look (white ink on black) and a day look (ink on warm paper). It follows your system's light/dark setting until you choose, then remembers your choice. The theme is applied before the first paint, so there is no flash. Everything follows the theme: the animated background, graphs and canvas, the live-news pop-up, and exported PNGs. All colours come from a small set of CSS custom properties, so adding a theme only means redefining them.
+**Day and night.** A sun/moon switch in the header swaps between the blueprint (night) and the whiteprint (day). It follows your system's light/dark setting until you choose, then remembers your choice. The theme is applied before the first paint, so there is no flash. Everything follows the theme: the animated background, graphs and canvas, the live-news pop-up, and exported PNGs. All colours come from a small set of CSS custom properties, so adding a theme only means redefining them.
 
 ## Features
 
@@ -104,7 +104,7 @@ Plain **HTML, CSS and vanilla JavaScript**, with no framework and no build step.
 - **Fonts:** Pinyon Script (calligraphy), Cormorant Garamond (research serif), IBM Plex Mono (instrument labels), from Google Fonts
 - **Logos:** [Simple Icons](https://simpleicons.org) glyphs (CC0) and project GitHub avatars, stored in the repo. Logos are trademarks of their respective projects.
 - **Venn diagram:** hand-built SVG using clip paths and masks to paint each exact intersection
-- **Background:** hand-written Canvas 2D scene (starfield, 3D point-cloud globe, perspective grid) at about 60 fps, with no libraries; it renders a single still frame when `prefers-reduced-motion` is set
+- **Background:** hand-written Canvas 2D blueprint (grid paper, parametric gear/bearing/enclosure/arm/PCB drawings, crosshair) at about 60 fps, with no libraries; it renders a single still frame when `prefers-reduced-motion` is set
 - **News:** [Hacker News Algolia API](https://hn.algolia.com/api), with no API key needed
 - **Hosting:** [Vercel](https://vercel.com)
 

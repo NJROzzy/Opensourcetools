@@ -5,7 +5,7 @@
 
   const now = new Date();
   $("#today").textContent = now.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
-  $("#year").textContent = now.getFullYear();
+  $("#year").textContent = now.toISOString().slice(0, 10);
 
   const discName = Object.fromEntries(disciplines.map((d) => [d.id, d.name]));
   const discShort = Object.fromEntries(disciplines.map((d) => [d.id, d.short]));
@@ -1557,7 +1557,7 @@
     const day = t === "day";
     themeBtn.setAttribute("aria-label", day ? "Switch to night mode" : "Switch to day mode");
     themeBtn.querySelector(".tt-label").textContent = day ? "Day" : "Night";
-    document.querySelector('meta[name="theme-color"]').content = day ? "#f6f4ee" : "#050505";
+    document.querySelector('meta[name="theme-color"]').content = day ? "#f3f0e4" : "#0d3b70";
     if (save) { try { localStorage.setItem("amg-theme", t); } catch { /* storage unavailable */ } }
     if (field) readTheme(); // the background scene repaints in the new colours
   }
@@ -1592,42 +1592,237 @@
   });
 
   // ---------------------------------------------------------------------
-  // Field: a depth starfield, a rotating point-cloud globe with orbit rings
-  // that drifts away as you scroll, and a perspective grid to the horizon.
+  // Field: blueprint paper. A fine and a major grid on mottled, folded paper,
+  // engineering drawings in line work that drift past as you scroll (a gear
+  // meshing with a pinion, a bearing section, an isometric enclosure, a
+  // robot-arm linkage, PCB traces), and a drafting crosshair at the pointer.
   const c = $("#field");
-  // The field paints with the theme's ink on the theme's ground
-  let FG = "255,255,255", GROUND = "2,2,2";
+  const ctx = c.getContext("2d");
+  let FG = "236,243,255", GROUND = "13,59,112";
+  let FW, FH, dpr, small, finePointer = matchMedia("(pointer: fine)").matches;
+  const paper = document.createElement("canvas"), pctx = paper.getContext("2d");
+  const mouse = { x: 0, y: 0, tx: 0, ty: 0, px: -1, py: -1 }; // eased -1..1 for the title, plus pixels
+  const ink = (a) => `rgba(${FG},${a})`;
+
   function readTheme() {
     const cs = getComputedStyle(root);
     FG = cs.getPropertyValue("--fg").trim() || FG;
-    GROUND = theme() === "day" ? "246,244,238" : "2,2,2";
+    GROUND = cs.getPropertyValue("--ground").trim() || GROUND;
+    paintPaper();
     if (reduced) frame(0);
   }
-  const ctx = c.getContext("2d");
-  let FW, FH, dpr, small, stars = [], globe = [];
-  const mouse = { x: 0, y: 0, tx: 0, ty: 0 }; // -1..1, eased toward the pointer
+
+  // The paper itself: uneven tone, darker edges and two fold creases, painted once per size
+  function paintPaper() {
+    if (!FW) return;
+    paper.width = FW; paper.height = FH;
+    const day = theme() === "day";
+    pctx.fillStyle = `rgb(${GROUND})`;
+    pctx.fillRect(0, 0, FW, FH);
+    const rnd = (i) => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+    for (let i = 0; i < 16; i++) {
+      const x = rnd(i) * FW, y = rnd(i + 40) * FH, r = (0.2 + rnd(i + 80) * 0.5) * Math.max(FW, FH);
+      const g = pctx.createRadialGradient(x, y, 0, x, y, r);
+      const tone = i % 2 ? "255,255,255" : (day ? "120,100,60" : "0,10,30");
+      g.addColorStop(0, `rgba(${tone},${day ? 0.03 : 0.045})`); g.addColorStop(1, `rgba(${tone},0)`);
+      pctx.fillStyle = g; pctx.fillRect(0, 0, FW, FH);
+    }
+    const v = pctx.createRadialGradient(FW / 2, FH / 2, Math.min(FW, FH) * 0.35, FW / 2, FH / 2, Math.max(FW, FH) * 0.8);
+    v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, day ? "rgba(110,90,50,.10)" : "rgba(0,12,35,.38)");
+    pctx.fillStyle = v; pctx.fillRect(0, 0, FW, FH);
+    // Fold creases: a highlight beside a shadow
+    const crease = (x1, y1, x2, y2, nx, ny) => {
+      pctx.lineWidth = 2 * dpr;
+      pctx.strokeStyle = day ? "rgba(255,255,255,.55)" : "rgba(255,255,255,.05)";
+      pctx.beginPath(); pctx.moveTo(x1, y1); pctx.lineTo(x2, y2); pctx.stroke();
+      pctx.strokeStyle = day ? "rgba(90,70,40,.08)" : "rgba(0,10,30,.18)";
+      pctx.beginPath(); pctx.moveTo(x1 + nx * 2 * dpr, y1 + ny * 2 * dpr); pctx.lineTo(x2 + nx * 2 * dpr, y2 + ny * 2 * dpr); pctx.stroke();
+    };
+    crease(FW * 0.333, 0, FW * 0.333, FH, 1, 0);
+    crease(0, FH * 0.5, FW, FH * 0.5, 0, 1);
+  }
+
   function size() {
     dpr = Math.min(devicePixelRatio || 1, 2);
     FW = c.width = innerWidth * dpr;
     FH = c.height = innerHeight * dpr;
     small = innerWidth < 760;
-    stars = Array.from({ length: small ? 120 : 240 }, () => ({ x: Math.random() * 2 - 1, y: Math.random() * 2 - 1, z: Math.random() }));
-    // Evenly spread points on a sphere (Fibonacci lattice)
-    const n = small ? 300 : 560, golden = Math.PI * (3 - Math.sqrt(5));
-    globe = Array.from({ length: n }, (_, i) => {
-      const y = 1 - (i / (n - 1)) * 2, r = Math.sqrt(1 - y * y), th = golden * i;
-      return [Math.cos(th) * r, y, Math.sin(th) * r];
-    });
+    paintPaper();
     if (reduced) frame(0);
   }
   addEventListener("resize", size);
-  addEventListener("pointermove", (e) => { mouse.tx = e.clientX / innerWidth * 2 - 1; mouse.ty = e.clientY / innerHeight * 2 - 1; });
+  addEventListener("pointermove", (e) => {
+    mouse.tx = e.clientX / innerWidth * 2 - 1; mouse.ty = e.clientY / innerHeight * 2 - 1;
+    if (e.pointerType === "mouse") { mouse.px = e.clientX * dpr; mouse.py = e.clientY * dpr; }
+  });
+  document.addEventListener("pointerleave", () => { mouse.px = -1; });
   if (reduced) addEventListener("scroll", () => frame(0), { passive: true });
 
-  const rotate = ([x, y, z], ay, ax) => {
-    const x1 = x * Math.cos(ay) + z * Math.sin(ay), z1 = -x * Math.sin(ay) + z * Math.cos(ay);
-    return [x1, y * Math.cos(ax) - z1 * Math.sin(ax), y * Math.sin(ax) + z1 * Math.cos(ax)];
-  };
+  // ---- Drafting helpers ----
+  const P = (n) => n * dpr;
+  function stroke(a, w = 1, dash = []) { ctx.strokeStyle = ink(a); ctx.lineWidth = P(w); ctx.setLineDash(dash.map(P)); }
+  function line(x1, y1, x2, y2) { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
+  function circle(x, y, r) { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.stroke(); }
+  function label(text, x, y, a = 0.55, align = "left", size = 10) {
+    ctx.setLineDash([]); ctx.fillStyle = ink(a); ctx.textAlign = align; ctx.textBaseline = "middle";
+    ctx.font = `${P(size)}px "IBM Plex Mono", monospace`; ctx.fillText(text, x, y);
+  }
+  const centerline = (x1, y1, x2, y2) => { stroke(0.32, 0.8, [18, 4, 3, 4]); line(x1, y1, x2, y2); };
+  function arrow(x, y, ang) {
+    const s = P(7);
+    ctx.setLineDash([]); ctx.fillStyle = ink(0.6); ctx.beginPath();
+    ctx.moveTo(x, y); ctx.lineTo(x - s * Math.cos(ang - 0.3), y - s * Math.sin(ang - 0.3)); ctx.lineTo(x - s * Math.cos(ang + 0.3), y - s * Math.sin(ang + 0.3)); ctx.fill();
+  }
+  // A dimension between two points, offset to one side, with extension lines and a value
+  function dim(x1, y1, x2, y2, off, text) {
+    const ang = Math.atan2(y2 - y1, x2 - x1), nx = -Math.sin(ang) * off, ny = Math.cos(ang) * off;
+    stroke(0.3, 0.7);
+    line(x1, y1, x1 + nx * 1.12, y1 + ny * 1.12); line(x2, y2, x2 + nx * 1.12, y2 + ny * 1.12);
+    stroke(0.5, 0.8);
+    line(x1 + nx, y1 + ny, x2 + nx, y2 + ny);
+    arrow(x2 + nx, y2 + ny, ang); arrow(x1 + nx, y1 + ny, ang + Math.PI);
+    const mx = (x1 + x2) / 2 + nx, my = (y1 + y2) / 2 + ny;
+    ctx.save(); ctx.translate(mx, my); ctx.rotate(Math.abs(ang) > Math.PI / 2 ? ang + Math.PI : ang);
+    const w = ctx.measureText(text).width;
+    ctx.fillStyle = `rgba(${GROUND},.9)`; ctx.fillRect(-w / 2 - P(4), P(-7), w + P(8), P(14));
+    label(text, 0, 0, 0.75, "center");
+    ctx.restore();
+  }
+  function leader(x1, y1, x2, y2, text) {
+    stroke(0.45, 0.7); line(x1, y1, x2, y2); line(x2, y2, x2 + P(x2 > x1 ? 14 : -14), y2);
+    arrow(x1, y1, Math.atan2(y1 - y2, x1 - x2));
+    label(text, x2 + P(x2 > x1 ? 18 : -18), y2, 0.7, x2 > x1 ? "left" : "right");
+  }
+  function hatch(x, y, w, h, gap = 6) {
+    ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+    stroke(0.28, 0.7);
+    for (let d = -h; d < w; d += P(gap)) line(x + d, y + h, x + d + h, y);
+    ctx.restore();
+    stroke(0.5, 1); ctx.strokeRect(x, y, w, h);
+  }
+
+  // ---- Parts ----
+  function gearPath(cx, cy, R, z, rot) {
+    const step = (Math.PI * 2) / z, rr = R * 0.86;
+    ctx.beginPath();
+    for (let i = 0; i < z; i++) {
+      const a = rot + i * step;
+      const pts = [[rr, a], [R, a + step * 0.18], [R, a + step * 0.42], [rr, a + step * 0.6]];
+      pts.forEach(([r, t], k) => { const x = cx + r * Math.cos(t), y = cy + r * Math.sin(t); i === 0 && k === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+      ctx.arc(cx, cy, rr, a + step * 0.6, a + step);
+    }
+    ctx.closePath();
+  }
+  function gear(cx, cy, R, z, rot, notes) {
+    stroke(0.5, 1.2); gearPath(cx, cy, R, z, rot); ctx.stroke();
+    stroke(0.22, 0.8, [5, 4]); circle(cx, cy, R * 0.93); // pitch circle
+    stroke(0.42, 1); circle(cx, cy, R * 0.66); circle(cx, cy, R * 0.24);
+    stroke(0.5, 1); circle(cx, cy, R * 0.11);
+    stroke(0.24, 0.8, [3, 3]); circle(cx, cy, R * 0.45); // bolt circle
+    stroke(0.42, 0.9);
+    for (let i = 0; i < 6; i++) { const a = rot + i * Math.PI / 3; circle(cx + R * 0.45 * Math.cos(a), cy + R * 0.45 * Math.sin(a), R * 0.055); }
+    // Keyway in the bore
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(rot); stroke(0.5, 1); ctx.strokeRect(-R * 0.03, -R * 0.15, R * 0.06, R * 0.06); ctx.restore();
+    centerline(cx - R * 1.22, cy, cx + R * 1.22, cy);
+    centerline(cx, cy - R * 1.22, cx, cy + R * 1.22);
+    if (notes) {
+      dim(cx - R, cy + R * 1.08, cx + R, cy + R * 1.08, P(16), `Ø ${Math.round((R * 2) / dpr)}`);
+      leader(cx + R * 0.45 * Math.cos(rot + Math.PI / 3), cy + R * 0.45 * Math.sin(rot + Math.PI / 3), cx + R * 0.95, cy - R * 0.98, "6× Ø18 EQ SP");
+      label(`SPUR GEAR  ·  Z = ${z}  ·  m = 4  ·  MAT. 42CrMo4`, cx - R, cy - R * 1.3, 0.55);
+    }
+  }
+  function bearing(cx, cy, s) {
+    const w = 150 * s, h = 46 * s, gap = 26 * s;
+    hatch(cx - w / 2, cy - gap - h, w * 0.38, h); hatch(cx + w * 0.12, cy - gap - h, w * 0.38, h);
+    hatch(cx - w / 2, cy + gap, w * 0.38, h); hatch(cx + w * 0.12, cy + gap, w * 0.38, h);
+    stroke(0.55, 1); circle(cx, cy - gap - h / 2, h * 0.36); circle(cx, cy + gap + h / 2, h * 0.36);
+    centerline(cx - w * 0.7, cy, cx + w * 0.7, cy);
+    centerline(cx, cy - gap - h * 1.6, cx, cy + gap + h * 1.6);
+    dim(cx + w / 2, cy - gap - h, cx + w / 2, cy + gap + h, P(26), `Ø ${Math.round((2 * (gap + h)) / dpr)}`);
+    dim(cx - w / 2, cy - gap, cx - w / 2, cy + gap, P(-22), `Ø ${Math.round((2 * gap) / dpr)}`);
+    label("SECTION A–A  ·  DEEP-GROOVE BALL BEARING", cx - w / 2, cy - gap - h - P(22), 0.55);
+  }
+  function enclosure(cx, cy, s) {
+    const iso = (x, y, z) => [cx + (x - y) * Math.cos(Math.PI / 6) * s, cy + ((x + y) * Math.sin(Math.PI / 6) - z) * s];
+    const A = 120, B = 80, Cz = 46;
+    const e = (p, q, a = 0.55, d = []) => { stroke(a, 1.1, d); const [x1, y1] = iso(...p), [x2, y2] = iso(...q); line(x1, y1, x2, y2); };
+    // hidden edges first, dashed
+    e([0, 0, 0], [A, 0, 0], 0.25, [4, 3]); e([0, 0, 0], [0, B, 0], 0.25, [4, 3]); e([0, 0, 0], [0, 0, Cz], 0.25, [4, 3]);
+    e([A, 0, 0], [A, B, 0]); e([0, B, 0], [A, B, 0]); e([A, 0, 0], [A, 0, Cz]); e([0, B, 0], [0, B, Cz]); e([A, B, 0], [A, B, Cz]);
+    e([0, 0, Cz], [A, 0, Cz]); e([0, 0, Cz], [0, B, Cz]); e([A, 0, Cz], [A, B, Cz]); e([0, B, Cz], [A, B, Cz]);
+    // a vent and a connector on the top face
+    for (let i = 0; i < 5; i++) e([20 + i * 9, 18, Cz], [20 + i * 9, 50, Cz], 0.35);
+    const [ox, oy] = iso(A, B * 0.55, Cz * 0.5); stroke(0.5, 1); ctx.beginPath(); ctx.ellipse(ox, oy, 8 * s, 5 * s, 0.5, 0, Math.PI * 2); ctx.stroke();
+    const [a1x, a1y] = iso(0, B, 0), [a2x, a2y] = iso(A, B, 0); dim(a1x, a1y, a2x, a2y, P(18), String(A));
+    const [b1x, b1y] = iso(A, 0, 0), [b2x, b2y] = iso(A, B, 0); dim(b1x, b1y, b2x, b2y, P(-18), String(B));
+    label("ISOMETRIC VIEW  ·  SENSOR ENCLOSURE  ·  PA12", iso(0, 0, Cz)[0] - P(60), iso(0, 0, Cz)[1] - P(40), 0.55);
+  }
+  function arm(cx, cy, s, t) {
+    const L1 = 120 * s, L2 = 95 * s, th1 = -1.0 + 0.18 * Math.sin(t * 0.5), th2 = 0.9 + 0.25 * Math.sin(t * 0.7 + 1);
+    const j1 = [cx + L1 * Math.cos(th1), cy + L1 * Math.sin(th1)];
+    const j2 = [j1[0] + L2 * Math.cos(th1 + th2), j1[1] + L2 * Math.sin(th1 + th2)];
+    hatch(cx - 34 * s, cy + 14 * s, 68 * s, 16 * s, 5);
+    const link = (p, q, w) => {
+      const a = Math.atan2(q[1] - p[1], q[0] - p[0]), nx = -Math.sin(a) * w, ny = Math.cos(a) * w;
+      stroke(0.55, 1.1); line(p[0] + nx, p[1] + ny, q[0] + nx, q[1] + ny); line(p[0] - nx, p[1] - ny, q[0] - nx, q[1] - ny);
+      centerline(p[0], p[1], q[0], q[1]);
+    };
+    link([cx, cy], j1, 9 * s); link(j1, j2, 7 * s);
+    stroke(0.6, 1.1); circle(cx, cy, 13 * s); circle(j1[0], j1[1], 11 * s); circle(j2[0], j2[1], 8 * s);
+    stroke(0.6, 1); line(j2[0], j2[1], j2[0] + 18 * s * Math.cos(th1 + th2 + 0.5), j2[1] + 18 * s * Math.sin(th1 + th2 + 0.5));
+    line(j2[0], j2[1], j2[0] + 18 * s * Math.cos(th1 + th2 - 0.5), j2[1] + 18 * s * Math.sin(th1 + th2 - 0.5));
+    stroke(0.4, 0.8); ctx.beginPath(); ctx.arc(cx, cy, 44 * s, 0, th1, true); ctx.stroke();
+    label(`θ1 = ${Math.round(-th1 * 180 / Math.PI)}°`, cx + 50 * s, cy - 18 * s, 0.7);
+    ctx.beginPath(); ctx.arc(j1[0], j1[1], 34 * s, th1, th1 + th2); ctx.stroke();
+    label(`θ2 = ${Math.round(th2 * 180 / Math.PI)}°`, j1[0] + 40 * s, j1[1] + 10 * s, 0.7);
+    dim(cx, cy, j1[0], j1[1], P(-20), `L1 ${Math.round(L1 / s)}`);
+    label("2-DOF ARM  ·  KINEMATIC DIAGRAM", cx - 34 * s, cy + 52 * s, 0.55);
+  }
+  function pcb(cx, cy, s) {
+    const g = 14 * s;
+    stroke(0.5, 1); ctx.strokeRect(cx - 9 * g, cy - 6 * g, 18 * g, 12 * g);
+    stroke(0.6, 1.2); ctx.strokeRect(cx - 2.5 * g, cy - 2 * g, 5 * g, 4 * g); // the chip
+    for (let i = 0; i < 6; i++) { stroke(0.5, 1); line(cx - 2 * g + i * 0.8 * g, cy - 2 * g, cx - 2 * g + i * 0.8 * g, cy - 2.6 * g); line(cx - 2 * g + i * 0.8 * g, cy + 2 * g, cx - 2 * g + i * 0.8 * g, cy + 2.6 * g); }
+    const trace = (pts) => { stroke(0.45, 1.6); ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(cx + x * g, cy + y * g) : ctx.moveTo(cx + x * g, cy + y * g))); ctx.stroke(); stroke(0.6, 1); const [ex, ey] = pts[pts.length - 1]; circle(cx + ex * g, cy + ey * g, 0.35 * g); };
+    trace([[-2, -2.6], [-2, -4], [-4, -4], [-7, -4]]); trace([[-0.4, -2.6], [-0.4, -4.6], [3, -4.6], [7, -4.6]]);
+    trace([[1.2, -2.6], [1.2, -3.4], [5, -3.4], [7, -1.4], [7, 1]]); trace([[-2, 2.6], [-2, 3.6], [-5, 3.6], [-7, 1.6], [-7, -1]]);
+    trace([[0.4, 2.6], [0.4, 4.4], [6, 4.4]]); trace([[2, 2.6], [2, 3.4], [4, 3.4]]);
+    dim(cx - 9 * g, cy + 6 * g, cx + 9 * g, cy + 6 * g, P(16), `${Math.round(18 * 14)} mm`);
+    label("PCB  ·  TOP COPPER  ·  2-LAYER  ·  FR-4", cx - 9 * g, cy - 6 * g - P(16), 0.55);
+  }
+
+  // Where each drawing sits on the long sheet (in viewport heights), repeating down the page
+  function parts(sy, t) {
+    const vh = FH, W = FW, cycle = 5.6;
+    const base = Math.min(W, vh);
+    const items = [
+      (y) => {
+        const R = base * (small ? 0.3 : 0.25), cx = W * (small ? 0.62 : 0.73), cy = y;
+        const rot = t * 0.08;
+        gear(cx, cy, R, 24, rot, !small);
+        // A pinion meshing with it: ratio 24:12, offset half a tooth
+        const r = R * 0.5, d = (R + r) * 0.93, a = Math.PI * 0.78;
+        gear(cx + d * Math.cos(a), cy + d * Math.sin(a), r, 12, -rot * 2 + Math.PI / 12 + 2 * a, false);
+        return R * 1.5;
+      },
+      (y) => { bearing(W * (small ? 0.5 : 0.2), y, base / 520 * dpr / dpr); return base * 0.4; },
+      (y) => { enclosure(W * (small ? 0.42 : 0.74), y, (base / 520)); return base * 0.45; },
+      (y) => { arm(W * (small ? 0.4 : 0.2), y, base / 520, t); return base * 0.5; },
+      (y) => { pcb(W * (small ? 0.5 : 0.78), y, base / 620); return base * 0.4; },
+    ];
+    const pos = [0.42, 1.55, 2.6, 3.6, 4.6];
+    const shift = sy * 0.5; // drawings drift at half the scroll speed
+    for (let k = 0; k < 4; k++) {
+      items.forEach((draw, i) => {
+        const y = (pos[i] + k * cycle) * vh - shift;
+        if (y < -vh * 0.7 || y > vh * 1.7) return;
+        // Drawings below the hero sit behind reading text, so they are softer
+        ctx.globalAlpha = i === 0 && k === 0 ? (small ? 0.5 : 1) : 0.62;
+        draw(y);
+        ctx.globalAlpha = 1;
+      });
+    }
+  }
 
   function frame(now) {
     const t = now / 1000;
@@ -1636,99 +1831,30 @@
     root.style.setProperty("--mx", mouse.x.toFixed(3));
     root.style.setProperty("--my", mouse.y.toFixed(3));
     const sy = scrollY * dpr;
+    ctx.setLineDash([]);
+    ctx.drawImage(paper, 0, 0);
 
-    ctx.fillStyle = `rgb(${GROUND})`;
-    ctx.fillRect(0, 0, FW, FH);
-
-    // Halo behind the globe
-    const gx = FW * (small ? 0.5 : 0.72), gy = FH * (small ? 0.3 : 0.42) - sy * 0.45;
-    const halo = ctx.createRadialGradient(gx, gy, 0, gx, gy, Math.max(FW, FH) * 0.55);
-    halo.addColorStop(0, `rgba(${FG},0.08)`);
-    halo.addColorStop(1, `rgba(${FG},0)`);
-    ctx.fillStyle = halo;
-    ctx.fillRect(0, 0, FW, FH);
-
-    // Starfield flying gently toward the viewer
-    for (const s of stars) {
-      if (!reduced) s.z -= 0.0012;
-      let px = FW / 2 + (s.x / s.z) * FW * 0.22 - mouse.x * 20 * dpr * (1 - s.z);
-      let py = FH / 2 + (s.y / s.z) * FH * 0.22 - mouse.y * 20 * dpr * (1 - s.z);
-      if (s.z < 0.03 || px < 0 || px > FW || py < 0 || py > FH) { s.z = 1; s.x = Math.random() * 2 - 1; s.y = Math.random() * 2 - 1; continue; }
-      const k = 1 - s.z;
-      ctx.fillStyle = `rgba(${FG},${(0.15 + k * 0.85).toFixed(3)})`;
-      const r = (0.4 + k * 1.6) * dpr;
-      ctx.fillRect(px - r / 2, py - r / 2, r, r);
+    // Grid paper: minor every 12px, major every 60px, sliding gently with the page
+    const minor = P(12), major = minor * 5, oy = (sy * 0.3) % major;
+    ctx.lineWidth = 1;
+    for (const [every, a] of [[minor, 0.06], [major, 0.14]]) {
+      ctx.strokeStyle = ink(a); ctx.beginPath();
+      for (let x = 0.5; x < FW; x += every) { ctx.moveTo(x, 0); ctx.lineTo(x, FH); }
+      for (let y = -oy + 0.5; y < FH; y += every) { if (y < 0) continue; ctx.moveTo(0, y); ctx.lineTo(FW, y); }
+      ctx.stroke();
     }
 
-    // Perspective grid floor; scrolling moves you across it
-    const horizon = FH * 0.66;
-    const spacing = 0.5, off = ((t * 0.25 + sy * 0.0025) % spacing);
-    ctx.lineWidth = dpr;
-    for (let i = 0; i < 26; i++) {
-      const z = 0.35 + i * spacing - off;
-      if (z <= 0.3) continue;
-      const y = horizon + (FH * 0.22) / z;
-      if (y > FH) continue;
-      ctx.strokeStyle = `rgba(${FG},${Math.min(0.28, 0.5 / (z * 2.2)).toFixed(3)})`;
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(FW, y); ctx.stroke();
-    }
-    const vx = FW / 2 - mouse.x * 60 * dpr;
-    for (let k = -18; k <= 18; k++) {
-      ctx.strokeStyle = `rgba(${FG},${(0.16 - Math.abs(k) * 0.006).toFixed(3)})`;
-      ctx.beginPath(); ctx.moveTo(vx + k * 6 * dpr, horizon); ctx.lineTo(FW / 2 + k * FW * 0.09, FH); ctx.stroke();
-    }
-    // Soften the horizon and draw its glow
-    const fade = ctx.createLinearGradient(0, horizon - 2, 0, horizon + FH * 0.12);
-    fade.addColorStop(0, `rgba(${GROUND},1)`); fade.addColorStop(1, `rgba(${GROUND},0)`);
-    ctx.fillStyle = fade; ctx.fillRect(0, horizon - 2, FW, FH * 0.12 + 2);
-    const glow = ctx.createLinearGradient(0, 0, FW, 0);
-    glow.addColorStop(0, `rgba(${FG},0)`); glow.addColorStop(0.5, `rgba(${FG},0.45)`); glow.addColorStop(1, `rgba(${FG},0)`);
-    ctx.fillStyle = glow; ctx.fillRect(0, horizon - dpr, FW, dpr);
+    parts(sy, reduced ? 0 : t);
 
-    // Globe of points, with a scanning band and two orbit rings
-    const R = Math.min(FW, FH) * (small ? 0.3 : 0.28);
-    if (gy + R * 1.6 > 0) {
-      const ay = t * 0.12 + mouse.x * 0.5, ax = -0.35 + mouse.y * 0.25;
-      const band = Math.sin(t * 0.6);
-      for (const p of globe) {
-        const [x, y, z] = rotate(p, ay, ax);
-        const f = 2.8 / (2.8 - z);
-        const lit = Math.abs(y - band) < 0.035;
-        const a = lit ? 1 : 0.12 + 0.68 * (z + 1) / 2;
-        ctx.fillStyle = `rgba(${FG},${a.toFixed(3)})`;
-        const r = (lit ? 2.2 : 1.3) * dpr * f;
-        ctx.fillRect(gx + x * R * f - r / 2, gy + y * R * f - r / 2, r, r);
-      }
-      for (const [tilt, speed, scale] of [[0.9, 0.5, 1.45], [-0.5, -0.35, 1.7]]) {
-        ctx.beginPath();
-        for (let i = 0; i <= 96; i++) {
-          const th = (i / 96) * Math.PI * 2;
-          const [x, y, z] = rotate([Math.cos(th) * scale, 0, Math.sin(th) * scale], 0.4, tilt + mouse.y * 0.1);
-          const f = 2.8 / (2.8 - z * 0.6);
-          const px = gx + x * R * f, py = gy + y * R * f;
-          i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
-        }
-        ctx.strokeStyle = `rgba(${FG},0.16)`;
-        ctx.stroke();
-        const th = t * speed;
-        const [x, y, z] = rotate([Math.cos(th) * scale, 0, Math.sin(th) * scale], 0.4, tilt + mouse.y * 0.1);
-        const f = 2.8 / (2.8 - z * 0.6);
-        const sat = [gx + x * R * f, gy + y * R * f];
-        ctx.fillStyle = `rgb(${FG})`;
-        ctx.beginPath(); ctx.arc(sat[0], sat[1], 2.6 * dpr, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = `rgba(${FG},0.35)`;
-        ctx.beginPath(); ctx.arc(sat[0], sat[1], 7 * dpr, 0, Math.PI * 2); ctx.stroke();
-      }
+    // Drafting crosshair and coordinates at the mouse
+    if (finePointer && mouse.px >= 0) {
+      stroke(0.22, 0.8, [6, 5]);
+      line(mouse.px, 0, mouse.px, FH); line(0, mouse.py, FW, mouse.py);
+      stroke(0.7, 1); ctx.strokeRect(mouse.px - P(5), mouse.py - P(5), P(10), P(10));
+      label(`X ${String(Math.round(mouse.px / dpr)).padStart(4, "0")}  Y ${String(Math.round((mouse.py + sy) / dpr)).padStart(5, "0")}`, mouse.px + P(12), mouse.py - P(12), 0.75);
     }
-
-    // A slow scan beam sweeping down the screen
-    if (!reduced) {
-      const by = ((t * 70 * dpr) % (FH * 1.6)) - FH * 0.3;
-      const beam = ctx.createLinearGradient(0, by - 60 * dpr, 0, by);
-      beam.addColorStop(0, `rgba(${FG},0)`); beam.addColorStop(1, `rgba(${FG},0.05)`);
-      ctx.fillStyle = beam; ctx.fillRect(0, by - 60 * dpr, FW, 60 * dpr);
-      requestAnimationFrame(frame);
-    }
+    ctx.setLineDash([]);
+    if (!reduced) requestAnimationFrame(frame);
   }
   size();
   readTheme();

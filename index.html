@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet" />
-  <meta name="theme-color" content="#050505" />
+  <meta name="theme-color" content="#0d3b70" />
   <script>
     // Apply the saved (or system) theme before the first paint, so there is no flash
     (function () {
@@ -76,7 +76,7 @@
       <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
       <div class="hud-top">
         <span class="live"><i></i>Live</span>
-        <span>AMG · Open Source Atlas · Vol. I</span>
+        <span>DWG AMG-001 · Open Source Atlas · Rev C</span>
         <span id="today"></span>
         <span id="clock">--:--:-- UTC</span>
       </div>
@@ -236,8 +236,16 @@
   </main>
 
   <footer class="wrap foot">
-    <span class="script">Amalgam</span>
-    <span>Compiled by NJR · Black on white on black · <span id="year"></span></span>
+    <div class="titleblock" aria-label="Drawing title block">
+      <div class="tb-cell tb-title"><span>Title</span><b class="script">Amalgam</b><em>Open-source atlas &amp; system designs</em></div>
+      <div class="tb-cell"><span>Drawn by</span><b>NJR</b></div>
+      <div class="tb-cell"><span>Dwg no.</span><b>AMG-001</b></div>
+      <div class="tb-cell"><span>Scale</span><b>1 : 1</b></div>
+      <div class="tb-cell"><span>Sheet</span><b>1 of 1</b></div>
+      <div class="tb-cell"><span>Rev</span><b>C</b></div>
+      <div class="tb-cell"><span>Date</span><b id="year"></b></div>
+      <div class="tb-cell tb-wide"><span>Notes</span><b>All tools free &amp; open source · Verify licences before building</b></div>
+    </div>
   </footer>
 
   <dialog class="drawer" id="drawer" aria-labelledby="drawer-title">
