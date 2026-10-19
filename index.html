@@ -8,6 +8,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet" />
+  <meta name="theme-color" content="#050505" />
+  <script>
+    // Apply the saved (or system) theme before the first paint, so there is no flash
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem("amg-theme"); } catch (e) {}
+      if (t !== "day" && t !== "night") t = window.matchMedia && matchMedia("(prefers-color-scheme: light)").matches ? "day" : "night";
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
   <link rel="stylesheet" href="styles.css" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23000'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' dominant-baseline='middle' font-family='serif' font-style='italic' font-size='44' fill='%23fff'%3EA%3C/text%3E%3C/svg%3E" />
 </head>
@@ -28,6 +38,14 @@
         <a href="#method">Method</a>
         <a href="#atlas">Atlas</a>
       </nav>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to day mode" title="Day / night">
+        <span class="tt-track" aria-hidden="true">
+          <svg class="tt-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2" /><g><line x1="12" y1="1.8" x2="12" y2="4.6" /><line x1="12" y1="19.4" x2="12" y2="22.2" /><line x1="1.8" y1="12" x2="4.6" y2="12" /><line x1="19.4" y1="12" x2="22.2" y2="12" /><line x1="4.8" y1="4.8" x2="6.8" y2="6.8" /><line x1="17.2" y1="17.2" x2="19.2" y2="19.2" /><line x1="4.8" y1="19.2" x2="6.8" y2="17.2" /><line x1="17.2" y1="6.8" x2="19.2" y2="4.8" /></g></svg>
+          <svg class="tt-moon" viewBox="0 0 24 24"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z" /></svg>
+          <span class="tt-knob"></span>
+        </span>
+        <span class="tt-label">Night</span>
+      </button>
     </div>
   </header>
 

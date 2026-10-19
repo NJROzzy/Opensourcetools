@@ -1543,6 +1543,33 @@
   schedule();
 
   // ---------------------------------------------------------------------
+  // Day / night: follows the system until you choose, then remembers
+  const root = document.documentElement;
+  const theme = () => (root.dataset.theme === "day" ? "day" : "night");
+  const themeBtn = $("#theme-toggle");
+  function applyTheme(t, { save = false, animate = false, field = true } = {}) {
+    if (animate) {
+      root.classList.add("theme-anim");
+      clearTimeout(applyTheme.t);
+      applyTheme.t = setTimeout(() => root.classList.remove("theme-anim"), 600);
+    }
+    root.dataset.theme = t;
+    const day = t === "day";
+    themeBtn.setAttribute("aria-label", day ? "Switch to night mode" : "Switch to day mode");
+    themeBtn.querySelector(".tt-label").textContent = day ? "Day" : "Night";
+    document.querySelector('meta[name="theme-color"]').content = day ? "#f6f4ee" : "#050505";
+    if (save) { try { localStorage.setItem("amg-theme", t); } catch { /* storage unavailable */ } }
+    if (field) readTheme(); // the background scene repaints in the new colours
+  }
+  themeBtn.addEventListener("click", () => applyTheme(theme() === "day" ? "night" : "day", { save: true, animate: true }));
+  matchMedia("(prefers-color-scheme: light)").addEventListener("change", (e) => {
+    let saved = null;
+    try { saved = localStorage.getItem("amg-theme"); } catch { /* storage unavailable */ }
+    if (!saved) applyTheme(e.matches ? "day" : "night", { animate: true });
+  });
+  applyTheme(theme(), { field: false }); // the scene reads the theme itself when it starts
+
+  // ---------------------------------------------------------------------
   // Hero instruments: typed boot line, UTC clock, stats that count up.
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const bootText = `> indexing ${tools.length} open-source tools · ${projects.length} projects · ${tracks.length} build paths … ready`;
@@ -1568,8 +1595,15 @@
   // Field: a depth starfield, a rotating point-cloud globe with orbit rings
   // that drifts away as you scroll, and a perspective grid to the horizon.
   const c = $("#field");
+  // The field paints with the theme's ink on the theme's ground
+  let FG = "255,255,255", GROUND = "2,2,2";
+  function readTheme() {
+    const cs = getComputedStyle(root);
+    FG = cs.getPropertyValue("--fg").trim() || FG;
+    GROUND = theme() === "day" ? "246,244,238" : "2,2,2";
+    if (reduced) frame(0);
+  }
   const ctx = c.getContext("2d");
-  const root = document.documentElement;
   let FW, FH, dpr, small, stars = [], globe = [];
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 }; // -1..1, eased toward the pointer
   function size() {
@@ -1603,14 +1637,14 @@
     root.style.setProperty("--my", mouse.y.toFixed(3));
     const sy = scrollY * dpr;
 
-    ctx.fillStyle = "#020202";
+    ctx.fillStyle = `rgb(${GROUND})`;
     ctx.fillRect(0, 0, FW, FH);
 
     // Halo behind the globe
     const gx = FW * (small ? 0.5 : 0.72), gy = FH * (small ? 0.3 : 0.42) - sy * 0.45;
     const halo = ctx.createRadialGradient(gx, gy, 0, gx, gy, Math.max(FW, FH) * 0.55);
-    halo.addColorStop(0, "rgba(255,255,255,0.08)");
-    halo.addColorStop(1, "rgba(255,255,255,0)");
+    halo.addColorStop(0, `rgba(${FG},0.08)`);
+    halo.addColorStop(1, `rgba(${FG},0)`);
     ctx.fillStyle = halo;
     ctx.fillRect(0, 0, FW, FH);
 
@@ -1621,7 +1655,7 @@
       let py = FH / 2 + (s.y / s.z) * FH * 0.22 - mouse.y * 20 * dpr * (1 - s.z);
       if (s.z < 0.03 || px < 0 || px > FW || py < 0 || py > FH) { s.z = 1; s.x = Math.random() * 2 - 1; s.y = Math.random() * 2 - 1; continue; }
       const k = 1 - s.z;
-      ctx.fillStyle = `rgba(255,255,255,${(0.15 + k * 0.85).toFixed(3)})`;
+      ctx.fillStyle = `rgba(${FG},${(0.15 + k * 0.85).toFixed(3)})`;
       const r = (0.4 + k * 1.6) * dpr;
       ctx.fillRect(px - r / 2, py - r / 2, r, r);
     }
@@ -1635,20 +1669,20 @@
       if (z <= 0.3) continue;
       const y = horizon + (FH * 0.22) / z;
       if (y > FH) continue;
-      ctx.strokeStyle = `rgba(255,255,255,${Math.min(0.28, 0.5 / (z * 2.2)).toFixed(3)})`;
+      ctx.strokeStyle = `rgba(${FG},${Math.min(0.28, 0.5 / (z * 2.2)).toFixed(3)})`;
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(FW, y); ctx.stroke();
     }
     const vx = FW / 2 - mouse.x * 60 * dpr;
     for (let k = -18; k <= 18; k++) {
-      ctx.strokeStyle = `rgba(255,255,255,${(0.16 - Math.abs(k) * 0.006).toFixed(3)})`;
+      ctx.strokeStyle = `rgba(${FG},${(0.16 - Math.abs(k) * 0.006).toFixed(3)})`;
       ctx.beginPath(); ctx.moveTo(vx + k * 6 * dpr, horizon); ctx.lineTo(FW / 2 + k * FW * 0.09, FH); ctx.stroke();
     }
     // Soften the horizon and draw its glow
     const fade = ctx.createLinearGradient(0, horizon - 2, 0, horizon + FH * 0.12);
-    fade.addColorStop(0, "rgba(2,2,2,1)"); fade.addColorStop(1, "rgba(2,2,2,0)");
+    fade.addColorStop(0, `rgba(${GROUND},1)`); fade.addColorStop(1, `rgba(${GROUND},0)`);
     ctx.fillStyle = fade; ctx.fillRect(0, horizon - 2, FW, FH * 0.12 + 2);
     const glow = ctx.createLinearGradient(0, 0, FW, 0);
-    glow.addColorStop(0, "rgba(255,255,255,0)"); glow.addColorStop(0.5, "rgba(255,255,255,0.45)"); glow.addColorStop(1, "rgba(255,255,255,0)");
+    glow.addColorStop(0, `rgba(${FG},0)`); glow.addColorStop(0.5, `rgba(${FG},0.45)`); glow.addColorStop(1, `rgba(${FG},0)`);
     ctx.fillStyle = glow; ctx.fillRect(0, horizon - dpr, FW, dpr);
 
     // Globe of points, with a scanning band and two orbit rings
@@ -1661,7 +1695,7 @@
         const f = 2.8 / (2.8 - z);
         const lit = Math.abs(y - band) < 0.035;
         const a = lit ? 1 : 0.12 + 0.68 * (z + 1) / 2;
-        ctx.fillStyle = `rgba(255,255,255,${a.toFixed(3)})`;
+        ctx.fillStyle = `rgba(${FG},${a.toFixed(3)})`;
         const r = (lit ? 2.2 : 1.3) * dpr * f;
         ctx.fillRect(gx + x * R * f - r / 2, gy + y * R * f - r / 2, r, r);
       }
@@ -1674,15 +1708,15 @@
           const px = gx + x * R * f, py = gy + y * R * f;
           i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
         }
-        ctx.strokeStyle = "rgba(255,255,255,0.16)";
+        ctx.strokeStyle = `rgba(${FG},0.16)`;
         ctx.stroke();
         const th = t * speed;
         const [x, y, z] = rotate([Math.cos(th) * scale, 0, Math.sin(th) * scale], 0.4, tilt + mouse.y * 0.1);
         const f = 2.8 / (2.8 - z * 0.6);
         const sat = [gx + x * R * f, gy + y * R * f];
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = `rgb(${FG})`;
         ctx.beginPath(); ctx.arc(sat[0], sat[1], 2.6 * dpr, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = "rgba(255,255,255,0.35)";
+        ctx.strokeStyle = `rgba(${FG},0.35)`;
         ctx.beginPath(); ctx.arc(sat[0], sat[1], 7 * dpr, 0, Math.PI * 2); ctx.stroke();
       }
     }
@@ -1691,11 +1725,12 @@
     if (!reduced) {
       const by = ((t * 70 * dpr) % (FH * 1.6)) - FH * 0.3;
       const beam = ctx.createLinearGradient(0, by - 60 * dpr, 0, by);
-      beam.addColorStop(0, "rgba(255,255,255,0)"); beam.addColorStop(1, "rgba(255,255,255,0.05)");
+      beam.addColorStop(0, `rgba(${FG},0)`); beam.addColorStop(1, `rgba(${FG},0.05)`);
       ctx.fillStyle = beam; ctx.fillRect(0, by - 60 * dpr, FW, 60 * dpr);
       requestAnimationFrame(frame);
     }
   }
   size();
+  readTheme();
   if (!reduced) requestAnimationFrame(frame);
 })();

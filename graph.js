@@ -502,17 +502,21 @@ window.createArchGraph = function createArchGraph(host, o) {
   // ---- Export the diagram as a PNG ---------------------------------------
   async function exportPNG() {
     const d = o.getDesign(), b = L.bounds, pad = 48, head = 70, s = 2;
+    // Draw in the current theme's colours
+    const cs = getComputedStyle(document.documentElement), v = (n, f) => cs.getPropertyValue(n).trim() || f;
+    const FG = v("--fg", "255,255,255"), HI = v("--hi", "#fff");
+    const [S0, S1, S2, S3] = [["--s0", "#050505"], ["--s1", "#0b0b0b"], ["--s2", "#121212"], ["--s3", "#151515"]].map(([n, f]) => v(n, f));
     const W = Math.ceil(b.w + pad * 2), H = Math.ceil(b.h + pad * 2 + head);
     const cv = document.createElement("canvas");
     cv.width = W * s; cv.height = H * s;
     const c = cv.getContext("2d");
     c.scale(s, s);
-    c.fillStyle = "#050505"; c.fillRect(0, 0, W, H);
-    c.fillStyle = "rgba(255,255,255,.08)";
+    c.fillStyle = S0; c.fillRect(0, 0, W, H);
+    c.fillStyle = `rgba(${FG},.08)`;
     for (let x = 10; x < W; x += 20) for (let y = 10; y < H; y += 20) c.fillRect(x, y, 1, 1);
-    c.fillStyle = "#fff"; c.font = 'italic 30px "Cormorant Garamond", serif';
+    c.fillStyle = HI; c.font = 'italic 30px "Cormorant Garamond", serif';
     c.fillText(d.title || d.root?.title || "Architecture", pad, 50);
-    c.fillStyle = "rgba(255,255,255,.45)"; c.font = '10px "IBM Plex Mono", monospace';
+    c.fillStyle = `rgba(${FG},.45)`; c.font = '10px "IBM Plex Mono", monospace';
     c.fillText("AMALGAM · OPEN-SOURCE ARCHITECTURE", Math.max(pad, W - pad - 230), 46);
     c.translate(pad - b.x, pad + head - b.y);
     const srcs = [...new Set(L.order.flatMap((n) => n.tools.map((t) => toolByName[t]?.logo).filter(Boolean)))];
@@ -524,9 +528,9 @@ window.createArchGraph = function createArchGraph(host, o) {
     c.lineWidth = 1.4;
     for (const e of L.edges) {
       const g = edgeGeom(L.nodes[e.from], L.nodes[e.to]);
-      c.strokeStyle = "rgba(255,255,255,.55)"; c.setLineDash([6, 5]); c.stroke(new Path2D(g.d)); c.setLineDash([]);
+      c.strokeStyle = `rgba(${FG},.55)`; c.setLineDash([6, 5]); c.stroke(new Path2D(g.d)); c.setLineDash([]);
       const ang = Math.atan2(g.p2[1] - g.c2[1], g.p2[0] - g.c2[0]);
-      c.fillStyle = "rgba(255,255,255,.8)"; c.beginPath();
+      c.fillStyle = `rgba(${FG},.8)`; c.beginPath();
       c.moveTo(g.p2[0], g.p2[1]);
       c.lineTo(g.p2[0] - 9 * Math.cos(ang - 0.4), g.p2[1] - 9 * Math.sin(ang - 0.4));
       c.lineTo(g.p2[0] - 9 * Math.cos(ang + 0.4), g.p2[1] - 9 * Math.sin(ang + 0.4));
@@ -534,32 +538,32 @@ window.createArchGraph = function createArchGraph(host, o) {
       if (e.label) {
         c.font = '10px "IBM Plex Mono", monospace';
         const w = c.measureText(e.label).width + 14;
-        round(g.mid[0] - w / 2, g.mid[1] - 9, w, 18, 9); c.fillStyle = "#050505"; c.fill(); c.strokeStyle = "rgba(255,255,255,.3)"; c.stroke();
-        c.fillStyle = "rgba(255,255,255,.75)"; c.fillText(e.label, g.mid[0] - w / 2 + 7, g.mid[1] + 3.5);
+        round(g.mid[0] - w / 2, g.mid[1] - 9, w, 18, 9); c.fillStyle = S0; c.fill(); c.strokeStyle = `rgba(${FG},.3)`; c.stroke();
+        c.fillStyle = `rgba(${FG},.75)`; c.fillText(e.label, g.mid[0] - w / 2 + 7, g.mid[1] + 3.5);
       }
     }
     // Components
     for (const n of L.order) {
       const h = collapsed.has(n.id) ? HEAD : HEAD + 10 + n.tools.length * TOOL;
-      round(n.x, n.y, GW, h, 12); c.fillStyle = "#0b0b0b"; c.fill(); c.strokeStyle = "rgba(255,255,255,.35)"; c.stroke();
-      c.fillStyle = "#fff"; c.font = '500 18px "Cormorant Garamond", serif';
+      round(n.x, n.y, GW, h, 12); c.fillStyle = S1; c.fill(); c.strokeStyle = `rgba(${FG},.35)`; c.stroke();
+      c.fillStyle = HI; c.font = '500 18px "Cormorant Garamond", serif';
       c.fillText(n.name, n.x + 14, n.y + 30, GW - 28);
-      c.strokeStyle = "rgba(255,255,255,.12)"; c.beginPath(); c.moveTo(n.x, n.y + HEAD); c.lineTo(n.x + GW, n.y + HEAD); c.stroke();
+      c.strokeStyle = `rgba(${FG},.12)`; c.beginPath(); c.moveTo(n.x, n.y + HEAD); c.lineTo(n.x + GW, n.y + HEAD); c.stroke();
       if (collapsed.has(n.id)) continue;
       n.tools.forEach((t, i) => {
         const ty = n.y + HEAD + 6 + i * TOOL;
-        round(n.x + 8, ty, GW - 16, 40, 9); c.fillStyle = "#121212"; c.fill(); c.strokeStyle = "rgba(255,255,255,.12)"; c.stroke();
+        round(n.x + 8, ty, GW - 16, 40, 9); c.fillStyle = S2; c.fill(); c.strokeStyle = `rgba(${FG},.12)`; c.stroke();
         round(n.x + 14, ty + 7, 26, 26, 6); c.fillStyle = "#f7f7f4"; c.fill();
         const im = imgs[toolByName[t]?.logo];
         if (im) c.drawImage(im, n.x + 18, ty + 11, 18, 18);
-        c.fillStyle = "#fff"; c.font = '11.5px "IBM Plex Mono", monospace'; c.fillText(t, n.x + 48, ty + 18, GW - 70);
-        c.fillStyle = "rgba(255,255,255,.45)"; c.font = 'italic 12px "Cormorant Garamond", serif'; c.fillText(toolByName[t]?.kind || "", n.x + 48, ty + 32, GW - 70);
+        c.fillStyle = HI; c.font = '11.5px "IBM Plex Mono", monospace'; c.fillText(t, n.x + 48, ty + 18, GW - 70);
+        c.fillStyle = `rgba(${FG},.45)`; c.font = 'italic 12px "Cormorant Garamond", serif'; c.fillText(toolByName[t]?.kind || "", n.x + 48, ty + 32, GW - 70);
       });
     }
     // Notes
     for (const t of L.notes) {
-      round(t.x, t.y, NOTE_W, 70, 10); c.fillStyle = "#151515"; c.fill(); c.strokeStyle = "rgba(255,255,255,.4)"; c.setLineDash([3, 3]); c.stroke(); c.setLineDash([]);
-      c.fillStyle = "rgba(255,255,255,.85)"; c.font = 'italic 15px "Cormorant Garamond", serif';
+      round(t.x, t.y, NOTE_W, 70, 10); c.fillStyle = S3; c.fill(); c.strokeStyle = `rgba(${FG},.4)`; c.setLineDash([3, 3]); c.stroke(); c.setLineDash([]);
+      c.fillStyle = `rgba(${FG},.85)`; c.font = 'italic 15px "Cormorant Garamond", serif';
       (t.text || "").split("\n").slice(0, 3).forEach((line, i) => c.fillText(line, t.x + 12, t.y + 24 + i * 18, NOTE_W - 24));
     }
     cv.toBlob((blob) => {
