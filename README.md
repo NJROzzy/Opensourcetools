@@ -37,6 +37,15 @@ The design is an **engineering drawing sheet**. At night it is a classic **bluep
 
 ## Features
 
+### Build your first architecture
+
+1. In **System Design Canvas**, choose a domain and load a ready-made design, a build path's common architecture, or a recommended project.
+2. Select a component to edit its role and tools in the **Inspector**. Drag components to reposition them, or drag from a component's connection port to link it to another.
+3. Select the empty canvas to show **Copy as text** and **Download PNG** in the Inspector. The canvas saves your edits in the current browser.
+4. To assemble a stack by layer, open a path or project's architecture graph and choose **Open in Studio**. The graph also offers **Edit on the canvas** for diagram editing.
+
+### Explore the atlas
+
 | Section | What it does |
 |---|---|
 | **§1 System Design Canvas** | The first thing on the page: a full diagram editor for system designs. Start from **25 ready-made system designs** across all 11 domains (URL shortener, real-time chat, e-commerce, video streaming, ride-hailing, food delivery, RAG chatbot, recommendations, fraud detection, warehouse robot fleet, drone delivery, clickstream analytics, lakehouse, job platform, API gateway, CDN edge, IoT telemetry, zero-trust access, SOC pipeline, smart-home hub, optimisation service, quantum workflow and more), a path's common architecture, or any recommended project. **Editing tools:** Select & move (V), Connect (C, or drag a box's ● port), add Component (B) and Note (N), drag tools between components, Delete, Undo/Redo (⌘/Ctrl Z, ⇧⌘/Ctrl Z), Auto-layout, Fit, zoom and pan, and **Export PNG**. The **Inspector** renames components, edits roles and connection labels (with quick picks), reverses connections, duplicates components, and adds or removes tools, with suggestions based on a component's name and role. You can copy the design as text; it is saved in your browser. |
@@ -112,7 +121,7 @@ Plain **HTML, CSS and vanilla JavaScript**, with no framework and no build step.
 
 ```
 ├── index.html   # Page structure and sections
-├── styles.css   # Monochrome, research-style design
+├── styles.css   # Blueprint and whiteprint themes, responsive layouts
 ├── data.js      # Domains, build tracks, architectures, tools, projects, chains, trends, map presets, news topics
 ├── app.js       # Paths, Studio, map, chains, drawers, live news, background animation
 ├── graph.js     # Architecture graph engine: layout, pan/zoom, viewing and full diagram editing, PNG export
@@ -128,6 +137,8 @@ cd Opensourcetools
 python3 -m http.server 8000
 # open http://localhost:8000
 ```
+
+The app runs as a static site. Your canvas, Studio board, and theme preference are stored in the browser for the current site address. Live Wire fetches headlines from Hacker News and needs an internet connection.
 
 ## Contributing a tool or recipe
 
