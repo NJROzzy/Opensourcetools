@@ -1,5 +1,5 @@
 :root {
-  /* Night: blueprint — white line work on Prussian-blue paper */
+  /* Blue: blueprint — white line work on Prussian-blue paper */
   --ink: #eef4ff;
   --ink-soft: #b9cde8;
   --ink-faint: #82a2cb;
@@ -23,27 +23,24 @@
   --chrome: linear-gradient(100deg, #9fbbe0 0%, #ffffff 18%, #d7e6f8 30%, #ffffff 42%, #a9c3e6 56%, #ffffff 72%, #b9cfea 100%);
   color-scheme: dark;
 }
-/* Day: whiteprint — blue line work on cream drafting paper */
-:root[data-theme="day"] {
-  --ink: #102f5a;
-  --ink-soft: #3c5c88;
-  --ink-faint: #7f94b3;
-  --paper: #f3f0e4;
-  --panel: #fffdf6;
-  --rule: #cfd6df;
-  --rule-strong: #98abc5;
-  --fg: 22,62,118;
-  --bg: 243,240,228;
-  --wash: 255,253,246;
-  --ground: 243,240,228;
-  --hi: #102f5a;
-  --lo: #fbf9f1;
-  --s0: #f3f0e4; --s1: #fffdf6; --s2: #efecdf; --s3: #e6e2d3;
-  --shade: .14;
-  --plate-border: #cdd5de;
-  --inv-soft: #c4d0e2; --inv-faint: #6f86a8; --inv-hover: #29497a;
-  --chrome: linear-gradient(100deg, #6f86a8 0%, #102f5a 18%, #3c5c88 30%, #102f5a 42%, #8095b4 56%, #102f5a 72%, #4d6a95 100%);
-  color-scheme: light;
+/* Black drafting paper with neutral gray surfaces */
+:root[data-theme="black"] {
+  --ink: #f2f2f2;
+  --ink-soft: #c7c7c7;
+  --ink-faint: #a3a3a3;
+  --paper: #080808;
+  --panel: #191919;
+  --rule: #414141;
+  --rule-strong: #777777;
+  --fg: 242,242,242;
+  --bg: 8,8,8;
+  --wash: 22,22,22;
+  --ground: 8,8,8;
+  --lo: #070707;
+  --s0: #101010; --s1: #181818; --s2: #222222; --s3: #2d2d2d;
+  --plate-border: #dedede;
+  --inv-soft: #464646; --inv-faint: #b3b3b3; --inv-hover: #e6e6e6;
+  --chrome: linear-gradient(100deg, #b6b6b6 0%, #fff 18%, #ddd 30%, #fff 42%, #b3b3b3 56%, #fff 72%, #c8c8c8 100%);
 }
 
 * { box-sizing: border-box; }
@@ -1073,7 +1070,7 @@ nav { gap: 18px; }
 /* Logos are never dragged as images, so grabbing one starts our own drag */
 .plate img { -webkit-user-drag: none; user-select: none; }
 
-/* ---------------- Day / night switch ---------------- */
+/* ---------------- Blue / black switch ---------------- */
 .bar { gap: 14px; }
 .bar nav { margin-left: auto; }
 .theme-toggle {
@@ -1095,28 +1092,21 @@ nav { gap: 18px; }
   background: var(--hi); box-shadow: 0 0 12px rgba(var(--fg),.5);
   transition: transform .45s cubic-bezier(.5,1.6,.4,.8), background .3s;
 }
-/* Night: the knob rests on the moon (right); day: on the sun (left) */
-:root:not([data-theme="day"]) .tt-knob { transform: translateX(30px); }
-:root:not([data-theme="day"]) .tt-moon { fill: var(--lo) !important; }
-:root[data-theme="day"] .tt-sun { stroke: var(--lo); }
+:root[data-theme="black"] .tt-knob { transform: translateX(30px); }
+:root[data-theme="black"] .tt-moon { fill: var(--lo) !important; }
+:root:not([data-theme="black"]) .tt-blue { stroke: var(--lo); }
 .tt-knob::after { content: ""; position: absolute; inset: 0; border-radius: 50%; }
 @media (max-width: 640px) {
   .tt-label { display: none; }
   .tt-track { width: 50px; height: 26px; padding: 0 6px; }
   .tt-knob { width: 18px; height: 18px; }
-  :root:not([data-theme="day"]) .tt-knob { transform: translateX(24px); }
+  :root[data-theme="black"] .tt-knob { transform: translateX(24px); }
   .bar { gap: 10px; }
 }
 /* A brief, smooth cross-fade when switching */
 :root.theme-anim, :root.theme-anim *, :root.theme-anim *::before, :root.theme-anim *::after {
   transition: background-color .45s ease, color .45s ease, border-color .45s ease, fill .45s ease, stroke .45s ease, box-shadow .45s ease !important;
 }
-/* Day mode details: logo tiles get an edge, grain is lighter, the hero title keeps its depth */
-:root[data-theme="day"] .plate { box-shadow: 0 1px 0 rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.06); }
-:root[data-theme="day"] body::after { opacity: .06; mix-blend-mode: multiply; }
-:root[data-theme="day"] .title span { filter: drop-shadow(0 6px 18px rgba(0,0,0,.12)); }
-:root[data-theme="day"] .orb-core { box-shadow: 0 0 14px 2px rgba(0,0,0,.25); }
-
 /* ---------------- Engineering title block (footer) ---------------- */
 .foot { display: block; padding-top: 48px; }
 .titleblock {

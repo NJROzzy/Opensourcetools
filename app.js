@@ -1543,31 +1543,32 @@
   schedule();
 
   // ---------------------------------------------------------------------
-  // Day / night: follows the system until you choose, then remembers
+  // Blue / black theme; remember the user's choice in this browser.
   const root = document.documentElement;
-  const theme = () => (root.dataset.theme === "day" ? "day" : "night");
+  const theme = () => root.dataset.theme === "black" ? "black" : "blue";
   const themeBtn = $("#theme-toggle");
-  function applyTheme(t, { save = false, animate = false, field = true } = {}) {
-    if (animate) {
-      root.classList.add("theme-anim");
-      clearTimeout(applyTheme.t);
-      applyTheme.t = setTimeout(() => root.classList.remove("theme-anim"), 600);
-    }
-    root.dataset.theme = t;
-    const day = t === "day";
-    themeBtn.setAttribute("aria-label", day ? "Switch to night mode" : "Switch to day mode");
-    themeBtn.querySelector(".tt-label").textContent = day ? "Day" : "Night";
-    document.querySelector('meta[name="theme-color"]').content = day ? "#f3f0e4" : "#0d3b70";
-    if (save) { try { localStorage.setItem("amg-theme", t); } catch { /* storage unavailable */ } }
-    if (field) readTheme(); // the background scene repaints in the new colours
+  function updateThemeButton() {
+    const black = theme() === "black";
+    const label = black ? "Switch to blue background" : "Switch to black background";
+    themeBtn.setAttribute("aria-label", label);
+    themeBtn.title = label;
+    themeBtn.querySelector(".tt-label").textContent = black ? "Black" : "Blue";
+    document.querySelector('meta[name="theme-color"]').content = black ? "#080808" : "#0d3b70";
   }
-  themeBtn.addEventListener("click", () => applyTheme(theme() === "day" ? "night" : "day", { save: true, animate: true }));
-  matchMedia("(prefers-color-scheme: light)").addEventListener("change", (e) => {
-    let saved = null;
-    try { saved = localStorage.getItem("amg-theme"); } catch { /* storage unavailable */ }
-    if (!saved) applyTheme(e.matches ? "day" : "night", { animate: true });
+  themeBtn.addEventListener("click", () => {
+    if (!reduced) {
+      root.classList.add("theme-anim");
+      clearTimeout(themeTimer);
+      themeTimer = setTimeout(() => root.classList.remove("theme-anim"), 600);
+    }
+    const next = theme() === "black" ? "blue" : "black";
+    root.dataset.theme = next;
+    try { localStorage.setItem("amg-theme", next); } catch { /* storage unavailable */ }
+    updateThemeButton();
+    readTheme();
   });
-  applyTheme(theme(), { field: false }); // the scene reads the theme itself when it starts
+  let themeTimer;
+  updateThemeButton();
 
   // ---------------------------------------------------------------------
   // Hero instruments: typed boot line, UTC clock, stats that count up.
@@ -1616,26 +1617,27 @@
   function paintPaper() {
     if (!FW) return;
     paper.width = FW; paper.height = FH;
-    const day = theme() === "day";
+    const black = theme() === "black";
+    const shadow = black ? "0,0,0" : "0,10,30";
     pctx.fillStyle = `rgb(${GROUND})`;
     pctx.fillRect(0, 0, FW, FH);
     const rnd = (i) => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
     for (let i = 0; i < 16; i++) {
       const x = rnd(i) * FW, y = rnd(i + 40) * FH, r = (0.2 + rnd(i + 80) * 0.5) * Math.max(FW, FH);
       const g = pctx.createRadialGradient(x, y, 0, x, y, r);
-      const tone = i % 2 ? "255,255,255" : (day ? "120,100,60" : "0,10,30");
-      g.addColorStop(0, `rgba(${tone},${day ? 0.03 : 0.045})`); g.addColorStop(1, `rgba(${tone},0)`);
+      const tone = i % 2 ? "255,255,255" : shadow;
+      g.addColorStop(0, `rgba(${tone},0.045)`); g.addColorStop(1, `rgba(${tone},0)`);
       pctx.fillStyle = g; pctx.fillRect(0, 0, FW, FH);
     }
     const v = pctx.createRadialGradient(FW / 2, FH / 2, Math.min(FW, FH) * 0.35, FW / 2, FH / 2, Math.max(FW, FH) * 0.8);
-    v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, day ? "rgba(110,90,50,.10)" : "rgba(0,12,35,.38)");
+    v.addColorStop(0, "rgba(0,0,0,0)"); v.addColorStop(1, black ? "rgba(0,0,0,.38)" : "rgba(0,12,35,.38)");
     pctx.fillStyle = v; pctx.fillRect(0, 0, FW, FH);
     // Fold creases: a highlight beside a shadow
     const crease = (x1, y1, x2, y2, nx, ny) => {
       pctx.lineWidth = 2 * dpr;
-      pctx.strokeStyle = day ? "rgba(255,255,255,.55)" : "rgba(255,255,255,.05)";
+      pctx.strokeStyle = "rgba(255,255,255,.05)";
       pctx.beginPath(); pctx.moveTo(x1, y1); pctx.lineTo(x2, y2); pctx.stroke();
-      pctx.strokeStyle = day ? "rgba(90,70,40,.08)" : "rgba(0,10,30,.18)";
+      pctx.strokeStyle = `rgba(${shadow},.18)`;
       pctx.beginPath(); pctx.moveTo(x1 + nx * 2 * dpr, y1 + ny * 2 * dpr); pctx.lineTo(x2 + nx * 2 * dpr, y2 + ny * 2 * dpr); pctx.stroke();
     };
     crease(FW * 0.333, 0, FW * 0.333, FH, 1, 0);
