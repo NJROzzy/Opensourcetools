@@ -23,19 +23,21 @@
 
 ## About
 
-**Amalgam** is a research-style field guide to building real projects with **only free, open-source tools**. Open with the **System Design Canvas**, an editable architecture graph with ready-made system designs for every domain. Then start from what you want to build (a web app, a mobile app, an AI/ML system, a robot), see the **common architecture** for that kind of project with the open tools for every layer, and explore project recipes across **eleven domains of computer science**, alongside **current trends and live news**:
+**Amalgam** helps students, developers, and curious builders turn an idea into a system using free, open-source tools. It connects project recipes to editable architecture diagrams so you can see what each tool does and how the pieces fit together.
+
+The site covers eleven domains of computer science.
 
 > Hardware · Software · Computation · Computer Networks · Data & Databases · Distributed Systems · Cybersecurity · Artificial Intelligence · Machine Learning · Robotics · Emerging Computing
-
-A real project is rarely one tool, or one domain. It is an *amalgam*: ROS 2 braided with MuJoCo and PyTorch, or an IoT monitor built from KiCad, Zephyr, MQTT and Grafana across hardware, networks and data. This site catalogues those parts, shows which combinations produce which kinds of projects, and keeps you current with what is happening in the field.
 
 The design is an **engineering drawing sheet**. Both themes use light line work on drafting paper, with a classic Prussian-blue **blueprint** and a neutral **black** option. The background is a live Canvas drawing: fine and major grid lines on mottled, folded paper, with technical drawings that drift past as you scroll. They include a spur gear meshing with a pinion, a bearing cross-section with hatching, an isometric enclosure with hidden edges, a moving 2-DOF robot-arm linkage and PCB traces, all with centre lines, dimensions and callouts. A drafting crosshair with X/Y coordinates follows the mouse. The page sits inside a double sheet border, and the footer is a drawing title block (title, drawn by, dwg no., scale, sheet, rev, date). Everything respects `prefers-reduced-motion`.
 
 **Blue and black.** Amalgam opens in blue by default. Use the theme switch in the header to switch backgrounds. The browser remembers your choice and applies it before the first paint. The selected palette also applies to the graphs, Live Wire, and exported PNGs.
 
-## Features
+## Getting started
 
-The homepage opens with an introduction that explains who Amalgam is for, why it was built, and what visitors can do with it. A greenhouse monitor illustrates how to go from a Build Path to an editable architecture. Direct links open their section, and the footer lets visitors read the introduction again.
+The homepage opens with a short welcome. Choose **Enter Amalgam**, then try the **IoT environmental monitor** under the Hardware build path. Open its architecture graph to follow readings from the sensor through messaging and storage to the dashboard. Choose **Edit on the canvas** to customise the design.
+
+Direct links open their section. The footer’s **Read the introduction** button reopens the welcome.
 
 ### Build your first architecture
 
@@ -44,11 +46,11 @@ The homepage opens with an introduction that explains who Amalgam is for, why it
 3. Select the empty canvas to show **Copy as text** and **Download PNG** in the Inspector. The canvas saves your edits in the current browser.
 4. To assemble a stack by layer, open a path or project's architecture graph and choose **Open in Studio**. The graph also offers **Edit on the canvas** for diagram editing.
 
-### Explore the atlas
+## Features
 
 | Section | What it does |
 |---|---|
-| **§1 System Design Canvas** | The first thing on the page: a full diagram editor for system designs. Start from **25 ready-made system designs** across all 11 domains (URL shortener, real-time chat, e-commerce, video streaming, ride-hailing, food delivery, RAG chatbot, recommendations, fraud detection, warehouse robot fleet, drone delivery, clickstream analytics, lakehouse, job platform, API gateway, CDN edge, IoT telemetry, zero-trust access, SOC pipeline, smart-home hub, optimisation service, quantum workflow and more), a path's common architecture, or any recommended project. **Editing tools:** Select & move (V), Connect (C, or drag a box's ● port), add Component (B) and Note (N), drag tools between components, Delete, Undo/Redo (⌘/Ctrl Z, ⇧⌘/Ctrl Z), Auto-layout, Fit, zoom and pan, and **Export PNG**. The **Inspector** renames components, edits roles and connection labels (with quick picks), reverses connections, duplicates components, and adds or removes tools, with suggestions based on a component's name and role. You can copy the design as text; it is saved in your browser. |
+| **§1 System Design Canvas** | An editable diagram for system designs. Start from **25 ready-made system designs** across all 11 domains (URL shortener, real-time chat, e-commerce, video streaming, ride-hailing, food delivery, RAG chatbot, recommendations, fraud detection, warehouse robot fleet, drone delivery, clickstream analytics, lakehouse, job platform, API gateway, CDN edge, IoT telemetry, zero-trust access, SOC pipeline, smart-home hub, optimisation service, quantum workflow and more), a path's common architecture, or any recommended project. **Editing tools:** Select & move (V), Connect (C, or drag a box's ● port), add Component (B) and Note (N), drag tools between components, Delete, Undo/Redo (⌘/Ctrl Z, ⇧⌘/Ctrl Z), Auto-layout, Fit, zoom and pan, and **Export PNG**. The **Inspector** renames components, edits roles and connection labels (with quick picks), reverses connections, duplicates components, and adds or removes tools, with suggestions based on a component's name and role. You can copy the design as text; it is saved in your browser. |
 | **§2 Build Paths** | Choose a path: **Software Engineering → Web applications / Mobile applications**, **AI / ML**, **Robotics**, then Data, Distributed systems, Networks, Security, Hardware, Computation and Emerging computing. Each path shows its **common-path architecture**: the layers a typical project passes through (e.g. *Interface → Build & style → Server & API → Data → Identity → Test → Deliver → Observe*), with the open-source tools for every layer. Below it are **explorable project cards**; hover one to light up the layers and tools it uses, or open it in a drawer showing the full stack, each tool's role and why it's needed, where it sits in the architecture, and links to its chain and its place on the map. |
 | **§3 Architecture Studio** | A drag-and-drop **grid** for assembling your own architecture. Pick a path and its layers become drop lanes (plus *Extras*). Drag tools from the palette into lanes, move them between lanes, or drag them back to remove them. You can also drop a whole **project** to load its stack (switching to its path), or simply click to add. An **Advisor** tile inside the grid recommends tools as you build: layer coverage, the best picks for empty layers, tools that pair well with yours (based on how often they appear together in the projects), the closest real projects with a match percentage, notes when a layer holds tools that do the same job, and a licence summary. Name it, copy it as text, or clear it; your board is saved in your browser. Works with mouse, pen and touch (press and hold to drag). |
 | **§4 The Amalgam Map** | An interactive **Venn diagram of any three domains**, picked by hand or from presets. Each project and tool lands in the overlap matching its domains. **By project** writes project names inside each region; **by tool** places tool logos there, with *+N more* when a region is crowded. |
@@ -121,6 +123,7 @@ Plain **HTML, CSS and vanilla JavaScript**, with no framework and no build step.
 
 ```
 ├── index.html   # Page structure and sections
+├── intro.js     # Opens the homepage introduction and handles entry and replay
 ├── styles.css   # Blue and black themes, responsive layouts
 ├── data.js      # Domains, build tracks, architectures, tools, projects, chains, trends, map presets, news topics
 ├── app.js       # Paths, Studio, map, chains, drawers, live news, background animation
