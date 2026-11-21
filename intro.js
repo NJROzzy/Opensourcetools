@@ -4,40 +4,48 @@
   const replay = document.getElementById("intro-replay");
   if (typeof intro.showModal !== "function") return;
 
-  const chapters = [...intro.querySelectorAll("[data-intro-step]")];
-  const progress = document.getElementById("intro-progress");
-  const back = document.getElementById("intro-back");
+  const choices = document.getElementById("intro-choices");
+  const storage = document.getElementById("intro-storage");
+  const storageNode = document.getElementById("intro-storage-node");
+  const feedback = document.getElementById("intro-feedback");
+  const reading = document.getElementById("intro-reading");
   const next = document.getElementById("intro-next");
-  let chapter = 0;
   let replaying = false;
-
-  function showChapter(index) {
-    chapters[chapter].hidden = true;
-    chapter = index;
-    chapters[chapter].hidden = false;
-    progress.textContent = `${chapter + 1} of ${chapters.length}`;
-    back.hidden = chapter === 0;
-    next.textContent = chapter === chapters.length - 1 ? "Enter Amalgam" : "Continue";
-    intro.scrollTop = 0;
-    chapters[chapter].querySelector("h2").focus({ preventScroll: true });
-  }
 
   function openIntro(isReplay) {
     replaying = isReplay;
+    choices.hidden = false;
+    reading.hidden = true;
+    next.hidden = true;
+    storage.textContent = "Missing tool";
+    storageNode.classList.remove("is-filled");
+    feedback.textContent = "";
     intro.showModal();
-    showChapter(0);
+    intro.scrollTop = 0;
+    document.getElementById("intro-heading").focus({ preventScroll: true });
   }
 
   function enterSite() {
-    try { localStorage.setItem("amg-intro-seen", "1"); } catch { /* storage unavailable */ }
+    try { localStorage.setItem("amg-intro-seen", "2"); } catch { /* storage unavailable */ }
     intro.close();
   }
 
-  next.addEventListener("click", () => {
-    if (chapter === chapters.length - 1) enterSite();
-    else showChapter(chapter + 1);
+  choices.addEventListener("click", (event) => {
+    const tool = event.target.closest("[data-intro-tool]");
+    if (!tool) return;
+    if (tool.dataset.introTool === "dashboard") {
+      feedback.textContent = "Grafana displays the readings. Try the tool that saves them.";
+      return;
+    }
+    storage.textContent = "PostgreSQL";
+    storageNode.classList.add("is-filled");
+    feedback.textContent = "A subscriber writes readings from the MQTT broker to PostgreSQL. Grafana queries the database to display them. In Amalgam, you can explore full project recipes and edit their architectures in the System Design Canvas.";
+    reading.hidden = false;
+    next.hidden = false;
+    next.focus();
+    choices.hidden = true;
   });
-  back.addEventListener("click", () => showChapter(chapter - 1));
+  next.addEventListener("click", enterSite);
   document.getElementById("intro-skip").addEventListener("click", enterSite);
   intro.addEventListener("cancel", (event) => {
     event.preventDefault();

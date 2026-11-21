@@ -18,7 +18,7 @@
       document.documentElement.dataset.theme = t;
       if (t === "black") document.querySelector('meta[name="theme-color"]').content = "#080808";
       var seen = false;
-      try { seen = localStorage.getItem("amg-intro-seen") === "1"; } catch (e) {}
+      try { seen = localStorage.getItem("amg-intro-seen") === "2"; } catch (e) {}
       if (!seen && !location.hash && typeof HTMLDialogElement !== "undefined" &&
           typeof HTMLDialogElement.prototype.showModal === "function") {
         document.documentElement.classList.add("intro-pending");
@@ -29,38 +29,32 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23000'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' dominant-baseline='middle' font-family='sans-serif' font-weight='600' font-size='44' fill='%23fff'%3EA%3C/text%3E%3C/svg%3E" />
 </head>
 <body>
-  <dialog class="intro" id="intro" aria-label="Introduction to Amalgam">
+  <dialog class="intro" id="intro" aria-labelledby="intro-heading">
     <div class="intro-inner">
       <header class="intro-header">
         <span class="intro-brand">Amalgam <small>by NJR</small></span>
-        <span class="intro-progress" id="intro-progress">1 of 4</span>
+        <button type="button" class="intro-skip" id="intro-skip">Skip example</button>
       </header>
       <div class="intro-story">
-        <section data-intro-step>
-          <h2 tabindex="-1" autofocus>How do you get from an idea to a working system?</h2>
-          <p>Say you want to build a monitor for a greenhouse. You need a sensor, a place to store its readings, and a dashboard. Finding each tool is easy enough. Figuring out how they fit together is the hard part.</p>
-          <p>Amalgam was built for that gap. It shows how to turn an idea into a working system using free, open-source tools.</p>
-        </section>
-        <section data-intro-step hidden>
-          <h2 tabindex="-1">Start with the shape of the system.</h2>
-          <p>In <strong>Build Paths</strong>, see the layers a typical project needs and browse real project recipes. For the greenhouse, trace the readings from the sensor through messaging and storage to the dashboard.</p>
-          <p>Open that example in the <strong>System Design Canvas</strong>. Move components, change connections, swap tools, or export the drawing when it matches what you want to build.</p>
-        </section>
-        <section data-intro-step hidden>
-          <h2 tabindex="-1">Find the parts that work together.</h2>
-          <p>In <strong>Architecture Studio</strong>, assemble your own stack layer by layer and see suggestions for what’s missing. Follow a <strong>Recommendation Chain</strong> to see what each tool does and why it belongs in the build.</p>
-          <p>The <strong>Amalgam Map</strong> shows where domains overlap, such as hardware, networking, and data in the greenhouse project. Search the <strong>Atlas</strong> when you want to compare tools or check their licences.</p>
-        </section>
-        <section data-intro-step hidden>
-          <h2 tabindex="-1">Take it wherever you want.</h2>
-          <p>Start with a template, browse for a project, or look up a single tool. <strong>Currents &amp; Trends</strong> and <strong>Live Wire</strong> are there when you want to see what’s changing in the field.</p>
-          <p>Once you enter Amalgam, you can jump straight to any section.</p>
-        </section>
+        <h2 id="intro-heading" tabindex="-1" autofocus>Build a greenhouse monitor.</h2>
+        <p>A sensor sends temperature readings over MQTT. The dashboard needs somewhere to read them from. Pick the open-source tool that stores the readings.</p>
+        <ol class="intro-flow" aria-label="Greenhouse monitor architecture">
+          <li><small>Measure</small><strong>Temperature sensor</strong></li>
+          <li><small>Send</small><strong>MQTT broker</strong></li>
+          <li id="intro-storage-node"><small>Store</small><strong id="intro-storage">Missing tool</strong></li>
+          <li><small>Display</small><strong>Grafana</strong></li>
+        </ol>
+        <div class="intro-actions" id="intro-choices" aria-label="Choose a tool">
+          <button type="button" data-intro-tool="storage">PostgreSQL</button>
+          <button type="button" data-intro-tool="dashboard">Grafana</button>
+        </div>
+        <div class="intro-feedback" role="status" id="intro-feedback"></div>
+        <div class="intro-reading" id="intro-reading" hidden>
+          <span>Example dashboard reading</span><strong>24.6 °C</strong>
+        </div>
       </div>
       <footer class="intro-actions">
-        <button type="button" class="intro-skip" id="intro-skip">Skip intro</button>
-        <button type="button" class="intro-back" id="intro-back" hidden>Back</button>
-        <button type="button" class="intro-next" id="intro-next">Continue</button>
+        <button type="button" class="intro-next" id="intro-next" hidden>Enter Amalgam</button>
       </footer>
     </div>
   </dialog>
@@ -279,7 +273,7 @@
   </main>
 
   <footer class="wrap foot">
-    <button type="button" class="intro-replay" id="intro-replay" hidden>Replay the introduction</button>
+    <button type="button" class="intro-replay" id="intro-replay" hidden>Replay the greenhouse example</button>
     <div class="titleblock" aria-label="Drawing title block">
       <div class="tb-cell tb-title"><span>Title</span><b>Amalgam</b><em>Open-source atlas &amp; system designs</em></div>
       <div class="tb-cell"><span>Drawn by</span><b>NJR</b></div>

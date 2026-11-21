@@ -35,7 +35,7 @@ The design is an **engineering drawing sheet**. Both themes use light line work 
 
 ## Features
 
-On a first visit to the homepage, a four-chapter introduction follows a greenhouse monitor from idea to architecture and shows where each part of Amalgam fits. Visitors can skip the tour, and the browser remembers when they enter the site. Direct links still open their section, and the footer has a **Replay the introduction** button.
+On a first visit to the homepage, visitors complete a greenhouse monitor by choosing the database that connects the sensor readings to a dashboard. They can skip the example, and the browser remembers when they enter the site. Direct links still open their section, and the footer has a **Replay the greenhouse example** button.
 
 ### Build your first architecture
 
