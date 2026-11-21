@@ -505,6 +505,7 @@ window.createArchGraph = function createArchGraph(host, o) {
     // Draw in the current theme's colours
     const cs = getComputedStyle(document.documentElement), v = (n, f) => cs.getPropertyValue(n).trim() || f;
     const FG = v("--fg", "255,255,255"), HI = v("--hi", "#fff");
+    const sans = v("--sans", "sans-serif");
     const [S0, S1, S2, S3] = [["--s0", "#050505"], ["--s1", "#0b0b0b"], ["--s2", "#121212"], ["--s3", "#151515"]].map(([n, f]) => v(n, f));
     const W = Math.ceil(b.w + pad * 2), H = Math.ceil(b.h + pad * 2 + head);
     const cv = document.createElement("canvas");
@@ -514,7 +515,7 @@ window.createArchGraph = function createArchGraph(host, o) {
     c.fillStyle = S0; c.fillRect(0, 0, W, H);
     c.fillStyle = `rgba(${FG},.08)`;
     for (let x = 10; x < W; x += 20) for (let y = 10; y < H; y += 20) c.fillRect(x, y, 1, 1);
-    c.fillStyle = HI; c.font = 'italic 30px "Cormorant Garamond", serif';
+    c.fillStyle = HI; c.font = `600 30px ${sans}`;
     c.fillText(d.title || d.root?.title || "Architecture", pad, 50);
     c.fillStyle = `rgba(${FG},.45)`; c.font = '10px "IBM Plex Mono", monospace';
     c.fillText("AMALGAM · OPEN-SOURCE ARCHITECTURE", Math.max(pad, W - pad - 230), 46);
@@ -546,7 +547,7 @@ window.createArchGraph = function createArchGraph(host, o) {
     for (const n of L.order) {
       const h = collapsed.has(n.id) ? HEAD : HEAD + 10 + n.tools.length * TOOL;
       round(n.x, n.y, GW, h, 12); c.fillStyle = S1; c.fill(); c.strokeStyle = `rgba(${FG},.35)`; c.stroke();
-      c.fillStyle = HI; c.font = '500 18px "Cormorant Garamond", serif';
+      c.fillStyle = HI; c.font = `600 18px ${sans}`;
       c.fillText(n.name, n.x + 14, n.y + 30, GW - 28);
       c.strokeStyle = `rgba(${FG},.12)`; c.beginPath(); c.moveTo(n.x, n.y + HEAD); c.lineTo(n.x + GW, n.y + HEAD); c.stroke();
       if (collapsed.has(n.id)) continue;
@@ -557,13 +558,13 @@ window.createArchGraph = function createArchGraph(host, o) {
         const im = imgs[toolByName[t]?.logo];
         if (im) c.drawImage(im, n.x + 18, ty + 11, 18, 18);
         c.fillStyle = HI; c.font = '11.5px "IBM Plex Mono", monospace'; c.fillText(t, n.x + 48, ty + 18, GW - 70);
-        c.fillStyle = `rgba(${FG},.45)`; c.font = 'italic 12px "Cormorant Garamond", serif'; c.fillText(toolByName[t]?.kind || "", n.x + 48, ty + 32, GW - 70);
+        c.fillStyle = `rgba(${FG},.45)`; c.font = `12px ${sans}`; c.fillText(toolByName[t]?.kind || "", n.x + 48, ty + 32, GW - 70);
       });
     }
     // Notes
     for (const t of L.notes) {
       round(t.x, t.y, NOTE_W, 70, 10); c.fillStyle = S3; c.fill(); c.strokeStyle = `rgba(${FG},.4)`; c.setLineDash([3, 3]); c.stroke(); c.setLineDash([]);
-      c.fillStyle = `rgba(${FG},.85)`; c.font = 'italic 15px "Cormorant Garamond", serif';
+      c.fillStyle = `rgba(${FG},.85)`; c.font = `15px ${sans}`;
       (t.text || "").split("\n").slice(0, 3).forEach((line, i) => c.fillText(line, t.x + 12, t.y + 24 + i * 18, NOTE_W - 24));
     }
     cv.toBlob((blob) => {

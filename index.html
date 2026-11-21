@@ -7,7 +7,7 @@
   <meta name="description" content="Build paths, architectures and project recipes using only free, open-source tools — for web and mobile apps, AI/ML, robotics and every domain of computer science." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Mono:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
   <meta name="theme-color" content="#0d3b70" />
   <script>
     // Apply the saved theme before the first paint
@@ -17,12 +17,54 @@
       t = t === "black" ? "black" : "blue";
       document.documentElement.dataset.theme = t;
       if (t === "black") document.querySelector('meta[name="theme-color"]').content = "#080808";
+      var seen = false;
+      try { seen = localStorage.getItem("amg-intro-seen") === "1"; } catch (e) {}
+      if (!seen && !location.hash && typeof HTMLDialogElement !== "undefined" &&
+          typeof HTMLDialogElement.prototype.showModal === "function") {
+        document.documentElement.classList.add("intro-pending");
+      }
     })();
   </script>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23000'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' dominant-baseline='middle' font-family='serif' font-style='italic' font-size='44' fill='%23fff'%3EA%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23000'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' dominant-baseline='middle' font-family='sans-serif' font-weight='600' font-size='44' fill='%23fff'%3EA%3C/text%3E%3C/svg%3E" />
 </head>
 <body>
+  <dialog class="intro" id="intro" aria-label="Introduction to Amalgam">
+    <div class="intro-inner">
+      <header class="intro-header">
+        <span class="intro-brand">Amalgam <small>by NJR</small></span>
+        <span class="intro-progress" id="intro-progress">1 of 4</span>
+      </header>
+      <div class="intro-story">
+        <section data-intro-step>
+          <h2 tabindex="-1" autofocus>How do you get from an idea to a working system?</h2>
+          <p>Say you want to build a monitor for a greenhouse. You need a sensor, a place to store its readings, and a dashboard. Finding each tool is easy enough. Figuring out how they fit together is the hard part.</p>
+          <p>Amalgam was built for that gap. It shows how to turn an idea into a working system using free, open-source tools.</p>
+        </section>
+        <section data-intro-step hidden>
+          <h2 tabindex="-1">Start with the shape of the system.</h2>
+          <p>In <strong>Build Paths</strong>, see the layers a typical project needs and browse real project recipes. For the greenhouse, trace the readings from the sensor through messaging and storage to the dashboard.</p>
+          <p>Open that example in the <strong>System Design Canvas</strong>. Move components, change connections, swap tools, or export the drawing when it matches what you want to build.</p>
+        </section>
+        <section data-intro-step hidden>
+          <h2 tabindex="-1">Find the parts that work together.</h2>
+          <p>In <strong>Architecture Studio</strong>, assemble your own stack layer by layer and see suggestions for what’s missing. Follow a <strong>Recommendation Chain</strong> to see what each tool does and why it belongs in the build.</p>
+          <p>The <strong>Amalgam Map</strong> shows where domains overlap, such as hardware, networking, and data in the greenhouse project. Search the <strong>Atlas</strong> when you want to compare tools or check their licences.</p>
+        </section>
+        <section data-intro-step hidden>
+          <h2 tabindex="-1">Take it wherever you want.</h2>
+          <p>Start with a template, browse for a project, or look up a single tool. <strong>Currents &amp; Trends</strong> and <strong>Live Wire</strong> are there when you want to see what’s changing in the field.</p>
+          <p>Once you enter Amalgam, you can jump straight to any section.</p>
+        </section>
+      </div>
+      <footer class="intro-actions">
+        <button type="button" class="intro-skip" id="intro-skip">Skip intro</button>
+        <button type="button" class="intro-back" id="intro-back" hidden>Back</button>
+        <button type="button" class="intro-next" id="intro-next">Continue</button>
+      </footer>
+    </div>
+  </dialog>
+
   <canvas id="field" aria-hidden="true"></canvas>
 
   <header class="masthead">
@@ -82,7 +124,7 @@
         <span id="clock">--:--:-- UTC</span>
       </div>
       <p class="boot" id="boot" aria-hidden="true"></p>
-      <h1 class="title" data-text="Amalgam"><span>Amalgam</span></h1>
+      <h1 class="title" data-text="Amalgam" tabindex="-1"><span>Amalgam</span></h1>
       <p class="byline"><span></span>by NJR</p>
       <p class="lede">
         A field guide to the <em>free and open-source</em> instruments with which one may build
@@ -211,7 +253,7 @@
         <h2>Method</h2>
       </div>
       <div class="method">
-        <p><span class="drop">O</span>n inclusion. A tool enters the Atlas only if it can be used at no cost and its source is published under a recognised open licence (MIT, Apache-2.0, BSD, GPL, MPL and kin). For open-<em>weight</em> AI models, only releases under an open-source licence (Apache-2.0) are recommended. Nothing here requires a paid plan. Where a project moved to a source-available licence, the Atlas lists its open community fork instead.</p>
+        <p>On inclusion. A tool enters the Atlas only if it can be used at no cost and its source is published under a recognised open licence (MIT, Apache-2.0, BSD, GPL, MPL and kin). For open-<em>weight</em> AI models, only releases under an open-source licence (Apache-2.0) are recommended. Nothing here requires a paid plan. Where a project moved to a source-available licence, the Atlas lists its open community fork instead.</p>
         <p>On assembly. A proper project is rarely one tool, or one domain — it is an <em>amalgam</em>. A robotics study might braid ROS 2, MuJoCo and PyTorch; an IoT monitor braids KiCad, Zephyr, MQTT and Grafana across hardware, networks and data. Every tool is tagged with each domain it serves, which is how the map places it. Read the Atlas as a set of parts, not a ranking.</p>
         <p>On currency. Licences change. Always verify the licence file in a project's repository before you build upon it.</p>
       </div>
@@ -237,8 +279,9 @@
   </main>
 
   <footer class="wrap foot">
+    <button type="button" class="intro-replay" id="intro-replay" hidden>Replay the introduction</button>
     <div class="titleblock" aria-label="Drawing title block">
-      <div class="tb-cell tb-title"><span>Title</span><b class="script">Amalgam</b><em>Open-source atlas &amp; system designs</em></div>
+      <div class="tb-cell tb-title"><span>Title</span><b>Amalgam</b><em>Open-source atlas &amp; system designs</em></div>
       <div class="tb-cell"><span>Drawn by</span><b>NJR</b></div>
       <div class="tb-cell"><span>Dwg no.</span><b>AMG-001</b></div>
       <div class="tb-cell"><span>Scale</span><b>1 : 1</b></div>
@@ -266,6 +309,7 @@
     <div class="ag-host gm-graph" id="gm-graph"></div>
   </dialog>
 
+  <script src="intro.js" onerror="document.documentElement.classList.remove('intro-pending')"></script>
   <script src="data.js"></script>
   <script src="graph.js"></script>
   <script src="app.js"></script>

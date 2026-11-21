@@ -29,11 +29,13 @@
 
 A real project is rarely one tool, or one domain. It is an *amalgam*: ROS 2 braided with MuJoCo and PyTorch, or an IoT monitor built from KiCad, Zephyr, MQTT and Grafana across hardware, networks and data. This site catalogues those parts, shows which combinations produce which kinds of projects, and keeps you current with what is happening in the field.
 
-The design is an **engineering drawing sheet**. Both themes use light line work on drafting paper, with a classic Prussian-blue **blueprint** and a neutral **black** option. The background is a live Canvas drawing: fine and major grid lines on mottled, folded paper, with technical drawings that drift past as you scroll. They include a spur gear meshing with a pinion, a bearing cross-section with hatching, an isometric enclosure with hidden edges, a moving 2-DOF robot-arm linkage and PCB traces, all with centre lines, dimensions and callouts. A drafting crosshair with X/Y coordinates follows the mouse. The page sits inside a double sheet border, and the footer is a drawing title block (title, drawn by, dwg no., scale, sheet, rev, date). The calligraphic *Amalgam* title and the research-paper serif remain. Everything respects `prefers-reduced-motion`.
+The design is an **engineering drawing sheet**. Both themes use light line work on drafting paper, with a classic Prussian-blue **blueprint** and a neutral **black** option. The background is a live Canvas drawing: fine and major grid lines on mottled, folded paper, with technical drawings that drift past as you scroll. They include a spur gear meshing with a pinion, a bearing cross-section with hatching, an isometric enclosure with hidden edges, a moving 2-DOF robot-arm linkage and PCB traces, all with centre lines, dimensions and callouts. A drafting crosshair with X/Y coordinates follows the mouse. The page sits inside a double sheet border, and the footer is a drawing title block (title, drawn by, dwg no., scale, sheet, rev, date). Everything respects `prefers-reduced-motion`.
 
 **Blue and black.** Amalgam opens in blue by default. Use the theme switch in the header to switch backgrounds. The browser remembers your choice and applies it before the first paint. The selected palette also applies to the graphs, Live Wire, and exported PNGs.
 
 ## Features
+
+On a first visit to the homepage, a four-chapter introduction follows a greenhouse monitor from idea to architecture and shows where each part of Amalgam fits. Visitors can skip the tour, and the browser remembers when they enter the site. Direct links still open their section, and the footer has a **Replay the introduction** button.
 
 ### Build your first architecture
 
@@ -108,7 +110,7 @@ Clicking a tool anywhere on the site opens a drawer with its licence, domains, i
 
 Plain **HTML, CSS and vanilla JavaScript**, with no framework and no build step.
 
-- **Fonts:** Pinyon Script (calligraphy), Cormorant Garamond (research serif), IBM Plex Mono (instrument labels), from Google Fonts
+- **Fonts:** System sans-serif for headings and body text, and IBM Plex Mono from Google Fonts for technical labels
 - **Logos:** [Simple Icons](https://simpleicons.org) glyphs (CC0) and project GitHub avatars, stored in the repo. Logos are trademarks of their respective projects.
 - **Venn diagram:** hand-built SVG using clip paths and masks to paint each exact intersection
 - **Background:** hand-written Canvas 2D blueprint (grid paper, parametric gear/bearing/enclosure/arm/PCB drawings, crosshair) at about 60 fps, with no libraries; it renders a single still frame when `prefers-reduced-motion` is set

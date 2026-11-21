@@ -231,7 +231,9 @@
   const NAME_SIZE = 16, LINE = 20;
   const measure = (() => {
     const ctx = document.createElement("canvas").getContext("2d");
-    return (s) => { ctx.font = `500 ${NAME_SIZE}px "Cormorant Garamond"`; return ctx.measureText(s).width; };
+    const font = getComputedStyle(document.documentElement).getPropertyValue("--sans").trim();
+    ctx.font = `500 ${NAME_SIZE}px ${font}`;
+    return (s) => ctx.measureText(s).width;
   })();
   function fitLines(mask, lines) {
     const widths = lines.map(measure);
