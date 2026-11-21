@@ -18,7 +18,7 @@
       document.documentElement.dataset.theme = t;
       if (t === "black") document.querySelector('meta[name="theme-color"]').content = "#080808";
       var seen = false;
-      try { seen = localStorage.getItem("amg-intro-seen") === "2"; } catch (e) {}
+      try { seen = localStorage.getItem("amg-intro-seen") === "3"; } catch (e) {}
       if (!seen && !location.hash && typeof HTMLDialogElement !== "undefined" &&
           typeof HTMLDialogElement.prototype.showModal === "function") {
         document.documentElement.classList.add("intro-pending");
@@ -33,28 +33,19 @@
     <div class="intro-inner">
       <header class="intro-header">
         <span class="intro-brand">Amalgam <small>by NJR</small></span>
-        <button type="button" class="intro-skip" id="intro-skip">Skip example</button>
       </header>
       <div class="intro-story">
-        <h2 id="intro-heading" tabindex="-1" autofocus>Build a greenhouse monitor.</h2>
-        <p>A sensor sends temperature readings over MQTT. The dashboard needs somewhere to read them from. Pick the open-source tool that stores the readings.</p>
-        <ol class="intro-flow" aria-label="Greenhouse monitor architecture">
-          <li><small>Measure</small><strong>Temperature sensor</strong></li>
-          <li><small>Send</small><strong>MQTT broker</strong></li>
-          <li id="intro-storage-node"><small>Store</small><strong id="intro-storage">Missing tool</strong></li>
-          <li><small>Display</small><strong>Grafana</strong></li>
-        </ol>
-        <div class="intro-actions" id="intro-choices" aria-label="Choose a tool">
-          <button type="button" data-intro-tool="storage">PostgreSQL</button>
-          <button type="button" data-intro-tool="dashboard">Grafana</button>
-        </div>
-        <div class="intro-feedback" role="status" id="intro-feedback"></div>
-        <div class="intro-reading" id="intro-reading" hidden>
-          <span>Example dashboard reading</span><strong>24.6 °C</strong>
-        </div>
+        <h2 id="intro-heading" tabindex="-1" autofocus>Welcome to Amalgam.</h2>
+        <p>Amalgam is a field guide for students, developers, and curious builders who want to make real projects with free, open-source tools.</p>
+        <p>I built it because finding individual tools is only part of the work. You also need to see what each tool does, where it fits, and how the pieces work together.</p>
+        <section class="intro-example" aria-labelledby="intro-example-heading">
+          <h3 id="intro-example-heading">What you can do here</h3>
+          <p>Say you want to monitor the temperature in a greenhouse. Find an environmental monitor in <strong>Build Paths</strong>, then open its architecture in the <strong>System Design Canvas</strong> to see how the sensor, database, and dashboard connect. Swap a tool or change a connection to make the design your own.</p>
+          <p>Use <strong>Architecture Studio</strong> to assemble a stack from scratch, or browse the <strong>Atlas</strong> to compare tools and check their licences.</p>
+        </section>
       </div>
       <footer class="intro-actions">
-        <button type="button" class="intro-next" id="intro-next" hidden>Enter Amalgam</button>
+        <button type="button" class="intro-next" id="intro-next">Enter Amalgam</button>
       </footer>
     </div>
   </dialog>
@@ -273,7 +264,7 @@
   </main>
 
   <footer class="wrap foot">
-    <button type="button" class="intro-replay" id="intro-replay" hidden>Replay the greenhouse example</button>
+    <button type="button" class="intro-replay" id="intro-replay" hidden>Read the introduction</button>
     <div class="titleblock" aria-label="Drawing title block">
       <div class="tb-cell tb-title"><span>Title</span><b>Amalgam</b><em>Open-source atlas &amp; system designs</em></div>
       <div class="tb-cell"><span>Drawn by</span><b>NJR</b></div>
