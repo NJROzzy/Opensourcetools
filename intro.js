@@ -13,15 +13,10 @@
     document.getElementById("intro-heading").focus({ preventScroll: true });
   }
 
-  function enterSite() {
-    try { localStorage.setItem("amg-intro-seen", "3"); } catch { /* storage unavailable */ }
-    intro.close();
-  }
-
-  document.getElementById("intro-next").addEventListener("click", enterSite);
+  document.getElementById("intro-next").addEventListener("click", () => intro.close());
   intro.addEventListener("cancel", (event) => {
     event.preventDefault();
-    enterSite();
+    intro.close();
   });
   intro.addEventListener("close", () => {
     const destination = replaying ? replay : document.querySelector("#hero h1");

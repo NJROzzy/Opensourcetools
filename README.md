@@ -35,7 +35,7 @@ The design is an **engineering drawing sheet**. Both themes use light line work 
 
 ## Features
 
-A first-visit introduction explains who Amalgam is for, why it was built, and what visitors can do with it. A greenhouse monitor illustrates how to go from a Build Path to an editable architecture. Direct links open their section, and the footer lets visitors read the introduction again.
+The homepage opens with an introduction that explains who Amalgam is for, why it was built, and what visitors can do with it. A greenhouse monitor illustrates how to go from a Build Path to an editable architecture. Direct links open their section, and the footer lets visitors read the introduction again.
 
 ### Build your first architecture
 

@@ -17,9 +17,7 @@
       t = t === "black" ? "black" : "blue";
       document.documentElement.dataset.theme = t;
       if (t === "black") document.querySelector('meta[name="theme-color"]').content = "#080808";
-      var seen = false;
-      try { seen = localStorage.getItem("amg-intro-seen") === "3"; } catch (e) {}
-      if (!seen && !location.hash && typeof HTMLDialogElement !== "undefined" &&
+      if ((!location.hash || location.hash === "#top") && typeof HTMLDialogElement !== "undefined" &&
           typeof HTMLDialogElement.prototype.showModal === "function") {
         document.documentElement.classList.add("intro-pending");
       }
