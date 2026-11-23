@@ -20,7 +20,7 @@
   let replaying = false;
   let finished = false;
 
-  for (const track of tracks) picker.add(new Option(track.name, track.id), picker.options.length - 1);
+  for (const track of tracks) picker.add(new Option(track.name, track.id), picker.options.length - 2);
 
   function showStage(index) {
     stages[stage].hidden = true;
@@ -31,14 +31,19 @@
     progress.textContent = `Step ${stage + 1} of ${stages.length}`;
     back.hidden = stage === 0;
     next.disabled = stage === goalStage && !picker.value;
-    next.textContent = stage === lastStage
-      ? (picker.value === "browse" ? "Explore Amalgam" : "Open build path")
-      : "Continue";
+    next.textContent = "Continue";
     if (stage === lastStage) {
       const track = tracks.find(({ id }) => id === picker.value);
-      recommendation.textContent = track
-        ? `Start with ${track.name}. ${track.blurb} We’ll open that build path so you can see its architecture and choose a project recipe.`
-        : "Open the System Design Canvas and start with a ready-made design. You can change the components, try different tools, and export the result.";
+      if (track) {
+        next.textContent = "Open build path";
+        recommendation.textContent = `Start with ${track.name}. ${track.blurb} We’ll open that build path so you can see its architecture and choose a project recipe.`;
+      } else if (picker.value === "scratch") {
+        next.textContent = "Open System Design Canvas";
+        recommendation.textContent = "Choose Blank canvas to draw the greenhouse monitor or sketch your own system. Write down the requirements, add one box per job, and trace a request or reading through the diagram.";
+      } else {
+        next.textContent = "Explore Amalgam";
+        recommendation.textContent = "Open the System Design Canvas and start with a ready-made design. You can change the components, try different tools, and export the result.";
+      }
     }
     intro.scrollTop = 0;
     heading.focus({ preventScroll: true });
@@ -48,6 +53,7 @@
     replaying = isReplay;
     finished = false;
     picker.value = "";
+    intro.querySelectorAll("details[open]").forEach((detail) => { detail.open = false; });
     intro.showModal();
     showStage(0);
   }

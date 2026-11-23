@@ -31,12 +31,12 @@
     <div class="intro-inner">
       <header class="intro-header">
         <span class="intro-brand">Amalgam <small>by NJR</small></span>
-        <span id="intro-progress" class="intro-progress">Step 1 of 6</span>
+        <span id="intro-progress" class="intro-progress">Step 1 of 10</span>
       </header>
       <div class="intro-story">
         <section data-intro-stage>
           <h2 id="intro-welcome" tabindex="-1" autofocus>Welcome to Amalgam</h2>
-          <p>A field guide for students, developers, and curious builders who want to make real projects with free, open-source tools.</p>
+          <p>A field guide for students, developers, and curious builders who want to make real projects with free, open-source tools. We’ll design a small system together, then help you start a project of your own.</p>
         </section>
         <section data-intro-stage hidden>
           <h2 id="intro-purpose" tabindex="-1">Why Amalgam exists</h2>
@@ -44,8 +44,42 @@
         </section>
         <section data-intro-stage hidden>
           <h2 id="intro-how" tabindex="-1">How Amalgam works</h2>
-          <p>Say you want to monitor a greenhouse. In <strong>Build Paths</strong>, find the environmental monitor recipe and trace readings from the sensor through messaging and storage to the dashboard.</p>
-          <p>Open the recipe in the <strong>System Design Canvas</strong> to swap a tool or change a connection. Use <strong>Architecture Studio</strong> to assemble your own stack layer by layer.</p>
+          <p>Imagine a greenhouse grower who wants to check the temperature from anywhere. We’ll work from that request to a design you can draw in the <strong>System Design Canvas</strong>.</p>
+          <p>Start with what the grower needs, then sketch how a reading travels, decide what happens when something breaks, and choose tools once each component has a job.</p>
+        </section>
+        <section data-intro-stage hidden>
+          <h2 id="intro-requirements" tabindex="-1">Start with the requirements</h2>
+          <p>The grower needs to see the latest temperature and the last seven days of readings. For this first version, assume one greenhouse, one sensor, and one reading per minute.</p>
+          <p>Write down what success looks like: the dashboard shows a reading less than two minutes old while the sensor is online. Keep automatic climate control out of this first version.</p>
+          <details class="intro-practice">
+            <summary>Try it: How many readings will you store each day?</summary>
+            <p>One reading per minute × 60 minutes × 24 hours gives <strong>1,440 readings per day</strong>. Estimate traffic and storage before deciding whether you need more infrastructure.</p>
+          </details>
+        </section>
+        <section data-intro-stage hidden>
+          <h2 id="intro-flow" tabindex="-1">Sketch how data moves</h2>
+          <p>Draw one box for each job. Label each arrow with what moves across it or what the next component asks for.</p>
+          <ol class="intro-flow" aria-label="Greenhouse reading flow">
+            <li><strong>Sensor</strong><span>Sends a reading</span></li>
+            <li><strong>Collector</strong><span>Validates and saves it</span></li>
+            <li><strong>Database</strong><span>Stores the history</span></li>
+            <li><strong>Dashboard</strong><span>Queries and displays it</span></li>
+          </ol>
+          <p>To make the sketch concrete, follow one message through it. A reading contains a device ID, a timestamp, and the temperature in Celsius. The dashboard queries for recent readings and plots them over time.</p>
+        </section>
+        <section data-intro-stage hidden>
+          <h2 id="intro-failure" tabindex="-1">Design for a failure</h2>
+          <p>Suppose the greenhouse loses Wi-Fi. The sensor can buffer recent readings and send them when the connection returns. Meanwhile, the dashboard can show when it last received a reading and flag stale data.</p>
+          <details class="intro-practice">
+            <summary>Try it: What if a retry sends the same reading twice?</summary>
+            <p>Give each reading a stable ID. Store it only once so retries don’t create duplicate points on the chart.</p>
+          </details>
+        </section>
+        <section data-intro-stage hidden>
+          <h2 id="intro-validate" tabindex="-1">Choose tools and test the design</h2>
+          <p>For this version, you could use a Zephyr device, a small HTTP collector, PostgreSQL for history, and Grafana for charts. A single collector is enough to start. Consider an MQTT broker if you later need devices to publish to multiple consumers.</p>
+          <p>Test the smallest complete path first. Send one sample reading, confirm it’s stored, and look for it on the chart. Then disconnect the sensor and check both the stale-data warning and recovery.</p>
+          <p>In the <strong>System Design Canvas</strong>, choose <strong>Blank canvas</strong>, add the four boxes, and label their connections. Keep the requirements and failure behaviour in notes beside the diagram.</p>
         </section>
         <section data-intro-stage hidden>
           <h2 id="intro-hardware" tabindex="-1">What hardware can you design?</h2>
@@ -60,6 +94,7 @@
           <label class="intro-goal-label" for="intro-track">Choose a build path</label>
           <select id="intro-track">
             <option value="">Select a starting point</option>
+            <option value="scratch">I want to practise system design</option>
             <option value="browse">I’m here to explore</option>
           </select>
         </section>

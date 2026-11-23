@@ -92,6 +92,20 @@ html:has(.intro[open]) { overflow: hidden; }
 .intro-story h2:focus { outline: none; }
 .intro-story p { max-width: 59ch; margin: 16px 0 0; font-size: clamp(16px, 2.2vw, 19px); color: var(--ink-soft); }
 .intro-story strong { color: var(--ink); }
+.intro-practice { margin-top: 18px; padding: 12px 16px; border: 1px solid var(--rule-strong); background: var(--s1); }
+.intro-practice summary { cursor: pointer; font-size: 16px; font-weight: 600; }
+.intro-practice p { margin-top: 8px; }
+.intro-flow {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px;
+  margin: 18px 0; padding: 0; list-style: none;
+}
+.intro-flow li { position: relative; padding: 9px; border: 1px solid var(--rule-strong); background: var(--s1); }
+.intro-flow li:not(:last-child)::after { content: "→"; position: absolute; left: 100%; top: 50%; transform: translateY(-50%); width: 18px; text-align: center; color: var(--ink-soft); }
+.intro-flow span { display: block; color: var(--ink-soft); font-size: 14px; }
+@media (max-width: 560px) {
+  .intro-flow { grid-template-columns: 1fr; }
+  .intro-flow li:not(:last-child)::after { content: "↓"; left: 10px; top: 100%; transform: none; line-height: 18px; }
+}
 .intro-hardware { padding-inline-start: 1.25em; color: var(--ink-soft); }
 .intro-hardware li + li { margin-top: 8px; }
 .intro-goal-label { display: block; margin: 18px 0 6px; color: var(--ink-soft); font-size: 16px; }
