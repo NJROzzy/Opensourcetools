@@ -62,7 +62,7 @@ body {
 }
 main, footer { position: relative; z-index: 2; }
 
-/* First-visit introduction */
+/* Homepage introduction */
 .intro-pending body > :not(.intro) { visibility: hidden; }
 html:has(.intro[open]) { overflow: hidden; }
 .intro {
@@ -84,7 +84,7 @@ html:has(.intro[open]) { overflow: hidden; }
   padding-bottom: 14px; border-bottom: 1px solid var(--rule);
 }
 .intro-brand { font-size: 20px; font-weight: 650; }
-.intro-brand small { color: var(--ink-soft); font-size: 14px; }
+.intro-brand small, .intro-progress { color: var(--ink-soft); font-size: 14px; }
 .intro-story { padding-block: clamp(22px, 4vw, 38px) 0; }
 .intro-story h2 {
   max-width: 18ch; font-size: clamp(29px, 5vw, 54px); line-height: 1.1; text-wrap: balance;
@@ -92,17 +92,23 @@ html:has(.intro[open]) { overflow: hidden; }
 .intro-story h2:focus { outline: none; }
 .intro-story p { max-width: 59ch; margin: 16px 0 0; font-size: clamp(16px, 2.2vw, 19px); color: var(--ink-soft); }
 .intro-story strong { color: var(--ink); }
-.intro-example { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--rule-strong); }
-.intro-example h3 { margin: 0; font-size: 20px; }
-.intro-example p { margin-top: 8px; }
-.intro-actions { margin-top: 24px; }
+.intro-hardware { padding-inline-start: 1.25em; color: var(--ink-soft); }
+.intro-hardware li + li { margin-top: 8px; }
+.intro-goal-label { display: block; margin: 18px 0 6px; color: var(--ink-soft); font-size: 16px; }
+#intro-track {
+  width: min(100%, 360px); min-height: 44px; padding: 8px 12px;
+  border: 1px solid var(--rule-strong); border-radius: 4px;
+  background: var(--s1); color: var(--ink); font: 500 16px var(--sans);
+}
+.intro-actions { margin-top: 24px; display: flex; justify-content: space-between; gap: 12px; }
 .intro-actions button, .intro-replay {
   min-height: 44px; padding: 8px 14px; border: 1px solid var(--rule-strong);
   border-radius: 4px; background: var(--s1); color: var(--ink);
   font: 600 15px var(--sans); cursor: pointer;
 }
 .intro-actions button:hover, .intro-replay:hover { border-color: var(--ink); }
-.intro-actions .intro-next { background: var(--ink); color: var(--paper); }
+.intro-actions .intro-next { margin-inline-start: auto; background: var(--ink); color: var(--paper); }
+.intro-actions .intro-next:disabled { opacity: .6; cursor: default; }
 .intro-replay { margin-bottom: 14px; letter-spacing: normal; text-transform: none; }
 
 .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }

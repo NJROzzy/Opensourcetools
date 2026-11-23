@@ -35,7 +35,9 @@ The design is an **engineering drawing sheet**. Both themes use light line work 
 
 ## Getting started
 
-The homepage opens with a short welcome. Choose **Enter Amalgam**, then try the **IoT environmental monitor** under the Hardware build path. Open its architecture graph to follow readings from the sensor through messaging and storage to the dashboard. Choose **Edit on the canvas** to customise the design.
+The homepage opens with six stages covering the welcome, purpose, workflow, hardware projects, and what you want to build. Choose a goal to get a recommended starting point. **Open build path** takes you to the selected path. **I’m here to explore** takes you to the System Design Canvas.
+
+For a concrete example, try the **IoT environmental monitor** under Hardware. Its architecture shows how readings travel from the sensor through messaging and storage to the dashboard. Choose **Edit on the canvas** to customise it.
 
 Direct links open their section. The footer’s **Read the introduction** button reopens the welcome.
 

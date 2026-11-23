@@ -27,23 +27,51 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23000'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' dominant-baseline='middle' font-family='sans-serif' font-weight='600' font-size='44' fill='%23fff'%3EA%3C/text%3E%3C/svg%3E" />
 </head>
 <body>
-  <dialog class="intro" id="intro" aria-labelledby="intro-heading">
+  <dialog class="intro" id="intro" aria-labelledby="intro-welcome">
     <div class="intro-inner">
       <header class="intro-header">
         <span class="intro-brand">Amalgam <small>by NJR</small></span>
+        <span id="intro-progress" class="intro-progress">Step 1 of 6</span>
       </header>
       <div class="intro-story">
-        <h2 id="intro-heading" tabindex="-1" autofocus>Welcome to Amalgam.</h2>
-        <p>Amalgam is a field guide for students, developers, and curious builders who want to make real projects with free, open-source tools.</p>
-        <p>I built it because finding individual tools is only part of the work. You also need to see what each tool does, where it fits, and how the pieces work together.</p>
-        <section class="intro-example" aria-labelledby="intro-example-heading">
-          <h3 id="intro-example-heading">What you can do here</h3>
-          <p>Say you want to monitor the temperature in a greenhouse. Find an environmental monitor in <strong>Build Paths</strong>, then open its architecture in the <strong>System Design Canvas</strong> to see how the sensor, database, and dashboard connect. Swap a tool or change a connection to make the design your own.</p>
-          <p>Use <strong>Architecture Studio</strong> to assemble a stack from scratch, or browse the <strong>Atlas</strong> to compare tools and check their licences.</p>
+        <section data-intro-stage>
+          <h2 id="intro-welcome" tabindex="-1" autofocus>Welcome to Amalgam</h2>
+          <p>A field guide for students, developers, and curious builders who want to make real projects with free, open-source tools.</p>
+        </section>
+        <section data-intro-stage hidden>
+          <h2 id="intro-purpose" tabindex="-1">Why Amalgam exists</h2>
+          <p>I built Amalgam to help you go from “I have an idea” to “I know what I need to build it.” It shows what each tool does, where it fits, and how the pieces work together.</p>
+        </section>
+        <section data-intro-stage hidden>
+          <h2 id="intro-how" tabindex="-1">How Amalgam works</h2>
+          <p>Say you want to monitor a greenhouse. In <strong>Build Paths</strong>, find the environmental monitor recipe and trace readings from the sensor through messaging and storage to the dashboard.</p>
+          <p>Open the recipe in the <strong>System Design Canvas</strong> to swap a tool or change a connection. Use <strong>Architecture Studio</strong> to assemble your own stack layer by layer.</p>
+        </section>
+        <section data-intro-stage hidden>
+          <h2 id="intro-hardware" tabindex="-1">What hardware can you design?</h2>
+          <ul class="intro-hardware">
+            <li><strong>Circuit boards and enclosures</strong> with KiCad and FreeCAD.</li>
+            <li><strong>Sensor nodes and embedded devices</strong> with Zephyr and PlatformIO.</li>
+            <li><strong>Digital logic and processor designs</strong> with Verilator and Yosys.</li>
+          </ul>
+        </section>
+        <section data-intro-stage hidden>
+          <h2 id="intro-goal" tabindex="-1">What are you here to build?</h2>
+          <label class="intro-goal-label" for="intro-track">Choose a build path</label>
+          <select id="intro-track">
+            <option value="">Select a starting point</option>
+            <option value="browse">I’m here to explore</option>
+          </select>
+        </section>
+        <section data-intro-stage hidden>
+          <h2 id="intro-help" tabindex="-1">How Amalgam can help</h2>
+          <p id="intro-recommendation"></p>
+          <p>Use the <strong>Atlas</strong> to compare tools and check their licences as you go.</p>
         </section>
       </div>
       <footer class="intro-actions">
-        <button type="button" class="intro-next" id="intro-next">Enter Amalgam</button>
+        <button type="button" id="intro-back" hidden>Back</button>
+        <button type="button" class="intro-next" id="intro-next">Continue</button>
       </footer>
     </div>
   </dialog>
@@ -292,8 +320,8 @@
     <div class="ag-host gm-graph" id="gm-graph"></div>
   </dialog>
 
-  <script src="intro.js" onerror="document.documentElement.classList.remove('intro-pending')"></script>
   <script src="data.js"></script>
+  <script src="intro.js" onerror="document.documentElement.classList.remove('intro-pending')"></script>
   <script src="graph.js"></script>
   <script src="app.js"></script>
 </body>
