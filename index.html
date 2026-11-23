@@ -31,61 +31,31 @@
     <div class="intro-inner">
       <header class="intro-header">
         <span class="intro-brand">Amalgam <small>by NJR</small></span>
-        <span id="intro-progress" class="intro-progress">Step 1 of 10</span>
+        <span id="intro-progress" class="intro-progress">Step 1 of 5</span>
       </header>
       <div class="intro-story">
         <section data-intro-stage>
           <h2 id="intro-welcome" tabindex="-1" autofocus>Welcome to Amalgam</h2>
-          <p>A field guide for students, developers, and curious builders who want to make real projects with free, open-source tools. We’ll design a small system together, then help you start a project of your own.</p>
+          <p>Amalgam helps you design and scale real projects with free, open-source tools. We’ll start with a simple example, then open a canvas for what you want to build.</p>
         </section>
         <section data-intro-stage hidden>
-          <h2 id="intro-purpose" tabindex="-1">Why Amalgam exists</h2>
-          <p>Amalgam helps you design a first version and plan how it can grow. It shows what each component does, how the pieces fit, and what to change when more people or more data put pressure on the design.</p>
-        </section>
-        <section data-intro-stage hidden>
-          <h2 id="intro-how" tabindex="-1">How Amalgam works</h2>
-          <p>Imagine two roommates who want a shared to-do list. We’ll turn that idea into a simple design you can draw in the <strong>System Design Canvas</strong>.</p>
-          <p>Start with what the roommates need, then follow one action through the system. Once that works, think through what changes if more people start using it.</p>
-        </section>
-        <section data-intro-stage hidden>
-          <h2 id="intro-requirements" tabindex="-1">Start with the requirements</h2>
-          <p>Both roommates need to see the same list, add a task, and mark it done. Saved tasks should still be there when either person refreshes.</p>
-          <p>Start with one shared list. Reminders, file attachments, and live updates can wait.</p>
-        </section>
-        <section data-intro-stage hidden>
-          <h2 id="intro-flow" tabindex="-1">Sketch how data moves</h2>
-          <p>Give each box one job and label the connections with what moves between them.</p>
+          <h2 id="intro-flow" tabindex="-1">Design a shared to-do list</h2>
+          <p>Two roommates need to see the same list, add tasks, and mark them done. Start with three boxes and follow one new task through them.</p>
           <ol class="intro-flow" aria-label="Task saving flow">
             <li><strong>Browser</strong><span>Sends a new task</span></li>
             <li><strong>App server</strong><span>Checks and saves it</span></li>
             <li><strong>Database</strong><span>Keeps the shared list</span></li>
           </ol>
-          <p>When someone opens the list, the browser asks the server for tasks. The server reads them from the database and sends them back.</p>
+          <p>Test it by adding a task in one browser and refreshing the other. If a save fails, keep the task text so the user can retry.</p>
         </section>
         <section data-intro-stage hidden>
-          <h2 id="intro-failure" tabindex="-1">What if a save fails?</h2>
-          <p>If the connection drops while someone adds a task, keep their text and offer a retry. Show the task as saved after the server confirms it.</p>
-          <details class="intro-practice">
-            <summary>What if the server saved it before the connection dropped?</summary>
-            <p>Send the same task ID on retry. The server can recognise the task it already saved and return it without adding a duplicate.</p>
-          </details>
-        </section>
-        <section data-intro-stage hidden>
-          <h2 id="intro-validate" tabindex="-1">Start small, then scale</h2>
-          <p>Start with one app server and one database. Test that a task added in one browser appears in the other after a refresh.</p>
-          <p>As usage grows, measure what slows down. If reading a list gets slow, check the database query and consider an index. If traffic overwhelms the app server, consider running more than one server behind a load balancer.</p>
-          <p>Use Amalgam to sketch the next version and see which connections and tools need to change.</p>
-        </section>
-        <section data-intro-stage hidden>
-          <h2 id="intro-hardware" tabindex="-1">What hardware can you design?</h2>
-          <ul class="intro-hardware">
-            <li><strong>Circuit boards and enclosures</strong> with KiCad and FreeCAD.</li>
-            <li><strong>Sensor nodes and embedded devices</strong> with Zephyr and PlatformIO.</li>
-            <li><strong>Digital logic and processor designs</strong> with Verilator and Yosys.</li>
-          </ul>
+          <h2 id="intro-scale" tabindex="-1">Scale when you hit a limit</h2>
+          <p>Start with one server and one database. If the list gets slow, measure where the time goes. Check the query and consider an index if the database is slow. If the app server is overloaded, consider adding another server behind a load balancer.</p>
+          <p>Use the canvas to sketch the change and decide what to test next.</p>
         </section>
         <section data-intro-stage hidden>
           <h2 id="intro-goal" tabindex="-1">What are you here to build?</h2>
+          <p>Choose a topic such as a web app, robotics, or hardware. Hardware designs can include circuit boards, sensor nodes, and digital logic.</p>
           <label class="intro-goal-label" for="intro-track">Choose a build path</label>
           <select id="intro-track">
             <option value="">Select a starting point</option>

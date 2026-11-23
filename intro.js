@@ -53,7 +53,6 @@
     replaying = isReplay;
     finished = false;
     picker.value = "";
-    intro.querySelectorAll("details[open]").forEach((detail) => { detail.open = false; });
     intro.showModal();
     showStage(0);
   }
