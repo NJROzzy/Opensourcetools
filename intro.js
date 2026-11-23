@@ -12,6 +12,9 @@
   const progress = document.getElementById("intro-progress");
   const picker = document.getElementById("intro-track");
   const recommendation = document.getElementById("intro-recommendation");
+  const canvas = document.getElementById("canvas");
+  const canvasGuide = document.getElementById("cv-onboarding");
+  const explore = document.getElementById("cv-explore");
   const back = document.getElementById("intro-back");
   const next = document.getElementById("intro-next");
   const goalStage = stages.indexOf(picker.closest("[data-intro-stage]"));
@@ -31,18 +34,15 @@
     progress.textContent = `Step ${stage + 1} of ${stages.length}`;
     back.hidden = stage === 0;
     next.disabled = stage === goalStage && !picker.value;
-    next.textContent = "Continue";
+    next.textContent = stage === lastStage ? "Open System Design Canvas" : "Continue";
     if (stage === lastStage) {
       const track = tracks.find(({ id }) => id === picker.value);
       if (track) {
-        next.textContent = "Open build path";
-        recommendation.textContent = `Start with ${track.name}. ${track.blurb} We’ll open that build path so you can see its architecture and choose a project recipe.`;
+        recommendation.textContent = `We’ll open the canvas with ${track.name} selected. Pick a design to see how its components fit together, or choose Blank canvas to draw your own.`;
       } else if (picker.value === "scratch") {
-        next.textContent = "Open System Design Canvas";
-        recommendation.textContent = "Choose Blank canvas to draw the greenhouse monitor or sketch your own system. Write down the requirements, add one box per job, and trace a request or reading through the diagram.";
+        recommendation.textContent = "Choose Blank canvas and draw the to-do list from the lesson. Add a Browser, an App server, and a Database, then label each connection.";
       } else {
-        next.textContent = "Explore Amalgam";
-        recommendation.textContent = "Open the System Design Canvas and start with a ready-made design. You can change the components, try different tools, and export the result.";
+        recommendation.textContent = "Pick a ready-made design in the canvas to see how it works. You can move components, swap tools, and sketch a version of your own.";
       }
     }
     intro.scrollTop = 0;
@@ -74,14 +74,23 @@
       (replaying ? replay : document.querySelector("#hero h1")).focus();
       return;
     }
-    const trackButton = [...document.querySelectorAll("#track-groups [data-track]")]
-      .find((button) => button.dataset.track === picker.value);
-    trackButton?.click();
-    const section = document.getElementById(trackButton ? "paths" : "canvas");
-    const heading = section.querySelector("h2");
+    const trackId = picker.value === "scratch" ? "web" : picker.value;
+    const track = tracks.find(({ id }) => id === trackId);
+    if (track) canvas.querySelector(`[data-cv-track="${track.id}"]`)?.click();
+    document.getElementById("cv-onboarding-guide").textContent = recommendation.textContent;
+    canvasGuide.hidden = false;
+    root.classList.add("canvas-focus");
+    const heading = canvas.querySelector("h2");
     heading.tabIndex = -1;
     heading.focus({ preventScroll: true });
-    section.scrollIntoView();
+    canvas.scrollIntoView();
+  });
+
+  explore.addEventListener("click", () => {
+    root.classList.remove("canvas-focus");
+    canvasGuide.hidden = true;
+    canvas.querySelector("h2").focus({ preventScroll: true });
+    canvas.scrollIntoView();
   });
 
   replay.hidden = false;

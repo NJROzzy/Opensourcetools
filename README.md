@@ -23,7 +23,7 @@
 
 ## About
 
-**Amalgam** helps students, developers, and curious builders turn an idea into a system using free, open-source tools. It connects project recipes to editable architecture diagrams so you can see what each tool does and how the pieces fit together.
+**Amalgam** helps students, developers, and curious builders turn an idea into a system using free, open-source tools. It connects project recipes to editable architecture diagrams so you can see what each tool does, how the pieces fit together, and how the design can grow as usage increases.
 
 The site covers eleven domains of computer science.
 
@@ -35,9 +35,9 @@ The design is an **engineering drawing sheet**. Both themes use light line work 
 
 ## Getting started
 
-The homepage introduces Amalgam and teaches system design from scratch with a greenhouse monitor. Work through requirements, rough sizing, data flow, failures, tool choices, and testing. Choose a build path to see its architecture, or choose **I want to practise system design** to continue in the System Design Canvas. Select **Blank canvas** there to sketch your own system.
+The homepage introduces Amalgam with a shared to-do list. Start with three components, follow a task from browser to database, and see how to grow the design as usage increases.
 
-For a concrete example, try the **IoT environmental monitor** under Hardware. Its architecture shows how readings travel from the sensor through messaging and storage to the dashboard. Choose **Edit on the canvas** to customise it.
+Choose what you want to build to open the **System Design Canvas** with that topic selected. Pick a starter design or choose **Blank canvas** to draw your own. **Explore the full site** opens the other sections.
 
 Direct links open their section. The footer’s **Read the introduction** button reopens the welcome.
 

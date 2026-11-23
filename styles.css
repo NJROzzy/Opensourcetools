@@ -96,7 +96,7 @@ html:has(.intro[open]) { overflow: hidden; }
 .intro-practice summary { cursor: pointer; font-size: 16px; font-weight: 600; }
 .intro-practice p { margin-top: 8px; }
 .intro-flow {
-  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px;
   margin: 18px 0; padding: 0; list-style: none;
 }
 .intro-flow li { position: relative; padding: 9px; border: 1px solid var(--rule-strong); background: var(--s1); }
@@ -124,6 +124,19 @@ html:has(.intro[open]) { overflow: hidden; }
 .intro-actions .intro-next { margin-inline-start: auto; background: var(--ink); color: var(--paper); }
 .intro-actions .intro-next:disabled { opacity: .6; cursor: default; }
 .intro-replay { margin-bottom: 14px; letter-spacing: normal; text-transform: none; }
+
+.canvas-focus main > section:not(#canvas),
+.canvas-focus .masthead nav,
+.canvas-focus .wire-orb,
+.canvas-focus .wire-pop,
+.canvas-focus body > footer { display: none; }
+.cv-onboarding:not([hidden]) {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;
+  margin-bottom: 16px; padding: 12px 16px; border: 1px solid var(--rule-strong);
+  background: var(--s1);
+}
+.cv-onboarding p { flex: 1 1 320px; margin: 0; color: var(--ink-soft); font-size: 16px; }
+.cv-onboarding button { min-height: 44px; }
 
 .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
 @media (min-width: 720px) { .wrap { padding: 0 32px; } }

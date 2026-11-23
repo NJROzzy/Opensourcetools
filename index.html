@@ -40,46 +40,41 @@
         </section>
         <section data-intro-stage hidden>
           <h2 id="intro-purpose" tabindex="-1">Why Amalgam exists</h2>
-          <p>I built Amalgam to help you go from “I have an idea” to “I know what I need to build it.” It shows what each tool does, where it fits, and how the pieces work together.</p>
+          <p>Amalgam helps you design a first version and plan how it can grow. It shows what each component does, how the pieces fit, and what to change when more people or more data put pressure on the design.</p>
         </section>
         <section data-intro-stage hidden>
           <h2 id="intro-how" tabindex="-1">How Amalgam works</h2>
-          <p>Imagine a greenhouse grower who wants to check the temperature from anywhere. We’ll work from that request to a design you can draw in the <strong>System Design Canvas</strong>.</p>
-          <p>Start with what the grower needs, then sketch how a reading travels, decide what happens when something breaks, and choose tools once each component has a job.</p>
+          <p>Imagine two roommates who want a shared to-do list. We’ll turn that idea into a simple design you can draw in the <strong>System Design Canvas</strong>.</p>
+          <p>Start with what the roommates need, then follow one action through the system. Once that works, think through what changes if more people start using it.</p>
         </section>
         <section data-intro-stage hidden>
           <h2 id="intro-requirements" tabindex="-1">Start with the requirements</h2>
-          <p>The grower needs to see the latest temperature and the last seven days of readings. For this first version, assume one greenhouse, one sensor, and one reading per minute.</p>
-          <p>Write down what success looks like: the dashboard shows a reading less than two minutes old while the sensor is online. Keep automatic climate control out of this first version.</p>
-          <details class="intro-practice">
-            <summary>Try it: How many readings will you store each day?</summary>
-            <p>One reading per minute × 60 minutes × 24 hours gives <strong>1,440 readings per day</strong>. Estimate traffic and storage before deciding whether you need more infrastructure.</p>
-          </details>
+          <p>Both roommates need to see the same list, add a task, and mark it done. Saved tasks should still be there when either person refreshes.</p>
+          <p>Start with one shared list. Reminders, file attachments, and live updates can wait.</p>
         </section>
         <section data-intro-stage hidden>
           <h2 id="intro-flow" tabindex="-1">Sketch how data moves</h2>
-          <p>Draw one box for each job. Label each arrow with what moves across it or what the next component asks for.</p>
-          <ol class="intro-flow" aria-label="Greenhouse reading flow">
-            <li><strong>Sensor</strong><span>Sends a reading</span></li>
-            <li><strong>Collector</strong><span>Validates and saves it</span></li>
-            <li><strong>Database</strong><span>Stores the history</span></li>
-            <li><strong>Dashboard</strong><span>Queries and displays it</span></li>
+          <p>Give each box one job and label the connections with what moves between them.</p>
+          <ol class="intro-flow" aria-label="Task saving flow">
+            <li><strong>Browser</strong><span>Sends a new task</span></li>
+            <li><strong>App server</strong><span>Checks and saves it</span></li>
+            <li><strong>Database</strong><span>Keeps the shared list</span></li>
           </ol>
-          <p>To make the sketch concrete, follow one message through it. A reading contains a device ID, a timestamp, and the temperature in Celsius. The dashboard queries for recent readings and plots them over time.</p>
+          <p>When someone opens the list, the browser asks the server for tasks. The server reads them from the database and sends them back.</p>
         </section>
         <section data-intro-stage hidden>
-          <h2 id="intro-failure" tabindex="-1">Design for a failure</h2>
-          <p>Suppose the greenhouse loses Wi-Fi. The sensor can buffer recent readings and send them when the connection returns. Meanwhile, the dashboard can show when it last received a reading and flag stale data.</p>
+          <h2 id="intro-failure" tabindex="-1">What if a save fails?</h2>
+          <p>If the connection drops while someone adds a task, keep their text and offer a retry. Show the task as saved after the server confirms it.</p>
           <details class="intro-practice">
-            <summary>Try it: What if a retry sends the same reading twice?</summary>
-            <p>Give each reading a stable ID. Store it only once so retries don’t create duplicate points on the chart.</p>
+            <summary>What if the server saved it before the connection dropped?</summary>
+            <p>Send the same task ID on retry. The server can recognise the task it already saved and return it without adding a duplicate.</p>
           </details>
         </section>
         <section data-intro-stage hidden>
-          <h2 id="intro-validate" tabindex="-1">Choose tools and test the design</h2>
-          <p>For this version, you could use a Zephyr device, a small HTTP collector, PostgreSQL for history, and Grafana for charts. A single collector is enough to start. Consider an MQTT broker if you later need devices to publish to multiple consumers.</p>
-          <p>Test the smallest complete path first. Send one sample reading, confirm it’s stored, and look for it on the chart. Then disconnect the sensor and check both the stale-data warning and recovery.</p>
-          <p>In the <strong>System Design Canvas</strong>, choose <strong>Blank canvas</strong>, add the four boxes, and label their connections. Keep the requirements and failure behaviour in notes beside the diagram.</p>
+          <h2 id="intro-validate" tabindex="-1">Start small, then scale</h2>
+          <p>Start with one app server and one database. Test that a task added in one browser appears in the other after a refresh.</p>
+          <p>As usage grows, measure what slows down. If reading a list gets slow, check the database query and consider an index. If traffic overwhelms the app server, consider running more than one server behind a load balancer.</p>
+          <p>Use Amalgam to sketch the next version and see which connections and tools need to change.</p>
         </section>
         <section data-intro-stage hidden>
           <h2 id="intro-hardware" tabindex="-1">What hardware can you design?</h2>
@@ -101,7 +96,7 @@
         <section data-intro-stage hidden>
           <h2 id="intro-help" tabindex="-1">How Amalgam can help</h2>
           <p id="intro-recommendation"></p>
-          <p>Use the <strong>Atlas</strong> to compare tools and check their licences as you go.</p>
+          <p>Keep your first design small. As it grows, use the canvas to compare architectures and see where to add capacity.</p>
         </section>
       </div>
       <footer class="intro-actions">
@@ -188,6 +183,10 @@
         <span class="num">§ 1</span>
         <h2>System Design Canvas</h2>
         <p class="sub">Start with the graph. Load a ready-made system design for any domain, a path's common architecture or a recommended project, then make it yours: move boxes, connect components, add or swap open-source tools, leave notes, and export it as an image.</p>
+      </div>
+      <div class="cv-onboarding" id="cv-onboarding" hidden>
+        <p id="cv-onboarding-guide"></p>
+        <button type="button" class="st-btn" id="cv-explore">Explore the full site</button>
       </div>
       <div class="cv">
         <div class="cv-bar">
