@@ -103,12 +103,8 @@ html:has(.intro[open]) { overflow: hidden; }
   .intro-flow { grid-template-columns: 1fr; }
   .intro-flow li:not(:last-child)::after { content: "↓"; left: 10px; top: 100%; transform: none; line-height: 18px; }
 }
-.intro-goal-label { display: block; margin: 18px 0 6px; color: var(--ink-soft); font-size: 16px; }
-#intro-track {
-  width: min(100%, 360px); min-height: 44px; padding: 8px 12px;
-  border: 1px solid var(--rule-strong); border-radius: 4px;
-  background: var(--s1); color: var(--ink); font: 500 16px var(--sans);
-}
+.intro-outcomes { margin: 16px 0 0; padding-inline-start: 1.25em; color: var(--ink-soft); }
+.intro-outcomes li + li { margin-top: 10px; }
 .intro-actions { margin-top: 24px; display: flex; justify-content: space-between; gap: 12px; }
 .intro-actions button, .intro-replay {
   min-height: 44px; padding: 8px 14px; border: 1px solid var(--rule-strong);
@@ -117,7 +113,6 @@ html:has(.intro[open]) { overflow: hidden; }
 }
 .intro-actions button:hover, .intro-replay:hover { border-color: var(--ink); }
 .intro-actions .intro-next { margin-inline-start: auto; background: var(--ink); color: var(--paper); }
-.intro-actions .intro-next:disabled { opacity: .6; cursor: default; }
 .intro-replay { margin-bottom: 14px; letter-spacing: normal; text-transform: none; }
 
 .canvas-focus main > section:not(#canvas),

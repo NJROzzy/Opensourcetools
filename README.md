@@ -37,7 +37,7 @@ The design is an **engineering drawing sheet**. Both themes use light line work 
 
 The five-step introduction teaches system design with a shared to-do list. Start with three components, follow a task from browser to database, and see how to grow the design as usage increases.
 
-Choose what you want to build to open the **System Design Canvas** with that topic selected. Pick a starter design or choose **Blank canvas** to draw your own. **Explore the full site** opens the other sections.
+The intro shows what you can design, how to plan for growth, and how to take the example into the **System Design Canvas**. Pick a starter design or choose **Blank canvas** to draw your own. **Explore the full site** opens the other sections.
 
 Direct links open their section. The footer’s **Read the introduction** button reopens the welcome.
 
