@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AmalgambyNJR — Open Source Atlas</title>
+  <title>Amalgam — Plan projects with open-source tools</title>
   <meta name="description" content="Build paths, architectures and project recipes using only free, open-source tools — for web and mobile apps, AI/ML, robotics and every domain of computer science." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,10 +17,6 @@
       t = t === "black" ? "black" : "blue";
       document.documentElement.dataset.theme = t;
       if (t === "black") document.querySelector('meta[name="theme-color"]').content = "#080808";
-      if ((!location.hash || location.hash === "#top") && typeof HTMLDialogElement !== "undefined" &&
-          typeof HTMLDialogElement.prototype.showModal === "function") {
-        document.documentElement.classList.add("intro-pending");
-      }
     })();
   </script>
   <link rel="stylesheet" href="styles.css" />
@@ -75,20 +71,16 @@
   </dialog>
 
   <canvas id="field" aria-hidden="true"></canvas>
+  <a class="skip" href="#main">Skip to content</a>
 
   <header class="masthead">
     <div class="wrap bar">
-      <a class="mark" href="#top">Amalgam<span>by NJR</span></a>
-      <nav>
-        <a href="#canvas">Canvas</a>
-        <a href="#paths">Paths</a>
-        <a href="#studio">Studio</a>
-        <a href="#map">Map</a>
-        <a href="#chains">Chains</a>
-        <a href="#trends">Trends</a>
-        <a href="#wire-side" class="nav-live" id="ws-nav"><i></i>Live news</a>
-        <a href="#method">Method</a>
-        <a href="#atlas">Atlas</a>
+      <a class="mark" href="#home">Amalgam<span>by NJR</span></a>
+      <nav aria-label="Main">
+        <a href="#build" data-nav="build">Build</a>
+        <a href="#tools" data-nav="tools">Tools</a>
+        <a href="#design" data-nav="design">Design</a>
+        <a href="#news" data-nav="news" class="nav-news">News<span class="ws-badge" id="ws-badge" hidden></span></a>
       </nav>
       <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to black background" title="Switch to black background">
         <span class="tt-track" aria-hidden="true">
@@ -101,205 +93,204 @@
     </div>
   </header>
 
-  <button class="wire-orb" id="ws-toggle" aria-controls="wire-side" aria-expanded="false" aria-label="Open live news">
-    <svg viewBox="0 0 120 120" aria-hidden="true">
-      <defs><path id="orb-ring" d="M60,60 m-47,0 a47,47 0 1,1 94,0 a47,47 0 1,1 -94,0" /></defs>
-      <g class="orb-spin"><text><textPath href="#orb-ring" textLength="292" lengthAdjust="spacing">LIVE NEWS · LIVE NEWS · LIVE NEWS · </textPath></text></g>
-      <circle class="orb-dash" cx="60" cy="60" r="35" />
-    </svg>
-    <span class="orb-sweep"></span>
-    <span class="orb-core"></span>
-    <span class="ws-badge" id="ws-badge" hidden></span>
-  </button>
-  <div class="wire-pop" id="wire-side" role="dialog" aria-label="Live news" tabindex="-1">
-    <div class="ws-head">
-      <span class="live"><i></i>Live Wire</span>
-      <span class="ws-updated" id="ws-updated">connecting…</span>
-      <button class="ws-btn" id="ws-refresh" aria-label="Refresh now" title="Refresh now">↻</button>
-      <button class="ws-btn" id="ws-close" aria-label="Close live news" title="Close">×</button>
-    </div>
-    <div class="ws-topics" id="wire-tabs" role="tablist" aria-label="News topics"></div>
-    <ul class="ws-list" id="wire-list" aria-live="polite"></ul>
-    <p class="ws-foot">Headlines from the Hacker News index · refreshes every minute</p>
-  </div>
-
-  <main id="top">
-    <section class="hero wrap" id="hero">
-      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-      <div class="hud-top">
-        <span class="live"><i></i>Live</span>
-        <span>DWG AMG-001 · Open Source Atlas · Rev C</span>
-        <span id="today"></span>
-        <span id="clock">--:--:-- UTC</span>
-      </div>
-      <p class="boot" id="boot" aria-hidden="true"></p>
-      <h1 class="title" data-text="Amalgam" tabindex="-1"><span>Amalgam</span></h1>
-      <p class="byline"><span></span>by NJR</p>
-      <p class="lede">
-        A field guide to the <em>free and open-source</em> instruments with which one may build
-        a proper project across <strong>Computer Science</strong> — from hardware, software and computation
-        to networks, data, distributed systems and security — and in <strong>Artificial Intelligence</strong>,
-        <strong>Machine Learning</strong>, <strong>Robotics</strong> and <strong>emerging computing</strong>:
-        catalogued, annotated, and read against the currents of the day.
-      </p>
-      <div class="stats" id="stats"></div>
-      <a class="scroll-cue" href="#canvas" aria-label="Scroll to the System Design Canvas">Scroll<span></span></a>
-    </section>
-
-    <section id="canvas" class="wrap wide section">
-      <div class="section-head">
-        <span class="num">§ 1</span>
-        <h2>System Design Canvas</h2>
-        <p class="sub">Start with the graph. Load a ready-made system design for any domain, a path's common architecture or a recommended project, then make it yours: move boxes, connect components, add or swap open-source tools, leave notes, and export it as an image.</p>
-      </div>
-      <div class="cv-onboarding" id="cv-onboarding" hidden>
-        <p>To draw the to-do list, choose <strong>Blank canvas</strong> and add a browser, an app server, and a database. You can also open a ready-made design to see how it works.</p>
-        <button type="button" class="st-btn" id="cv-explore">Explore the full site</button>
-      </div>
-      <div class="cv">
-        <div class="cv-bar">
-          <div class="pills" id="cv-domains" aria-label="Domains"></div>
-          <span class="st-status" id="cv-status" aria-live="polite"></span>
+  <main id="main" tabindex="-1">
+    <!-- Home: what this is, where to start, and search across everything -->
+    <section class="view home wrap" id="view-home" data-view="home" aria-labelledby="home-title">
+      <div class="hero">
+        <p class="eyebrow">Open-source atlas · 11 domains of computer science</p>
+        <h1 id="home-title" tabindex="-1">Plan a real project with free, open-source tools.</h1>
+        <p class="lede">Pick what you want to build. See the tools for each layer and why each one is needed, then sketch your own system on an editable canvas.</p>
+        <div class="hero-actions">
+          <a class="btn solid" href="#build">Choose what to build</a>
+          <a class="btn" href="#design">Open the design canvas</a>
+          <button class="btn ghost" type="button" id="intro-open">New to system design? Take the tour</button>
         </div>
-        <div class="cv-templates" id="cv-templates" aria-label="Designs to start from"></div>
-        <div class="cv-main">
-          <div class="ag-host cv-graph" id="cv-graph" aria-label="System design editor"></div>
-          <aside class="cv-inspector" id="cv-inspector" aria-label="Inspector"></aside>
+        <div class="finder">
+          <label class="sr" for="home-q">Search tools and projects</label>
+          <input id="home-q" type="search" autocomplete="off" placeholder="Search tools and projects — e.g. robot, chat, PostgreSQL, MQTT" aria-controls="home-results" />
+          <ul class="finder-results" id="home-results" hidden></ul>
+        </div>
+        <div class="stats" id="stats"></div>
+      </div>
+
+      <div class="home-block">
+        <h2 class="h-sec">Start from what you want to build</h2>
+        <p class="sub">Each path lays out the layers a typical project passes through and the open-source tools for each layer, with example projects you can open.</p>
+        <div class="path-grid" id="home-paths"></div>
+      </div>
+
+      <div class="home-block">
+        <h2 class="h-sec">What you can do here</h2>
+        <div class="how">
+          <a class="how-card" href="#build"><b>Build</b><span>Follow a path, open a project, and see its full stack step by step: each tool, its role, why it is needed, and an alternative.</span><i>Browse 11 paths →</i></a>
+          <a class="how-card" href="#tools"><b>Tools</b><span>Search the catalogue by name, purpose, domain or licence, or use the map to see which tools sit where domains overlap.</span><i>Search the catalogue →</i></a>
+          <a class="how-card" href="#design"><b>Design</b><span>Start from one of 25 ready-made system designs or a blank canvas. Connect components, swap tools, and export a PNG.</span><i>Open the canvas →</i></a>
         </div>
       </div>
     </section>
 
-    <section id="paths" class="wrap section">
-      <div class="section-head">
-        <span class="num">§ 2</span>
-        <h2>Build Paths</h2>
-        <p class="sub">Pick what you want to build. Each path shows the common architecture — the layers almost every project of that kind passes through, with the free, open-source tools for each layer — and projects you can open to see their full stack.</p>
+    <!-- Build: paths, their architecture, and their projects -->
+    <section class="view wrap" id="view-build" data-view="build" aria-labelledby="build-title" hidden>
+      <div class="view-head">
+        <h2 id="build-title" tabindex="-1">Build</h2>
+        <p class="sub">Choose a path to see its common architecture and the tools for each layer. Open a project for its full stack, step by step.</p>
       </div>
-      <div class="track-groups" id="track-groups" role="tablist" aria-label="Build paths"></div>
-      <div class="track-view" id="track-view" aria-live="polite"></div>
+      <div class="build">
+        <nav class="track-groups" id="track-groups" aria-label="Build paths"></nav>
+        <div class="track-view" id="track-view" aria-live="polite"></div>
+      </div>
     </section>
 
-    <section id="studio" class="wrap section">
-      <div class="section-head">
-        <span class="num">§ 3</span>
-        <h2>Architecture Studio</h2>
-        <p class="sub">Drag tools, or a whole project, onto the grid to assemble an architecture layer by layer, then switch to <em>Graph</em> to see how every layer and tool connects, and add or remove tools right there. The advisor points out empty layers, tools that pair well with yours, and the real projects your stack resembles.</p>
-      </div>
-      <div class="studio">
-        <div class="studio-bar">
-          <label class="st-field">Path <select id="st-track"></select></label>
-          <div class="st-views" role="tablist" aria-label="Studio view">
-            <button role="tab" data-view="grid" aria-selected="true">Grid</button>
-            <button role="tab" data-view="graph" aria-selected="false">Graph</button>
-          </div>
-          <input id="st-title" class="st-title" maxlength="60" aria-label="Architecture name" />
-          <span class="st-spacer"></span>
-          <span class="st-status" id="st-status" aria-live="polite"></span>
-          <button class="st-btn" id="st-undo" hidden>Undo</button>
-          <button class="st-btn" id="st-copy">Copy as text</button>
-          <button class="st-btn" id="st-clear">Clear</button>
+    <!-- Tools: the catalogue, or the domain map -->
+    <section class="view wrap" id="view-tools" data-view="tools" aria-labelledby="tools-title" hidden>
+      <div class="view-head">
+        <h2 id="tools-title" tabindex="-1">Tools</h2>
+        <p class="sub">Every entry is free to use and published under an open-source licence.</p>
+        <div class="seg" role="tablist" aria-label="Tools view">
+          <a role="tab" href="#tools" data-sub="catalogue">Catalogue</a>
+          <a role="tab" href="#tools/map" data-sub="map">Domain map</a>
         </div>
-        <div class="studio-body">
-          <aside class="palette" id="st-palette" data-trash aria-label="Tool palette">
-            <div class="pal-tabs" role="tablist">
-              <button role="tab" data-tab="tools" aria-selected="true">Tools</button>
-              <button role="tab" data-tab="projects" aria-selected="false">Projects</button>
+      </div>
+
+      <div class="sub-view" data-sub-view="catalogue">
+        <div class="controls">
+          <label class="search">
+            <span class="sr">Search tools</span>
+            <input id="q" type="search" placeholder="Search by name, purpose, domain or licence — e.g. VPN, LLM, MIT" autocomplete="off" />
+          </label>
+          <div class="pills" id="tabs" role="group" aria-label="Filter by domain"></div>
+        </div>
+        <p class="count" id="atlas-count" aria-live="polite"></p>
+        <div id="atlas-grid" class="grid"></div>
+        <p id="empty" class="empty" hidden>No tool matches that search. Try a broader word, or choose “All”.</p>
+        <details class="method">
+          <summary>What makes a tool eligible</summary>
+          <p>A tool is listed only if it can be used at no cost and its source is published under a recognised open licence (MIT, Apache-2.0, BSD, GPL, MPL and similar). For open-weight AI models, only releases under an open-source licence such as Apache-2.0 are recommended. Nothing here requires a paid plan. Where a project moved to a source-available licence, its open community fork is listed instead.</p>
+          <p>Every tool is tagged with each domain it serves, which is how the map places it. Treat the list as a set of parts, not a ranking.</p>
+          <p>Licences change. Always check the licence file in a project's repository before you build on it.</p>
+        </details>
+      </div>
+
+      <div class="sub-view" data-sub-view="map" hidden>
+        <p class="sub map-intro">Choose three domains to see which projects and tools sit in each overlap. Select a region or a logo for details.</p>
+        <div class="venn">
+          <figure class="venn-fig">
+            <div class="venn-controls">
+              <p class="vp-label">Domains on the map (pick three)</p>
+              <div class="pills" id="venn-domains" aria-label="Domains on the map"></div>
+              <p class="vp-label">Or start from a preset</p>
+              <div class="pills presets" id="venn-presets"></div>
             </div>
-            <input id="st-q" class="pal-q" type="search" placeholder="search tools…" autocomplete="off" aria-label="Search the palette" />
-            <div class="pal-list" id="st-list"></div>
-            <p class="pal-hint">Drag onto the grid, or click to add. Drag a placed tool back here to remove it. On touch screens, press and hold to drag.</p>
-          </aside>
-          <div class="board" id="st-board" aria-label="Architecture grid"></div>
+            <div class="tabs venn-mode" id="venn-mode" role="tablist" aria-label="Diagram view">
+              <button role="tab" data-mode="projects" aria-selected="true">By project</button>
+              <button role="tab" data-mode="tools" aria-selected="false">By tool</button>
+            </div>
+            <svg id="venn" viewBox="0 0 600 570" role="img" aria-label="Venn diagram of AI, Machine Learning and Robotics on a Computer Science ground"></svg>
+            <figcaption id="venn-keys" class="venn-keys"></figcaption>
+          </figure>
+          <aside class="venn-panel" id="venn-panel" aria-live="polite"></aside>
         </div>
       </div>
     </section>
 
-    <section id="map" class="wrap section">
-      <div class="section-head">
-        <span class="num">§ 4</span>
-        <h2>The Amalgam Map</h2>
-        <p class="sub">Where domains overlap, projects appear. Choose any three of the eleven domains, then view the map <em>by project</em> to see what can be built in each overlap, or <em>by tool</em> to see where every tool lives. Select a region or a logo for the full picture.</p>
+    <!-- Design: diagram canvas, or the layer-by-layer stack builder -->
+    <section class="view wrap wide" id="view-design" data-view="design" aria-labelledby="design-title" hidden>
+      <div class="view-head">
+        <h2 id="design-title" tabindex="-1">Design</h2>
+        <p class="sub" data-sub-note="canvas">Load a ready-made design or start blank. Drag components, connect them, swap open-source tools and export a PNG. Your work is saved in this browser.</p>
+        <p class="sub" data-sub-note="studio" hidden>Drag tools or a whole project into the lanes of a path's architecture. The advisor flags empty layers, tools that pair well with yours, and the real projects your stack resembles.</p>
+        <div class="seg" role="tablist" aria-label="Design tool">
+          <a role="tab" href="#design" data-sub="canvas">System diagram</a>
+          <a role="tab" href="#design/studio" data-sub="studio">Stack builder</a>
+        </div>
       </div>
-      <div class="venn">
-        <figure class="venn-fig">
-          <div class="venn-controls">
-            <p class="vp-label">Choose three domains</p>
-            <div class="pills" id="venn-domains" aria-label="Domains on the map"></div>
-            <p class="vp-label">Or start from a preset</p>
-            <div class="pills presets" id="venn-presets"></div>
+
+      <div class="sub-view" data-sub-view="canvas">
+        <div class="cv-onboarding" id="cv-onboarding" hidden>
+          <p>To draw the to-do list, choose <strong>Blank canvas</strong> and add a browser, an app server and a database. Or open a ready-made design to see how one fits together.</p>
+          <button type="button" class="st-btn" id="cv-explore">Got it</button>
+        </div>
+        <div class="cv">
+          <div class="cv-bar">
+            <div class="pills" id="cv-domains" aria-label="Domains"></div>
+            <span class="st-status" id="cv-status" aria-live="polite"></span>
           </div>
-          <div class="tabs venn-mode" id="venn-mode" role="tablist" aria-label="Diagram view">
-            <button role="tab" data-mode="projects" aria-selected="true">By project</button>
-            <button role="tab" data-mode="tools" aria-selected="false">By tool</button>
+          <div class="cv-templates" id="cv-templates" aria-label="Designs to start from"></div>
+          <div class="cv-main">
+            <div class="ag-host cv-graph" id="cv-graph" aria-label="System design editor"></div>
+            <aside class="cv-inspector" id="cv-inspector" aria-label="Inspector"></aside>
           </div>
-          <svg id="venn" viewBox="0 0 600 570" role="img" aria-label="Venn diagram of AI, Machine Learning and Robotics on a Computer Science ground"></svg>
-          <figcaption id="venn-keys" class="venn-keys"></figcaption>
-        </figure>
-        <aside class="venn-panel" id="venn-panel" aria-live="polite"></aside>
+        </div>
+      </div>
+
+      <div class="sub-view" data-sub-view="studio" hidden>
+        <div class="studio">
+          <div class="studio-bar">
+            <label class="st-field">Path <select id="st-track"></select></label>
+            <div class="st-views" role="tablist" aria-label="Studio view">
+              <button role="tab" data-view="grid" aria-selected="true">Grid</button>
+              <button role="tab" data-view="graph" aria-selected="false">Graph</button>
+            </div>
+            <input id="st-title" class="st-title" maxlength="60" aria-label="Architecture name" />
+            <span class="st-spacer"></span>
+            <span class="st-status" id="st-status" aria-live="polite"></span>
+            <button class="st-btn" id="st-undo" hidden>Undo</button>
+            <button class="st-btn" id="st-copy">Copy as text</button>
+            <button class="st-btn" id="st-clear">Clear</button>
+          </div>
+          <div class="studio-body">
+            <aside class="palette" id="st-palette" data-trash aria-label="Tool palette">
+              <div class="pal-tabs" role="tablist">
+                <button role="tab" data-tab="tools" aria-selected="true">Tools</button>
+                <button role="tab" data-tab="projects" aria-selected="false">Projects</button>
+              </div>
+              <input id="st-q" class="pal-q" type="search" placeholder="search tools…" autocomplete="off" aria-label="Search the palette" />
+              <div class="pal-list" id="st-list"></div>
+              <p class="pal-hint">Drag onto the grid, or click to add. Drag a placed tool back here to remove it. On touch screens, press and hold to drag.</p>
+            </aside>
+            <div class="board" id="st-board" aria-label="Architecture grid"></div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section id="chains" class="wrap section">
-      <div class="section-head">
-        <span class="num">§ 5</span>
-        <h2>Recommendation Chains</h2>
-        <p class="sub">Choose a project and follow its chain: each link is a tool, the role it plays, and why the project needs it — in the order you would assemble them.</p>
+    <!-- News: the movements shaping open tooling, and live headlines -->
+    <section class="view wrap" id="view-news" data-view="news" aria-labelledby="news-title" hidden>
+      <div class="view-head">
+        <h2 id="news-title" tabindex="-1">News</h2>
+        <p class="sub">The trends shaping open-source tooling, and live headlines from across the field.</p>
       </div>
-      <div class="chains">
-        <div class="chain-picker" id="chain-picker" role="tablist"></div>
-        <div class="chain-view" id="chain-view" aria-live="polite"></div>
+      <div class="news">
+        <div class="news-trends">
+          <h3 class="h-sub">Trends</h3>
+          <ol class="trends" id="trend-list"></ol>
+        </div>
+        <div class="wire" id="wire-side">
+          <div class="ws-head">
+            <h3 class="h-sub"><span class="live"><i></i></span>Live headlines</h3>
+            <span class="ws-updated" id="ws-updated">connecting…</span>
+            <button class="ws-btn" id="ws-refresh" aria-label="Refresh now" title="Refresh now">↻</button>
+          </div>
+          <div class="pills ws-topics" id="wire-tabs" role="tablist" aria-label="News topics"></div>
+          <ul class="ws-list" id="wire-list" aria-live="polite"></ul>
+          <p class="ws-foot">From the Hacker News index · refreshes every minute</p>
+        </div>
       </div>
-    </section>
-
-    <section id="trends" class="wrap section">
-      <div class="section-head">
-        <span class="num">§ 6</span>
-        <h2>Currents &amp; Trends</h2>
-        <p class="sub">The movements shaping open tooling right now, and the tools they touch.</p>
-      </div>
-      <ol class="trends" id="trend-list"></ol>
-    </section>
-
-    <section id="method" class="wrap section">
-      <div class="section-head">
-        <span class="num">§ 7</span>
-        <h2>Method</h2>
-      </div>
-      <div class="method">
-        <p>On inclusion. A tool enters the Atlas only if it can be used at no cost and its source is published under a recognised open licence (MIT, Apache-2.0, BSD, GPL, MPL and kin). For open-<em>weight</em> AI models, only releases under an open-source licence (Apache-2.0) are recommended. Nothing here requires a paid plan. Where a project moved to a source-available licence, the Atlas lists its open community fork instead.</p>
-        <p>On assembly. A proper project is rarely one tool, or one domain — it is an <em>amalgam</em>. A robotics study might braid ROS 2, MuJoCo and PyTorch; an IoT monitor braids KiCad, Zephyr, MQTT and Grafana across hardware, networks and data. Every tool is tagged with each domain it serves, which is how the map places it. Read the Atlas as a set of parts, not a ranking.</p>
-        <p>On currency. Licences change. Always verify the licence file in a project's repository before you build upon it.</p>
-      </div>
-    </section>
-    <section id="atlas" class="wrap section">
-      <div class="section-head">
-        <span class="num">§ 8</span>
-        <h2>The Atlas</h2>
-        <p class="sub">The full catalogue. Every entry is free to use and published under an open-source licence. Filter by any of the eleven domains, search by name, purpose, domain or licence, and open any card for details.</p>
-      </div>
-
-      <div class="controls">
-        <div class="tabs" id="tabs" role="tablist"></div>
-        <label class="search">
-          <span class="sr">Search tools</span>
-          <input id="q" type="search" placeholder="search — e.g. quantum, VPN, LLM, MIT…" autocomplete="off" />
-        </label>
-      </div>
-
-      <div id="atlas-grid" class="grid"></div>
-      <p id="empty" class="empty" hidden>No instrument matches that inquiry.</p>
     </section>
   </main>
 
   <footer class="wrap foot">
-    <button type="button" class="intro-replay" id="intro-replay" hidden>Read the introduction</button>
+    <div class="foot-links">
+      <a href="#build">Build</a><a href="#tools">Tools</a><a href="#tools/map">Domain map</a><a href="#design">Design</a><a href="#design/studio">Stack builder</a><a href="#news">News</a>
+      <button type="button" class="link-btn" id="intro-replay">Take the tour</button>
+    </div>
     <div class="titleblock" aria-label="Drawing title block">
       <div class="tb-cell tb-title"><span>Title</span><b>Amalgam</b><em>Open-source atlas &amp; system designs</em></div>
       <div class="tb-cell"><span>Drawn by</span><b>NJR</b></div>
       <div class="tb-cell"><span>Dwg no.</span><b>AMG-001</b></div>
       <div class="tb-cell"><span>Scale</span><b>1 : 1</b></div>
       <div class="tb-cell"><span>Sheet</span><b>1 of 1</b></div>
-      <div class="tb-cell"><span>Rev</span><b>C</b></div>
+      <div class="tb-cell"><span>Rev</span><b>D</b></div>
       <div class="tb-cell"><span>Date</span><b id="year"></b></div>
       <div class="tb-cell tb-wide"><span>Notes</span><b>All tools free &amp; open source · Verify licences before building</b></div>
     </div>
@@ -315,15 +306,15 @@
       <div class="gm-titles"><p class="eyebrow" id="gm-kicker"></p><h3 class="vp-title" id="gm-title"></h3></div>
       <span class="gm-diff" id="gm-diff" aria-live="polite"></span>
       <button class="st-btn" id="gm-reset">Reset</button>
-      <button class="st-btn" id="gm-studio">Open in Studio</button>
-      <button class="st-btn solid" id="gm-canvas">Edit on the canvas ↑</button>
+      <button class="st-btn" id="gm-studio">Open in stack builder</button>
+      <button class="st-btn solid" id="gm-canvas">Edit as a diagram</button>
       <button class="drawer-close gm-close" id="gm-close" aria-label="Close">×</button>
     </div>
     <div class="ag-host gm-graph" id="gm-graph"></div>
   </dialog>
 
   <script src="data.js"></script>
-  <script src="intro.js" onerror="document.documentElement.classList.remove('intro-pending')"></script>
+  <script src="intro.js"></script>
   <script src="graph.js"></script>
   <script src="app.js"></script>
 </body>

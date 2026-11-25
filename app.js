@@ -4,7 +4,6 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
   const now = new Date();
-  $("#today").textContent = now.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
   $("#year").textContent = now.toISOString().slice(0, 10);
 
   const discName = Object.fromEntries(disciplines.map((d) => [d.id, d.name]));
@@ -13,6 +12,16 @@
   const chainFor = (project) => chains.find((c) => c.project === project);
   const projectByName = Object.fromEntries(projects.map((p) => [p.name, p]));
   const domainLine = (ids, names = discShort) => ids.map((d) => names[d]).join(" ∩ ");
+
+  // One view at a time (home, build, tools, design, news), chosen by the URL
+  // hash so every view and sub-view can be linked and bookmarked. The router
+  // itself is set up at the end, once every view has been built.
+  let currentView = null, lastHash = null;
+  const onView = {}; // view id → called each time that view is shown; "any" for every change
+  const go = (hash) => {
+    if (location.hash === `#${hash}`) { lastHash = null; route(); }
+    else location.hash = hash;
+  };
 
   // Hero figures
   $("#stats").innerHTML = [
@@ -32,12 +41,12 @@
   let active = "all";
   const tabs = [{ id: "all", name: "All" }, ...disciplines];
   const tabBar = $("#tabs");
-  tabBar.innerHTML = tabs.map((t) => `<button role="tab" data-id="${t.id}" aria-selected="${t.id === active}">${esc(t.name)}</button>`).join("");
+  tabBar.innerHTML = tabs.map((t) => `<button type="button" data-id="${t.id}" aria-pressed="${t.id === active}">${esc(t.name)}</button>`).join("");
   tabBar.addEventListener("click", (e) => {
     const b = e.target.closest("button");
     if (!b) return;
     active = b.dataset.id;
-    tabBar.querySelectorAll("button").forEach((x) => x.setAttribute("aria-selected", x === b));
+    tabBar.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
     renderAtlas();
   });
   $("#q").addEventListener("input", renderAtlas);
@@ -50,23 +59,22 @@
     );
     $("#atlas-grid").innerHTML = list.map((t, i) => `
       <button class="card" data-open-tool="${esc(t.name)}" style="animation-delay:${Math.min(i, 20) * 25}ms">
-        <div class="top">${logo(t)}<span class="idx">${String(i + 1).padStart(3, "0")}</span></div>
-        <h3>${esc(t.name)}</h3>
-        <span class="arrow">→</span>
+        <div class="top">${logo(t)}<h3>${esc(t.name)}</h3></div>
         <p class="desc">${esc(t.desc)}</p>
         <p class="doms">${t.domains.map((d) => esc(discShort[d])).join(" · ")}</p>
         <div class="meta"><span>${esc(t.kind)}</span><span class="lic">${esc(t.license)}</span></div>
       </button>`).join("");
     $("#empty").hidden = list.length > 0;
+    $("#atlas-count").textContent = list.length === tools.length ? `${tools.length} tools` : `${list.length} of ${tools.length} tools`;
   }
   renderAtlas();
 
   function jumpToTool(name) {
     active = "all";
-    tabBar.querySelectorAll("button").forEach((x) => x.setAttribute("aria-selected", x.dataset.id === "all"));
+    tabBar.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x.dataset.id === "all"));
     $("#q").value = name;
     renderAtlas();
-    $("#atlas").scrollIntoView();
+    go("tools");
   }
 
   // Trends
@@ -398,7 +406,7 @@
           <p class="vp-region">${esc(domainLine(p.domains))}</p>
           ${role ? `<p><b class="vp-role">${esc(role.role)}.</b> ${esc(role.why)}</p>` : `<p>${esc(p.desc)}</p>`}
           <div class="vp-recipe">${p.tools.filter((n) => n !== exclude).map(toolChip).join('<span class="plus">+</span>')}</div>
-          ${chainFor(p.name) ? `<button class="follow" data-chain="${esc(p.name)}">Follow the chain →</button>` : ""}
+          <button class="follow" data-open-project="${esc(p.name)}">See the full stack →</button>
         </li>`;
 
   function select(mask) {
@@ -445,7 +453,7 @@
       <p class="vp-label">Used in ${uses.length} project${uses.length === 1 ? "" : "s"}</p>
       ${uses.length ? `<ol class="vp-list">${uses.map((p) => projectItem(p, { exclude: name, role: roles[p.name] })).join("")}</ol>`
         : `<p class="vp-note">Not yet part of a project recipe — a building block to reach for as needed.</p>`}
-      <button class="follow" data-atlas="${esc(name)}">Open in the Atlas →</button>`;
+      <button class="follow" data-atlas="${esc(name)}">Show in the catalogue →</button>`;
   }
 
   // In the panel: a tool chip opens that tool, a region link its region, a
@@ -457,57 +465,10 @@
     if (r) return select(+r.dataset.mask);
     const a = e.target.closest("[data-atlas]");
     if (a) return jumpToTool(a.dataset.atlas);
-    const c = e.target.closest("[data-chain]");
-    if (c) { showChain(c.dataset.chain); $("#chains").scrollIntoView(); }
+    const pr = e.target.closest("[data-open-project]");
+    if (pr) openProject(pr.dataset.openProject);
   });
 
-  // Recommendation chains
-  const picker = $("#chain-picker");
-  picker.innerHTML = chains.map((c) => `
-    <button role="tab" data-chain="${esc(c.project)}">
-      <span class="cp-name">${esc(c.project)}</span>
-      <span class="cp-meta">${esc(domainLine(projectByName[c.project].domains))} · ${esc(c.level)}</span>
-    </button>`).join("");
-  picker.addEventListener("click", (e) => { const b = e.target.closest("[data-chain]"); if (b) showChain(b.dataset.chain); });
-
-  function showChain(project) {
-    const c = chainFor(project);
-    picker.querySelectorAll("button").forEach((b) => {
-      const on = b.dataset.chain === project;
-      b.setAttribute("aria-selected", on);
-      // The picker scrolls (sideways on phones); keep the chosen project visible
-      if (on && picker.scrollWidth > picker.clientWidth) picker.scrollLeft = b.offsetLeft - picker.offsetLeft;
-      if (on && picker.scrollHeight > picker.clientHeight) picker.scrollTop = b.offsetTop - picker.offsetTop - 40;
-    });
-    $("#chain-view").innerHTML = `
-      <p class="eyebrow">${esc(domainLine(projectByName[project].domains))} · ${esc(c.level)} · ${c.steps.length} links</p>
-      <h3 class="vp-title">${esc(c.project)}</h3>
-      <p class="vp-note">${esc(c.goal)}</p>
-      <button class="follow chain-graph" data-chain-graph="${esc(project)}">View its architecture graph →</button>
-      <div class="chain-strip" aria-label="Chain summary">${c.steps.map((s) => `<span title="${esc(s.tool)}">${logo(toolByName[s.tool], "sm")}</span>`).join('<i>→</i>')}</div>
-      <ol class="chain">${c.steps.map((s, i) => {
-        const t = toolByName[s.tool];
-        return `
-        <li style="animation-delay:${i * 70}ms">
-          <div class="node"><span class="step">${String(i + 1).padStart(2, "0")}</span>${logo(t)}</div>
-          <div class="link-body">
-            <p class="stage">${esc(s.stage)}</p>
-            <h4><button class="tool-link" data-tool="${esc(s.tool)}">${esc(s.tool)}</button><span class="role">${esc(s.role)}</span></h4>
-            <p class="why"><b>Why it's needed —</b> ${esc(s.why)}</p>
-            ${s.alt ? `<p class="alt">Alternative: <button class="chip" data-tool="${esc(s.alt)}">${logo(toolByName[s.alt], "xs")}${esc(s.alt)}</button></p>` : ""}
-          </div>
-        </li>`;
-      }).join("")}
-      </ol>`;
-  }
-  $("#chain-view").addEventListener("click", (e) => {
-    const g = e.target.closest("[data-chain-graph]");
-    if (g) return openProjectGraph(g.dataset.chainGraph);
-    const t = e.target.closest("[data-tool]");
-    if (t) openTool(t.dataset.tool);
-  });
-
-  showChain(chains[0].project);
   // Names depend on the web font's metrics, so lay the map out once it loads
   buildVenn();
   document.fonts.ready.then(() => { layoutNames(); paint(); });
@@ -527,7 +488,7 @@
         <span class="pc-title">${esc(p.name)}</span>
         <span class="pc-desc">${esc(p.desc)}</span>
         <span class="pc-stack">${p.tools.slice(0, 6).map((n) => logo(toolByName[n], "sm")).join("")}${p.tools.length > 6 ? `<span class="pc-more">+${p.tools.length - 6}</span>` : ""}</span>
-        <span class="pc-foot"><span>${p.tools.length} tools${c ? ` · ${esc(c.level)} chain` : ""}</span><span class="pc-go">Explore →</span></span>
+        <span class="pc-foot"><span>${p.tools.length} tools${c ? ` · ${esc(c.level)}` : ""}</span><span class="pc-go">Open →</span></span>
       </button>`;
   };
 
@@ -535,9 +496,8 @@
   $("#track-groups").innerHTML = groups.map((g) => `
     <div class="tg">
       <p class="vp-label">${esc(g)}</p>
-      <div class="pills">${tracks.filter((t) => t.group === g).map((t) => `<button data-track="${t.id}">${esc(t.name)} <span>${projects.filter((p) => p.track === t.id).length}</span></button>`).join("")}</div>
+      <ul>${tracks.filter((t) => t.group === g).map((t) => `<li><a href="#build/${t.id}" data-track="${t.id}">${esc(t.name)} <span>${projects.filter((p) => p.track === t.id).length}</span></a></li>`).join("")}</ul>
     </div>`).join("");
-  $("#track-groups").addEventListener("click", (e) => { const b = e.target.closest("[data-track]"); if (b) showTrack(b.dataset.track); });
 
   let currentTrack = null;
   function showTrack(id) {
@@ -545,7 +505,7 @@
     const tr = trackById[id], arch = architectures[id];
     const list = projects.filter((p) => p.track === id);
     const archTools = new Set(arch.stages.flatMap((s) => s.tools));
-    $("#track-groups").querySelectorAll("[data-track]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.track === id));
+    $("#track-groups").querySelectorAll("[data-track]").forEach((b) => b.toggleAttribute("aria-current", b.dataset.track === id));
     $("#track-view").innerHTML = `
       <div class="tv-head">
         <p class="eyebrow">${esc(tr.group)} · ${list.length} projects · ${archTools.size} tools</p>
@@ -563,9 +523,10 @@
           </li>`).join("")}
         </ol>
         ${tr.note ? `<p class="arch-note">${esc(tr.note)}</p>` : ""}
-        <button class="follow" data-path-graph="${id}">See this path as a connected architecture graph →</button>
+        <button class="follow" data-path-graph="${id}">See this path as a connected graph →</button>
       </div>
-      <p class="vp-label">Projects on this path <span class="hint">— hover a card to light up the layers it uses; open it for the full stack</span></p>
+      <h4 class="h-sub">Projects on this path</h4>
+      <p class="hint">Hover a project to light up the layers it uses. Open it for the full stack, step by step.</p>
       <div class="pcards">${list.map(projectCard).join("")}</div>`;
   }
   const trackView = $("#track-view");
@@ -611,16 +572,20 @@
     const step = c ? Object.fromEntries(c.steps.map((s) => [s.tool, s])) : {};
     const staged = new Set(arch.stages.flatMap((s) => s.tools));
     const extra = p.tools.filter((n) => !staged.has(n));
+    // A project with a chain lists its tools in the order you'd assemble them
+    const order = c ? [...c.steps.map((s) => s.tool).filter((n) => p.tools.includes(n)), ...p.tools.filter((n) => !step[n])] : p.tools;
     openDrawer(`
-      <p class="eyebrow">${esc(tr.name)} · ${esc(domainLine(p.domains))}${c ? ` · ${esc(c.level)}` : ""}</p>
+      <p class="eyebrow">${esc(tr.name)}${domainLine(p.domains) !== tr.name ? ` · ${esc(domainLine(p.domains))}` : ""}${c ? ` · ${esc(c.level)}` : ""}</p>
       <h3 class="vp-title" id="drawer-title">${esc(p.name)}</h3>
       <p class="vp-note">${esc(c ? c.goal : p.desc)}</p>
-      <p class="vp-label">The stack · ${p.tools.length} tools, all free and open source</p>
-      <ol class="dr-stack">${p.tools.map((n) => {
+      <p class="vp-label">${c ? "Step by step" : "The stack"} · ${p.tools.length} tools, all free and open source</p>
+      <ol class="dr-stack">${order.map((n, i) => {
         const t = toolByName[n], s = step[n];
         return `<li>
+          ${s ? `<span class="dr-stage"><span class="step">${String(i + 1).padStart(2, "0")}</span>${esc(s.stage)}</span>` : ""}
           <button class="dr-tool" data-open-tool="${esc(n)}">${logo(t)}<span><b>${esc(n)}</b><i>${esc(s ? s.role : t.kind)}</i></span><em class="lic">${esc(t.license)}</em></button>
-          <p>${s ? `<b>Why it's needed —</b> ${esc(s.why)}` : esc(t.desc)}</p>
+          <p>${s ? `<b>Why it's needed:</b> ${esc(s.why)}` : esc(t.desc)}</p>
+          ${s?.alt ? `<p class="alt">Alternative <button class="chip" data-open-tool="${esc(s.alt)}">${logo(toolByName[s.alt], "xs")}${esc(s.alt)}</button></p>` : ""}
         </li>`;
       }).join("")}</ol>
       <p class="vp-label">Where it sits in the ${esc(tr.name.toLowerCase())} architecture</p>
@@ -631,9 +596,8 @@
       ${extra.length ? `<li class="on"><span class="step">+</span><b>Also</b><span>${extra.map(esc).join(", ")}</span></li>` : ""}
       </ol>
       <div class="dr-actions">
-        <button class="follow" data-drawer-graph="${esc(name)}">View its architecture graph →</button>
-        ${c ? `<button class="follow" data-drawer-chain="${esc(name)}">Follow the step-by-step chain →</button>` : ""}
-        <button class="follow" data-drawer-map="${esc(name)}">Place it on the map →</button>
+        <button class="follow" data-drawer-graph="${esc(name)}">View and edit its architecture graph →</button>
+        <button class="follow" data-drawer-map="${esc(name)}">Place it on the domain map →</button>
       </div>`);
   }
 
@@ -659,7 +623,7 @@
         </button>`).join("")}</div>` : `<p class="vp-note">Not yet part of a project here — a building block to reach for as needed.</p>`}
       <div class="dr-actions">
         <a class="follow" href="${esc(t.url)}" target="_blank" rel="noopener">Project website ↗</a>
-        <button class="follow" data-drawer-atlas="${esc(name)}">Show in the Atlas →</button>
+        <button class="follow" data-drawer-atlas="${esc(name)}">Show in the catalogue →</button>
       </div>`);
   }
 
@@ -671,7 +635,7 @@
     chosen = next;
     buildVenn();
     select(maskOf(p.domains));
-    $("#map").scrollIntoView();
+    go("tools/map");
   }
 
   drawer.addEventListener("click", (e) => {
@@ -682,20 +646,17 @@
     if (p) return openProject(p.dataset.openProject);
     const gr = e.target.closest("[data-drawer-graph]");
     if (gr) { drawer.close(); return openProjectGraph(gr.dataset.drawerGraph); }
-    const c = e.target.closest("[data-drawer-chain]");
-    if (c) { drawer.close(); showChain(c.dataset.drawerChain); return $("#chains").scrollIntoView(); }
     const m = e.target.closest("[data-drawer-map]");
     if (m) { drawer.close(); return placeOnMap(m.dataset.drawerMap); }
     const a = e.target.closest("[data-drawer-atlas]");
     if (a) { drawer.close(); return jumpToTool(a.dataset.drawerAtlas); }
     const tr = e.target.closest("[data-drawer-track]");
-    if (tr) { drawer.close(); showTrack(tr.dataset.drawerTrack); $("#paths").scrollIntoView(); }
+    if (tr) { drawer.close(); go(`build/${tr.dataset.drawerTrack}`); }
   });
 
   // Tools anywhere outside the map open in the drawer
   $("#atlas-grid").addEventListener("click", (e) => { const b = e.target.closest("[data-open-tool]"); if (b) openTool(b.dataset.openTool); });
 
-  showTrack(tracks[0].id);
 
   // ---------------------------------------------------------------------
   // Architecture Studio — drag tools (or whole projects) into the lanes of
@@ -1112,14 +1073,14 @@
     snapshot();
     st = { track: gmState.track, title: gmState.kind === "project" ? gmState.title : "", slots: JSON.parse(JSON.stringify(gmState.slots)), view: "graph" };
     gm.close();
-    stChanged("Loaded into the Studio · Undo restores your previous board");
-    $("#studio").scrollIntoView();
+    stChanged("Loaded into the stack builder · Undo restores your previous board");
+    go("design/studio");
   });
   $("#gm-canvas").addEventListener("click", () => {
     const d = gmDesign();
     gm.close();
     loadCanvas({ title: gmState.title, source: `${gmState.kind === "path" ? "Common path" : "Project"} · ${trackById[gmState.track].name}`, nodes: d.nodes.map(({ num, ...n }) => n), edges: d.edges }, gmState.track);
-    $("#canvas").scrollIntoView();
+    go("design");
   });
 
   // ---------------------------------------------------------------------
@@ -1432,12 +1393,12 @@
 
 
   // ---------------------------------------------------------------------
-  // Live Wire pop-up — Hacker News via Algolia (CORS-enabled, no key),
-  // opened from the rotating half-circle on the right edge. Polls every
-  // minute while the page is visible, marks headlines that arrived since
-  // the last poll, and counts unread ones while closed.
+  // Live headlines — Hacker News via Algolia (CORS-enabled, no key), on the
+  // News view. Polls every minute while the page is visible, marks headlines
+  // that arrived since the last poll, and counts unread ones on the nav link
+  // while you're elsewhere.
   const side = $("#wire-side"), wireTabs = $("#wire-tabs"), wireList = $("#wire-list");
-  const badge = $("#ws-badge"), toggle = $("#ws-toggle"), updatedEl = $("#ws-updated");
+  const badge = $("#ws-badge"), updatedEl = $("#ws-updated");
   const POLL_MS = 60000;
   const topics = [{ id: "all", name: "All", query: wire.map((w) => w.query).join(" "), any: true }, ...wire];
   let topic = "all", items = [], seen = new Set(), firstLoad = true, unread = 0, lastFetch = 0, timer = null;
@@ -1450,41 +1411,27 @@
     return `${Math.round(m / 1440)}d ago`;
   };
   const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return "news.ycombinator.com"; } };
-  const isOpen = () => document.body.classList.contains("wire-open");
+  const isOpen = () => currentView === "news";
 
   function renderBadge() {
     badge.hidden = !unread;
     badge.textContent = unread > 99 ? "99+" : unread;
   }
-  function setOpen(open) {
-    document.body.classList.toggle("wire-open", open);
-    toggle.setAttribute("aria-expanded", open);
-    toggle.setAttribute("aria-label", open ? "Close live news" : "Open live news");
-    $("#ws-nav").classList.toggle("on", open);
-    if (open) { unread = 0; renderBadge(); side.focus({ preventScroll: true }); }
-  }
-  toggle.addEventListener("click", () => setOpen(!isOpen()));
-  $("#ws-close").addEventListener("click", () => { setOpen(false); toggle.focus(); });
-  $("#ws-nav").addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); setOpen(!isOpen()); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && isOpen() && !$("#drawer").open) { setOpen(false); toggle.focus(); } });
-  // A click anywhere outside the pop-up and its orb closes it
-  document.addEventListener("click", (e) => {
-    if (isOpen() && !side.contains(e.target) && !toggle.contains(e.target)) setOpen(false);
-  });
+  onView.news = () => { unread = 0; renderBadge(); };
 
-  wireTabs.innerHTML = topics.map((w) => `<button role="tab" data-id="${w.id}" aria-selected="${w.id === topic}">${esc(w.name)}</button>`).join("");
+  wireTabs.innerHTML = topics.map((w) => `<button type="button" role="tab" data-id="${w.id}" aria-selected="${w.id === topic}">${esc(w.name)}</button>`).join("");
   wireTabs.addEventListener("click", (e) => {
     const b = e.target.closest("button");
     if (!b || b.dataset.id === topic) return;
     topic = b.dataset.id;
     wireTabs.querySelectorAll("button").forEach((x) => x.setAttribute("aria-selected", x === b));
     seen = new Set(); items = []; firstLoad = true;
-    wireList.innerHTML = `<li class="ws-note">Tuning in…</li>`;
+    wireList.innerHTML = `<li class="ws-note">Loading…</li>`;
     poll();
   });
 
   function render(fresh) {
-    if (!items.length) { wireList.innerHTML = `<li class="ws-note">The wire is quiet on this topic.</li>`; return; }
+    if (!items.length) { wireList.innerHTML = `<li class="ws-note">No recent headlines on this topic.</li>`; return; }
     wireList.innerHTML = items.map((h) => {
       const link = h.url || `https://news.ycombinator.com/item?id=${h.objectID}`;
       const isNew = fresh.has(h.objectID);
@@ -1519,7 +1466,7 @@
     } catch {
       side.classList.add("ws-error");
       updatedEl.textContent = "offline · retrying";
-      if (!items.length) wireList.innerHTML = `<li class="ws-note">The wire could not be reached — retrying shortly.</li>`;
+      if (!items.length) wireList.innerHTML = `<li class="ws-note">Headlines couldn't be loaded. Retrying shortly.</li>`;
     } finally {
       side.classList.remove("ws-busy");
     }
@@ -1573,14 +1520,8 @@
   updateThemeButton();
 
   // ---------------------------------------------------------------------
-  // Hero instruments: typed boot line, UTC clock, stats that count up.
+  // Home stats count up once.
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const bootText = `> indexing ${tools.length} open-source tools · ${projects.length} projects · ${tracks.length} build paths … ready`;
-  const boot = $("#boot");
-  if (reduced) boot.textContent = bootText;
-  else { let i = 0; const tick = () => { boot.textContent = bootText.slice(0, ++i); if (i < bootText.length) setTimeout(tick, 22); }; setTimeout(tick, 400); }
-  const clock = () => { $("#clock").textContent = new Date().toISOString().slice(11, 19) + " UTC"; };
-  clock(); setInterval(clock, 1000);
   document.querySelectorAll("#stats .stat b").forEach((b) => {
     const target = +b.textContent;
     if (reduced || !target) return;
@@ -1848,10 +1789,11 @@
       ctx.stroke();
     }
 
-    parts(sy, reduced ? 0 : t);
+    const showcase = currentView === "home";
+    if (showcase) parts(sy, reduced ? 0 : t);
 
     // Drafting crosshair and coordinates at the mouse
-    if (finePointer && mouse.px >= 0) {
+    if (showcase && finePointer && mouse.px >= 0) {
       stroke(0.22, 0.8, [6, 5]);
       line(mouse.px, 0, mouse.px, FH); line(0, mouse.py, FW, mouse.py);
       stroke(0.7, 1); ctx.strokeRect(mouse.px - P(5), mouse.py - P(5), P(10), P(10));
@@ -1860,7 +1802,89 @@
     ctx.setLineDash([]);
     if (!reduced) requestAnimationFrame(frame);
   }
+  onView.any = () => { if (reduced) requestAnimationFrame(frame); };
   size();
   readTheme();
   if (!reduced) requestAnimationFrame(frame);
+
+  // ---------------------------------------------------------------------
+  // Home: path cards and a search across tools and projects.
+  $("#home-paths").innerHTML = tracks.map((t) => {
+    const n = projects.filter((p) => p.track === t.id).length;
+    const stack = [...new Set(architectures[t.id].stages.flatMap((s) => s.tools))];
+    return `<a class="path-card" href="#build/${t.id}">
+      <span class="pc-domains">${esc(t.group)}</span>
+      <b>${esc(t.name)}</b>
+      <span class="pc-desc">${esc(t.blurb)}</span>
+      <span class="pc-stack">${stack.slice(0, 5).map((x) => logo(toolByName[x], "xs")).join("")}<span>${n} project${n === 1 ? "" : "s"} · ${stack.length} tools</span></span>
+    </a>`;
+  }).join("");
+
+  const homeQ = $("#home-q"), homeRes = $("#home-results");
+  const findIndex = [
+    ...projects.map((p) => ({ kind: "project", name: p.name, sub: `Project · ${trackById[p.track].name}`, hay: [p.name, p.desc, ...p.tools, ...p.domains.map((d) => discName[d])].join(" ").toLowerCase() })),
+    ...tools.map((t) => ({ kind: "tool", name: t.name, sub: `Tool · ${t.kind}`, hay: [t.name, t.kind, t.desc, t.license, ...t.domains.map((d) => discName[d])].join(" ").toLowerCase() })),
+  ];
+  function renderFinder() {
+    const q = homeQ.value.trim().toLowerCase();
+    if (!q) { homeRes.hidden = true; homeRes.innerHTML = ""; return; }
+    const words = q.split(/\s+/);
+    const score = (x) => {
+      const n = x.name.toLowerCase();
+      return (n === q ? 100 : n.startsWith(q) ? 50 : n.includes(q) ? 20 : 0) + (x.kind === "project" ? 1 : 0);
+    };
+    const hits = findIndex.filter((x) => words.every((w) => x.hay.includes(w))).sort((a, b) => score(b) - score(a)).slice(0, 8);
+    homeRes.hidden = false;
+    homeRes.innerHTML = hits.length ? hits.map((x) => `<li><button type="button" data-open-${x.kind}="${esc(x.name)}">${x.kind === "tool" ? logo(toolByName[x.name], "xs") : '<span class="fr-dot" aria-hidden="true"></span>'}<b>${esc(x.name)}</b><span>${esc(x.sub)}</span></button></li>`).join("")
+      : `<li class="fr-none">Nothing matches “${esc(homeQ.value.trim())}”. Try a broader word, or <a href="#tools">browse the catalogue</a>.</li>`;
+  }
+  homeQ.addEventListener("input", renderFinder);
+  homeRes.addEventListener("click", (e) => {
+    const t = e.target.closest("[data-open-tool]");
+    if (t) return openTool(t.dataset.openTool);
+    const p = e.target.closest("[data-open-project]");
+    if (p) openProject(p.dataset.openProject);
+  });
+
+  // ---------------------------------------------------------------------
+  // Router. Hashes are view[/sub]: #build/robotics, #tools/map, #design/studio.
+  // Links from the earlier one-page layout (#canvas, #atlas, …) still land.
+  const VIEWS = ["home", "build", "tools", "design", "news"];
+  const LEGACY = { top: "home", hero: "home", canvas: "design", paths: "build", chains: "build", studio: "design/studio", map: "tools/map", atlas: "tools", method: "tools", trends: "news", "wire-side": "news" };
+  const TITLES = { home: "Amalgam — Plan projects with open-source tools", build: "Build · Amalgam", tools: "Tools · Amalgam", design: "Design · Amalgam", news: "News · Amalgam" };
+  const SUBS = { tools: ["catalogue", "map"], design: ["canvas", "studio"] };
+
+  function route() {
+    let h = location.hash.slice(1);
+    try { h = decodeURIComponent(h); } catch { /* keep it as typed */ }
+    if (LEGACY[h]) { history.replaceState(null, "", `#${LEGACY[h]}`); h = LEGACY[h]; }
+    let [view, sub] = h.split("/");
+    if (!VIEWS.includes(view)) view = "home";
+    const changed = view !== currentView;
+    currentView = view;
+
+    document.querySelectorAll("[data-view]").forEach((v) => { if (v.matches("section")) v.hidden = v.dataset.view !== view; });
+    document.querySelectorAll("[data-nav]").forEach((a) => { if (a.dataset.nav === view) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+
+    if (SUBS[view]) {
+      const section = $(`#view-${view}`);
+      const pick = SUBS[view].includes(sub) ? sub : SUBS[view][0];
+      section.querySelectorAll("[data-sub-view]").forEach((x) => { x.hidden = x.dataset.subView !== pick; });
+      section.querySelectorAll("[data-sub-note]").forEach((x) => { x.hidden = x.dataset.subNote !== pick; });
+      section.querySelectorAll("[data-sub]").forEach((x) => x.setAttribute("aria-selected", x.dataset.sub === pick));
+    }
+    if (view === "build") showTrack(trackById[sub] ? sub : (currentTrack || tracks[0].id));
+
+    document.title = TITLES[view];
+    onView[view]?.();
+    onView.any?.();
+    if (h !== lastHash) scrollTo({ top: 0, behavior: "instant" });
+    lastHash = h;
+    if (changed) {
+      // Move focus to the new view's heading so keyboard and screen-reader users land there
+      if (document.activeElement?.closest?.(".masthead, .foot") || document.activeElement === document.body) $(`#view-${view} h1, #view-${view} h2`)?.focus({ preventScroll: true });
+    }
+  }
+  addEventListener("hashchange", route);
+  route();
 })();

@@ -1,24 +1,23 @@
+// The five-step tour. It opens only when asked for (from Home or the footer)
+// and ends on the design canvas with a short prompt to draw the example.
 (() => {
-  const root = document.documentElement;
   const intro = document.getElementById("intro");
+  const openers = [document.getElementById("intro-open"), document.getElementById("intro-replay")];
   if (typeof intro.showModal !== "function") {
-    root.classList.remove("intro-pending");
+    openers.forEach((b) => b && (b.hidden = true));
     return;
   }
 
-  const replay = document.getElementById("intro-replay");
   const stages = [...intro.querySelectorAll("[data-intro-stage]")];
   const progress = document.getElementById("intro-progress");
-  const canvas = document.getElementById("canvas");
   const canvasGuide = document.getElementById("cv-onboarding");
-  const explore = document.getElementById("cv-explore");
   const back = document.getElementById("intro-back");
   const next = document.getElementById("intro-next");
   const workflow = document.getElementById("intro-task-flow");
   const replayWorkflow = document.getElementById("intro-flow-replay");
   const lastStage = stages.length - 1;
   let stage = 0;
-  let replaying = false;
+  let opener = null;
   let finished = false;
 
   function playWorkflow() {
@@ -36,14 +35,14 @@
     intro.setAttribute("aria-labelledby", heading.id);
     progress.textContent = `Step ${stage + 1} of ${stages.length}`;
     back.hidden = stage === 0;
-    next.textContent = stage === lastStage ? "Open System Design Canvas" : "Continue";
+    next.textContent = stage === lastStage ? "Open the design canvas" : "Continue";
     intro.scrollTop = 0;
     heading.focus({ preventScroll: true });
     if (stages[stage].contains(workflow)) playWorkflow();
   }
 
-  function openIntro(isReplay) {
-    replaying = isReplay;
+  function openIntro(from) {
+    opener = from;
     finished = false;
     intro.showModal();
     showStage(0);
@@ -60,32 +59,14 @@
   });
 
   intro.addEventListener("close", () => {
-    if (!finished) {
-      (replaying ? replay : document.querySelector("#hero h1")).focus();
-      return;
-    }
+    if (!finished) { opener?.focus(); return; }
     canvasGuide.hidden = false;
-    root.classList.add("canvas-focus");
-    const heading = canvas.querySelector("h2");
-    heading.tabIndex = -1;
-    heading.focus({ preventScroll: true });
-    canvas.scrollIntoView();
+    location.hash = "#design";
   });
 
-  explore.addEventListener("click", () => {
-    root.classList.remove("canvas-focus");
-    canvasGuide.hidden = true;
-    canvas.querySelector("h2").focus({ preventScroll: true });
-    canvas.scrollIntoView();
-  });
+  document.getElementById("cv-explore").addEventListener("click", () => { canvasGuide.hidden = true; });
 
   replayWorkflow.hidden = false;
   replayWorkflow.addEventListener("click", playWorkflow);
-  replay.hidden = false;
-  replay.addEventListener("click", () => openIntro(true));
-
-  if (root.classList.contains("intro-pending")) {
-    try { openIntro(false); }
-    finally { root.classList.remove("intro-pending"); }
-  }
+  openers.forEach((b) => b && b.addEventListener("click", () => openIntro(b)));
 })();
