@@ -234,11 +234,7 @@ main:focus { outline: none; }
 .fr-dot { width: 18px; height: 18px; flex: none; border-radius: 4px; border: 1px solid var(--ink-soft); background: rgba(var(--fg),.12); }
 .fr-none { padding: 10px; color: var(--ink-soft); font-size: 16px; }
 
-.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 760px; margin-top: 40px; }
-.stat { padding: 12px 14px; border: 1px solid var(--rule); background: rgba(var(--bg),.45); }
-.stat b { display: block; font-family: var(--mono); font-weight: 400; font-size: clamp(26px, 3.4vw, 36px); line-height: 1; font-variant-numeric: tabular-nums; }
-.stat span { display: block; margin-top: 6px; font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); }
-@media (max-width: 640px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+.home-map-link { margin-top: 16px; font-size: 17px; }
 
 .home-block { padding-top: 72px; }
 .h-sec { font-family: var(--sans); font-weight: 620; font-size: clamp(26px, 3vw, 36px); line-height: 1.1; margin: 0; }

@@ -23,14 +23,6 @@
     else location.hash = hash;
   };
 
-  // Hero figures
-  $("#stats").innerHTML = [
-    [tools.length, "Open-source tools"],
-    [projects.length, "Projects"],
-    [tracks.length, "Build paths"],
-    [disciplines.length, "Domains"],
-  ].map(([n, l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join("");
-
   // Simple Icons SVGs are brand-colour marks; GitHub avatars are full-bleed photos
   const logo = (t, cls = "") => t?.logo
     ? `<span class="plate ${cls}"><img src="${esc(t.logo)}" alt="" loading="lazy" draggable="false" class="${t.logo.endsWith(".svg") ? "glyph" : "photo"}" /></span>`
@@ -1520,20 +1512,8 @@
   updateThemeButton();
 
   // ---------------------------------------------------------------------
-  // Home stats count up once.
+  // Honour the reduced-motion setting for the theme fade and the background.
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  document.querySelectorAll("#stats .stat b").forEach((b) => {
-    const target = +b.textContent;
-    if (reduced || !target) return;
-    const start = performance.now(), dur = 1400;
-    const step = (now) => {
-      const k = Math.min(1, (now - start) / dur);
-      b.textContent = Math.round(target * (1 - Math.pow(1 - k, 3)));
-      if (k < 1) requestAnimationFrame(step);
-    };
-    b.textContent = "0";
-    requestAnimationFrame(step);
-  });
 
   // ---------------------------------------------------------------------
   // Field: blueprint paper. A fine and a major grid on mottled, folded paper,
