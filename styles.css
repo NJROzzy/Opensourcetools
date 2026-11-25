@@ -1147,3 +1147,5 @@ nav { gap: 18px; }
 /* News: trend dates and the feed's failure note */
 .tr-date { margin: 0 0 8px !important; font-family: var(--mono); font-size: 11px !important; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint) !important; }
 .ws-note.ws-fail { font-style: normal; color: var(--ink); padding: 14px 0 14px 12px; box-shadow: inset 2px 0 0 var(--ink-soft); }
+.tool-verified { margin: -8px 0 18px; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+.tool-verified a { color: var(--ink); text-underline-offset: 3px; }

@@ -69,13 +69,13 @@
     go("tools");
   }
 
-  // Trends. `published` is when a trend was added; `reviewed` is set only after
+  // Trends. `published` is when a trend was added to Amalgam; `reviewed` is set only after
   // someone actually re-checks its content. Cards without a date show none.
   const fmtDate = (iso) => new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   $("#trend-list").innerHTML = trends.map((t) => `
     <li><div>
       <h3>${esc(t.title)}</h3>
-      ${t.published || t.reviewed ? `<p class="tr-date">${t.published ? `Published <time datetime="${esc(t.published)}">${fmtDate(t.published)}</time>` : ""}${t.published && t.reviewed ? " · " : ""}${t.reviewed ? `Last reviewed <time datetime="${esc(t.reviewed)}">${fmtDate(t.reviewed)}</time>` : ""}</p>` : ""}
+      ${t.published || t.reviewed ? `<p class="tr-date">${t.published ? `Added to Amalgam on <time datetime="${esc(t.published)}">${fmtDate(t.published)}</time>` : ""}${t.published && t.reviewed ? " · " : ""}${t.reviewed ? `Last reviewed <time datetime="${esc(t.reviewed)}">${fmtDate(t.reviewed)}</time>` : ""}</p>` : ""}
       <p>${esc(t.body)}</p>
       <div class="chips">${t.tools.map(toolChip).join("")}</div>
     </div></li>`).join("");
@@ -606,6 +606,7 @@
       <div class="tp-head">${logo(t, "lg")}<div><h3 class="vp-title" id="drawer-title">${esc(t.name)}</h3>
         <span class="badges"><span class="lic">${esc(t.license)}</span><span class="free">Open source · Free</span></span></div></div>
       <p class="vp-note">${esc(t.desc)}</p>
+      ${t.verified ? `<p class="tool-verified">Last verified <time datetime="${esc(t.verified)}">${fmtDate(t.verified)}</time>${t.licenseUrl ? ` · <a href="${esc(t.licenseUrl)}" target="_blank" rel="noopener">licence file checked ↗</a>` : ""}</p>` : ""}
       <p class="vp-label">Domains</p>
       <div class="dom-tags">${t.domains.map((d) => `<span>${esc(discName[d])}</span>`).join("")}</div>
       ${where.length ? `<p class="vp-label">In the build paths</p>

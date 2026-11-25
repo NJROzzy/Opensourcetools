@@ -154,7 +154,7 @@ The app runs as a static site. Your canvas, stack builder board, and theme prefe
 All content lives in **`data.js`**.
 
 - **Domains:** `hardware`, `software`, `computation`, `networks`, `data`, `distributed`, `security`, `ai`, `ml`, `robotics`, `emerging`.
-- **Add a tool:** append to `tools` with `domains` (primary first, then any others it serves), `name`, `logo`, `kind`, `license`, `url` and `desc`. Set `foundation: true` for tools every project relies on; they sit on the map's ground when none of their domains is chosen.
+- **Add a tool:** append to `tools` with `domains` (primary first, then any others it serves), `name`, `logo`, `kind`, `license`, `url` and `desc`. After checking a tool's official repository and licence file, add `verified` (the date you checked, `YYYY-MM-DD`) and `licenseUrl` (the licence file you read); the tool panel then shows *Last verified*. Set `foundation: true` for tools every project relies on; they sit on the map's ground when none of their domains is chosen.
 - **Add a project:** append to `projects` with its `track` (build path), `name`, a `short` label for the map, its `domains`, `desc` and `tools`. Tool names must exactly match a tool's `name`. The path, the drawer and the map pick it up automatically.
 - **Add a system design:** append to `designs` with `id`, `track`, `name`, `summary`, `nodes` (`{ id, name, role, tools }`) and `edges` (`{ from, to, label }`). It appears under its domain on the canvas.
 - **Edit an architecture:** each build path's common path lives in `architectures[track].stages` as `{ name, role, tools }`, in order, and `architectures[track].links` lists how layers connect as `[from, to, "what it does"]`. Links must not form a cycle, because the graph ranks layers from them.
