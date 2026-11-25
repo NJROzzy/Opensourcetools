@@ -41,11 +41,12 @@
         <section data-intro-stage hidden>
           <h2 id="intro-flow" tabindex="-1">Design a shared to-do list</h2>
           <p>Two roommates need to see the same list, add tasks, and mark them done. Start with three boxes and follow one new task through them.</p>
-          <ol class="intro-flow" aria-label="Task saving flow">
+          <ol class="intro-flow" id="intro-task-flow" aria-label="Task saving flow">
             <li><strong>Browser</strong><span>Sends a new task</span></li>
             <li><strong>App server</strong><span>Checks and saves it</span></li>
             <li><strong>Database</strong><span>Keeps the shared list</span></li>
           </ol>
+          <button class="st-btn intro-flow-replay" type="button" id="intro-flow-replay" hidden>Replay workflow</button>
           <p>Test it by adding a task in one browser and refreshing the other. If a save fails, keep the task text so the user can retry.</p>
         </section>
         <section data-intro-stage hidden>

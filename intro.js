@@ -14,10 +14,19 @@
   const explore = document.getElementById("cv-explore");
   const back = document.getElementById("intro-back");
   const next = document.getElementById("intro-next");
+  const workflow = document.getElementById("intro-task-flow");
+  const replayWorkflow = document.getElementById("intro-flow-replay");
   const lastStage = stages.length - 1;
   let stage = 0;
   let replaying = false;
   let finished = false;
+
+  function playWorkflow() {
+    workflow.classList.remove("is-playing");
+    // Flush the reset so replay also works while the animation is running.
+    void workflow.offsetWidth;
+    workflow.classList.add("is-playing");
+  }
 
   function showStage(index) {
     stages[stage].hidden = true;
@@ -30,6 +39,7 @@
     next.textContent = stage === lastStage ? "Open System Design Canvas" : "Continue";
     intro.scrollTop = 0;
     heading.focus({ preventScroll: true });
+    if (stages[stage].contains(workflow)) playWorkflow();
   }
 
   function openIntro(isReplay) {
@@ -69,6 +79,8 @@
     canvas.scrollIntoView();
   });
 
+  replayWorkflow.hidden = false;
+  replayWorkflow.addEventListener("click", playWorkflow);
   replay.hidden = false;
   replay.addEventListener("click", () => openIntro(true));
 
