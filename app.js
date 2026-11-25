@@ -1,6 +1,8 @@
 (() => {
   const { disciplines, tracks, architectures, designs, tools, projects, chains, trends, wire, venn } = window.ATLAS;
   const $ = (s) => document.querySelector(s);
+  // "2026-11-25" → "25 Nov 2026", the same for every reader whatever their time zone
+  const fmtDate = (iso) => new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
   const now = new Date();
@@ -54,7 +56,7 @@
         <div class="top">${logo(t)}<h3>${esc(t.name)}</h3></div>
         <p class="desc">${esc(t.desc)}</p>
         <p class="doms">${t.domains.map((d) => esc(discShort[d])).join(" · ")}</p>
-        <div class="meta"><span>${esc(t.kind)}</span><span class="lic">${esc(t.license)}</span></div>
+        <div class="meta"><span>${esc(t.kind)}</span><span class="lic-group"><span class="lic">${esc(t.license)}</span>${t.verified ? `<span class="lic-ok" title="Licence checked against the official licence file. Open the tool for the link."><span aria-hidden="true">✓</span> Licence verified <time datetime="${esc(t.verified)}">${fmtDate(t.verified)}</time></span>` : ""}</span></div>
       </button>`).join("");
     $("#empty").hidden = list.length > 0;
     $("#atlas-count").textContent = list.length === tools.length ? `${tools.length} tools` : `${list.length} of ${tools.length} tools`;
@@ -71,7 +73,6 @@
 
   // Trends. `published` is when a trend was added to Amalgam; `reviewed` is set only after
   // someone actually re-checks its content. Cards without a date show none.
-  const fmtDate = (iso) => new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   $("#trend-list").innerHTML = trends.map((t) => `
     <li><div>
       <h3>${esc(t.title)}</h3>

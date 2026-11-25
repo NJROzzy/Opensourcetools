@@ -1149,3 +1149,9 @@ nav { gap: 18px; }
 .ws-note.ws-fail { font-style: normal; color: var(--ink); padding: 14px 0 14px 12px; box-shadow: inset 2px 0 0 var(--ink-soft); }
 .tool-verified { margin: -8px 0 18px; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
 .tool-verified a { color: var(--ink); text-underline-offset: 3px; }
+
+/* Catalogue cards: a compact verified label beside the licence tag */
+.card .meta { flex-wrap: wrap; row-gap: 6px; }
+.lic-group { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 6px; margin-left: auto; }
+.lic-ok { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border: 1px solid var(--ink-soft); background: rgba(var(--fg),.08); color: var(--ink); font-size: 10px; letter-spacing: .04em; text-transform: none; white-space: nowrap; }
+.card:hover .lic-ok { color: var(--paper); border-color: var(--inv-soft); background: transparent; }
