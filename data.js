@@ -2294,6 +2294,7 @@ window.ATLAS = {
   trends: [
     {
       title: "Agentic AI and open tool protocols",
+      published: "2026-10-17",
       body: "Language models are moving from chat to action: agents that plan, call tools and operate software. Open standards such as the Model Context Protocol let any agent reach any tool, without vendor lock-in.",
       tools: [
         "Model Context Protocol",
@@ -2303,6 +2304,7 @@ window.ATLAS = {
     },
     {
       title: "Open-weight models closing the gap",
+      published: "2026-10-17",
       body: "Openly released models now rival closed systems on many benchmarks, and fully open efforts publish their data and training code too — making genuine reproducibility possible in AI research.",
       tools: [
         "OLMo (AI2)",
@@ -2313,6 +2315,7 @@ window.ATLAS = {
     },
     {
       title: "Local and edge inference",
+      published: "2026-10-17",
       body: "Quantisation and efficient runtimes put capable models on laptops, phones and robots — private by default, and free of per-token cost.",
       tools: [
         "llama.cpp",
@@ -2322,6 +2325,7 @@ window.ATLAS = {
     },
     {
       title: "Vision-language-action models for robots",
+      published: "2026-10-17",
       body: "The methods behind language models are being applied to embodiment: policies that map camera pixels and instructions directly to motor commands, trained on shared open datasets.",
       tools: [
         "LeRobot",
@@ -2331,6 +2335,7 @@ window.ATLAS = {
     },
     {
       title: "Simulation-first robotics",
+      published: "2026-10-17",
       body: "GPU-parallel simulators train thousands of robot instances at once, then transfer the policy to hardware — sim-to-real has become the default workflow for humanoids and manipulators.",
       tools: [
         "MuJoCo",
@@ -2341,6 +2346,7 @@ window.ATLAS = {
     },
     {
       title: "Retrieval inside the database",
+      published: "2026-10-17",
       body: "Rather than separate vector stores, teams increasingly keep embeddings beside their relational data, simplifying retrieval-augmented systems.",
       tools: [
         "PostgreSQL",
@@ -2350,6 +2356,7 @@ window.ATLAS = {
     },
     {
       title: "Post-quantum cryptography goes mainstream",
+      published: "2026-10-17",
       body: "Standardised post-quantum algorithms are landing in everyday libraries, and organisations are beginning to migrate TLS and key exchange before large quantum computers arrive.",
       tools: [
         "OpenSSL",
@@ -2359,6 +2366,7 @@ window.ATLAS = {
     },
     {
       title: "Open hardware and RISC-V",
+      published: "2026-10-17",
       body: "Open instruction sets and fully open chip-design flows mean students and start-ups can now take a processor from Verilog to silicon layout without proprietary tools.",
       tools: [
         "Verilator",
@@ -2369,6 +2377,7 @@ window.ATLAS = {
     },
     {
       title: "Community forks after licence changes",
+      published: "2026-10-17",
       body: "When popular infrastructure projects moved to source-available licences, foundations stepped in with open forks that keep the original promise.",
       tools: [
         "OpenTofu",
@@ -2378,6 +2387,7 @@ window.ATLAS = {
     },
     {
       title: "In-process analytics and the lakehouse",
+      published: "2026-10-17",
       body: "Columnar formats and embedded engines make serious analytics possible on a laptop, while the same open formats scale to clusters.",
       tools: [
         "DuckDB",
@@ -2388,6 +2398,7 @@ window.ATLAS = {
     },
     {
       title: "Observability as a shared standard",
+      published: "2026-10-17",
       body: "Traces, metrics and logs are converging on one open standard, so instrumentation written once works with any back end.",
       tools: [
         "OpenTelemetry",
@@ -2397,6 +2408,7 @@ window.ATLAS = {
     },
     {
       title: "Quantum error correction and hybrid workflows",
+      published: "2026-10-17",
       body: "Progress on error-corrected qubits is pushing quantum computing from demos toward utility, with classical and quantum code increasingly written together.",
       tools: [
         "Qiskit",

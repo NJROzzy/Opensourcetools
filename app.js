@@ -69,10 +69,13 @@
     go("tools");
   }
 
-  // Trends
+  // Trends. `published` is when a trend was added; `reviewed` is set only after
+  // someone actually re-checks its content. Cards without a date show none.
+  const fmtDate = (iso) => new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
   $("#trend-list").innerHTML = trends.map((t) => `
     <li><div>
       <h3>${esc(t.title)}</h3>
+      ${t.published || t.reviewed ? `<p class="tr-date">${t.published ? `Published <time datetime="${esc(t.published)}">${fmtDate(t.published)}</time>` : ""}${t.published && t.reviewed ? " · " : ""}${t.reviewed ? `Last reviewed <time datetime="${esc(t.reviewed)}">${fmtDate(t.reviewed)}</time>` : ""}</p>` : ""}
       <p>${esc(t.body)}</p>
       <div class="chips">${t.tools.map(toolChip).join("")}</div>
     </div></li>`).join("");
@@ -1417,13 +1420,42 @@
     if (!b || b.dataset.id === topic) return;
     topic = b.dataset.id;
     wireTabs.querySelectorAll("button").forEach((x) => x.setAttribute("aria-selected", x === b));
-    seen = new Set(); items = []; firstLoad = true;
-    wireList.innerHTML = `<li class="ws-note">Loading…</li>`;
+    seen = new Set(); items = []; firstLoad = true; lastFetch = 0;
     poll();
   });
 
+  // The feed is always in exactly one state, and every state sets both the
+  // status line and the list, so "connecting…" can't outlive its request:
+  //   loading → ok | empty | error  (each request is capped at FETCH_MS)
+  const FETCH_MS = 10000;
+  let state = "loading", inflight = null, seq = 0;
+
+  function setState(next, detail = "") {
+    state = next;
+    side.dataset.state = next;
+    side.classList.toggle("ws-busy", next === "loading");
+    side.classList.toggle("ws-error", next === "error");
+    side.setAttribute("aria-busy", next === "loading");
+    const topicName = topics.find((t) => t.id === topic).name;
+    if (next === "loading") {
+      updatedEl.textContent = "connecting…";
+      if (!items.length) wireList.innerHTML = `<li class="ws-note">Loading headlines…</li>`;
+    } else if (next === "empty") {
+      tickClock();
+      wireList.innerHTML = `<li class="ws-note">No recent headlines for ${esc(topicName)} right now. The feed loaded fine; check back later or pick another topic.</li>`;
+    } else if (next === "error") {
+      // Keep any headlines already on screen; say plainly that they may be stale
+      updatedEl.textContent = items.length ? "couldn't refresh" : "couldn't load";
+      const msg = `Headlines couldn't be loaded (${esc(detail)}). Press ↻ to try again. The feed also retries every minute.`;
+      wireList.querySelector(".ws-fail")?.remove();
+      if (items.length) wireList.insertAdjacentHTML("afterbegin", `<li class="ws-note ws-fail">${msg}</li>`);
+      else wireList.innerHTML = `<li class="ws-note ws-fail">${msg}</li>`;
+    } else {
+      tickClock();
+    }
+  }
+
   function render(fresh) {
-    if (!items.length) { wireList.innerHTML = `<li class="ws-note">No recent headlines on this topic.</li>`; return; }
     wireList.innerHTML = items.map((h) => {
       const link = h.url || `https://news.ycombinator.com/item?id=${h.objectID}`;
       const isNew = fresh.has(h.objectID);
@@ -1438,29 +1470,40 @@
   }
 
   async function poll() {
+    // A newer request replaces any older one still waiting
+    inflight?.abort();
+    const ctl = new AbortController(), id = ++seq;
+    inflight = ctl;
+    let timedOut = false;
+    const limit = setTimeout(() => { timedOut = true; ctl.abort(); }, FETCH_MS);
     const tp = topics.find((t) => t.id === topic);
     const q = encodeURIComponent(tp.query);
     const url = "https://hn.algolia.com/api/v1/search_by_date?tags=story&hitsPerPage=20&numericFilters=points%3E2"
       + `&restrictSearchableAttributes=title&typoTolerance=false&query=${q}${tp.any ? `&optionalWords=${q}` : ""}`;
-    side.classList.add("ws-busy");
+    setState("loading");
     try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(res.status);
-      if (tp.id !== topic) return; // the topic changed while this was in flight
-      const hits = (await res.json()).hits.filter((h) => h.title);
+      const res = await fetch(url, { signal: ctl.signal });
+      if (!res.ok) throw new Error(`server replied ${res.status}`);
+      let data;
+      try { data = await res.json(); } catch { throw new Error("unreadable response"); }
+      if (!Array.isArray(data?.hits)) throw new Error("unexpected response");
+      if (id !== seq) return; // superseded while this was in flight
+      const hits = data.hits.filter((h) => h.title);
       const fresh = firstLoad ? new Set() : new Set(hits.filter((h) => !seen.has(h.objectID)).map((h) => h.objectID));
       hits.forEach((h) => seen.add(h.objectID));
       if (fresh.size && !isOpen()) { unread += fresh.size; renderBadge(); }
       items = hits; firstLoad = false; lastFetch = Date.now();
-      side.classList.remove("ws-error");
       render(fresh);
-      tickClock();
-    } catch {
-      side.classList.add("ws-error");
-      updatedEl.textContent = "offline · retrying";
-      if (!items.length) wireList.innerHTML = `<li class="ws-note">Headlines couldn't be loaded. Retrying shortly.</li>`;
+      setState(hits.length ? "ok" : "empty");
+    } catch (err) {
+      if (id !== seq) return; // aborted because a newer request started
+      const detail = timedOut ? "the request timed out"
+        : err?.name === "TypeError" ? "network error or blocked by the browser"
+        : err?.message || "unknown error";
+      setState("error", detail);
     } finally {
-      side.classList.remove("ws-busy");
+      clearTimeout(limit);
+      if (inflight === ctl) inflight = null;
     }
   }
   function schedule() {
@@ -1468,7 +1511,7 @@
     timer = setTimeout(async () => { if (!document.hidden) await poll(); schedule(); }, POLL_MS);
   }
   function tickClock() {
-    if (lastFetch && !side.classList.contains("ws-error")) {
+    if (lastFetch && (state === "ok" || state === "empty")) {
       const s = Math.round((Date.now() - lastFetch) / 1000);
       updatedEl.textContent = s < 5 ? "updated just now" : `updated ${s < 60 ? `${s}s` : `${Math.round(s / 60)}m`} ago`;
     }
